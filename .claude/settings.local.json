@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Read(//c/Users/User/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/src/ui-ux-pro-max/**)",
+      "Bash(python scripts/search.py \"high-conversion landing page edtech education\" --domain landing -n 5)",
+      "Bash(python scripts/search.py \"premium editorial conversion trust\" --domain style -n 5)",
+      "Bash(python scripts/search.py \"education scholarship trust authority\" --domain color -n 3)",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:fullbrightindonesia.org)"
+    ]
+  }
+}
