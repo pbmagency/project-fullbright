@@ -82,6 +82,166 @@ Controller980bb49ee7ae63891f1d891d2fbcf1c9.form = Controller980bb49ee7ae63891f1d
 /**
 * @see \Inertia\Controller::__invoke
 * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+const Controller6ad05bb7481518473b08a04fcf63b47f = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller6ad05bb7481518473b08a04fcf63b47f.url(options),
+    method: 'get',
+})
+
+Controller6ad05bb7481518473b08a04fcf63b47f.definition = {
+    methods: ["get","head"],
+    url: '/variant-1',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+Controller6ad05bb7481518473b08a04fcf63b47f.url = (options?: RouteQueryOptions) => {
+    return Controller6ad05bb7481518473b08a04fcf63b47f.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+Controller6ad05bb7481518473b08a04fcf63b47f.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller6ad05bb7481518473b08a04fcf63b47f.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+Controller6ad05bb7481518473b08a04fcf63b47f.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller6ad05bb7481518473b08a04fcf63b47f.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+const Controller6ad05bb7481518473b08a04fcf63b47fForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller6ad05bb7481518473b08a04fcf63b47f.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+Controller6ad05bb7481518473b08a04fcf63b47fForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller6ad05bb7481518473b08a04fcf63b47f.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-1'
+*/
+Controller6ad05bb7481518473b08a04fcf63b47fForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller6ad05bb7481518473b08a04fcf63b47f.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller6ad05bb7481518473b08a04fcf63b47f.form = Controller6ad05bb7481518473b08a04fcf63b47fForm
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+const Controller256fd5b02d6e454a9f97700f8cda23ba = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller256fd5b02d6e454a9f97700f8cda23ba.url(options),
+    method: 'get',
+})
+
+Controller256fd5b02d6e454a9f97700f8cda23ba.definition = {
+    methods: ["get","head"],
+    url: '/variant-2',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+Controller256fd5b02d6e454a9f97700f8cda23ba.url = (options?: RouteQueryOptions) => {
+    return Controller256fd5b02d6e454a9f97700f8cda23ba.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+Controller256fd5b02d6e454a9f97700f8cda23ba.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller256fd5b02d6e454a9f97700f8cda23ba.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+Controller256fd5b02d6e454a9f97700f8cda23ba.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller256fd5b02d6e454a9f97700f8cda23ba.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+const Controller256fd5b02d6e454a9f97700f8cda23baForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller256fd5b02d6e454a9f97700f8cda23ba.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+Controller256fd5b02d6e454a9f97700f8cda23baForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller256fd5b02d6e454a9f97700f8cda23ba.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+* @route '/variant-2'
+*/
+Controller256fd5b02d6e454a9f97700f8cda23baForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: Controller256fd5b02d6e454a9f97700f8cda23ba.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+Controller256fd5b02d6e454a9f97700f8cda23ba.form = Controller256fd5b02d6e454a9f97700f8cda23baForm
+/**
+* @see \Inertia\Controller::__invoke
+* @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
 * @route '/bio-ig-toefl-hack'
 */
 const Controller40a01a1699aa81065f0aa8fdda0f8426 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -487,6 +647,8 @@ Controllere19ee86e9cf603ce1a59a1ec5d21dec5.form = Controllere19ee86e9cf603ce1a59
 */
 const Controller = {
     '/': Controller980bb49ee7ae63891f1d891d2fbcf1c9,
+    '/variant-1': Controller6ad05bb7481518473b08a04fcf63b47f,
+    '/variant-2': Controller256fd5b02d6e454a9f97700f8cda23ba,
     '/bio-ig-toefl-hack': Controller40a01a1699aa81065f0aa8fdda0f8426,
     '/toefl-hack': Controlleref596e3b2ff77794a2ffd983d4e27298,
     '/dashboard': Controller42a740574ecbfbac32f8cc353fc32db9,

@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public landing page ───────────────────────────────────────────────────────
 Route::inertia('/', 'landing')->name('home');
+Route::inertia('/variant-1', 'landingV1');
+Route::inertia('/variant-2', 'landingV2');
+
 Route::inertia('/bio-ig-toefl-hack', 'landing')->name('home2');
 Route::inertia('/toefl-hack', 'landing')->name('home3');
 
