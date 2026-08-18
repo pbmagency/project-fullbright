@@ -58,7 +58,7 @@ const internationalTestimonials = [
         role: 'Student Water Resources Engineering and Management',
         university: 'Stuttgart University, Germany',
         text: 'Fullbright growing together with their students. This place is good place to learn TOEFL & IELTS. Thank you for the teacher and friendly staff. Now I can see the world',
-        avatar: '/people/People 3.webp',
+        avatar: '/people/People 4.webp',
     },
 ];
 
