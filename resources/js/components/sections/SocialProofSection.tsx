@@ -48,7 +48,7 @@ const internationalTestimonials = [
         role: 'Accounting and Finance',
         university: 'University of Nottingham, UK',
         text: 'Full Bright ini tempat yang paling "pas" buat teman-teman Mahasiswa menaklukkan Tes TOEFL & IELTS',
-        avatar: '/people/People 1.webp',
+        avatar: '/people/People 3.webp',
     },
     {
         title: 'A Good Place to Learn TOEFL & IELTS',
@@ -56,7 +56,7 @@ const internationalTestimonials = [
         role: 'Student Water Resources Engineering and Management',
         university: 'Stuttgart University, Germany',
         text: 'Fullbright growing together with their students. This place is good place to learn TOEFL & IELTS. Thank you for the teacher and friendly staff. Now I can see the world',
-        avatar: '/people/People 2.webp',
+        avatar: '/people/People 3.webp',
     },
 ];
 
