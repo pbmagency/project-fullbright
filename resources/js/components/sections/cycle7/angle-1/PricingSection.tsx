@@ -37,21 +37,23 @@ type FeatureItem =
 
 const starterFeatures: FeatureItem[] = [
     { type: 'check', text: 'LIVE ZOOM 10 Hari', bold: true },
-    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 170 Soal)', bold: true },
+    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 370+ Soal)', bold: true },
     { type: 'check', text: 'Post Test (Full Test) 1x', bold: true },
     { type: 'check', text: 'Evaluasi Progress Mingguan' },
     { type: 'check', text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi' },
     { type: 'check', text: 'Rekaman ZOOM jika tidak hadir' },
     { type: 'check', text: '30+ Video Materi Pembelajaran' },
-    { type: 'check', text: 'E-Book Structure (100+ Soal)' },
-    { type: 'check', text: 'E-Book Listening dan Reading (190+ Soal)' },
+    { type: 'check', text: 'E-Book Structure' },
+    { type: 'check', text: 'E-Book Listening dan Reading' },
     { type: 'check', text: 'Grup WA Diskusi' },
     { type: 'check', text: 'Placement Test / Pre-Test' },
     { type: 'check', text: '10+ Link Soal Tambahan saat LIVE ZOOM' },
+    { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
+    { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
     { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
     { type: 'label', text: 'Bonus Spesial' },
-    { type: 'check', text: 'Sertifikat TOEFL Prediction' },
+    { type: 'check', text: 'Sertifikat TOEFL' },
     { type: 'cross', text: 'Tidak termasuk garansi mengulang 1 bulan' },
 ];
 
@@ -68,31 +70,36 @@ const intermediateFeatures: FeatureItem[] = [
     { type: 'check', text: 'Grup WA Diskusi' },
     { type: 'check', text: 'Placement Test / Pre-Test' },
     { type: 'check', text: '15 Link Soal Tambahan saat LIVE ZOOM' },
+    { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
+    { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
     { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
     { type: 'label', text: 'Bonus Spesial' },
-    { type: 'check', text: 'Sertifikat TOEFL Prediction' },
+    { type: 'check', text: 'Sertifikat TOEFL' },
     { type: 'cross', text: 'Tidak termasuk garansi mengulang 1 bulan' },
 ];
 
 const bundlingFeatures: FeatureItem[] = [
     { type: 'check', text: 'LIVE ZOOM 25 Hari', bold: true },
-    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 380 Soal)', bold: true },
+    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 1.370+ Soal)', bold: true },
     { type: 'check', text: 'Progress Test & Post Test (Full Test) 3x', bold: true },
     { type: 'check', text: 'Evaluasi Progress Mingguan' },
     { type: 'check', text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi' },
     { type: 'check', text: 'Rekaman ZOOM jika tidak hadir' },
     { type: 'check', text: '90+ Video Materi Pembelajaran' },
     { type: 'check', text: 'E-Book Structure (500+ Soal)' },
-    { type: 'check', text: 'E-Book Listening dan Reading (500+ Soal)' },
+    { type: 'check', text: 'E-Book Listening dan Reading' },
     { type: 'check', text: 'Grup WA Diskusi' },
     { type: 'check', text: 'Placement Test / Pre-Test' },
     { type: 'check', text: '25 Link Soal Tambahan saat LIVE ZOOM' },
     { type: 'check', text: 'Free mengulang 1 bulan jika belum capai skor 500+' },
+    { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
+    { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
     { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
     { type: 'label', text: 'Bonus Spesial' },
-    { type: 'check', text: 'Sertifikat TOEFL Prediction' },
+    { type: 'check', text: 'Sertifikat TOEFL' },
+
 ];
 
 const selfFeatures: FeatureItem[] = [
