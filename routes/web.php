@@ -16,8 +16,8 @@ Route::inertia('/c7-angle-1', 'cycle7/angle-1')->name('cycle7.angle.v1');
 Route::inertia('/c7-angle-2', 'cycle7/angle-2')->name('cycle7.angle.v2');
 Route::inertia('/c7-angle-3', 'cycle7/angle-3')->name('cycle7.angle.v3');
 Route::inertia('/c8-angle-1', 'cycle8/angle-1')->name('cycle8.angle.v1');
-Route::inertia('/bio-ig-toefl-hack', 'cycle7/angle-1')->name('home2');
-Route::inertia('/toefl-hack', 'cycle7/angle-1')->name('home3');
+Route::inertia('/bio-ig-toefl-hack', 'cycle8/angle-1')->name('home2');
+Route::inertia('/toefl-hack', 'cycle8/angle-1')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle7/angle-3')->name('home4');
 
 // ── Analytics tracking endpoint (public, uses session CSRF) ──────────────────
