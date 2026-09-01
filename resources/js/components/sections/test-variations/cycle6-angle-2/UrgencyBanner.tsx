@@ -8,7 +8,7 @@ export default function UrgencyBanner() {
                 fontFamily: 'var(--font-heading)',
             }}
         >
-            ⏳  Deadline Submission Beasiswa LPDP Segera · Amankan Skor TOEFL-mu!
+            ⏳ DISKON KEMERDEKAAN 68% to FLASH SALE SEPTEMBER
         </div>
     );
 }

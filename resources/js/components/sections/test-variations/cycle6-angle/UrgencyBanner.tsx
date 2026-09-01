@@ -8,7 +8,7 @@ export default function UrgencyBanner() {
                 fontFamily: 'var(--font-heading)',
             }}
         >
-            ⏳ Deadline Submission Beasiswa Luar Negeri Segera · Amankan Skor
+            ⏳  DISKON KEMERDEKAAN 68% to FLASH SALE SEPTEMBER
             TOEFL-mu!
         </div>
     );
