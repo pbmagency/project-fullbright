@@ -8,7 +8,7 @@ export default function UrgencyBanner() {
                 fontFamily: 'var(--font-heading)',
             }}
         >
-            ⏳ DISKON KEMERDEKAAN 68% to FLASH SALE SEPTEMBER
+            ⏳ FLASH SALE SEPTEMBER
         </div>
     );
 }

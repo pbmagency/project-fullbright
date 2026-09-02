@@ -64,7 +64,7 @@ export default function UrgencyBanner() {
         >
             <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-center text-[12px] font-[800] tracking-wide text-white sm:gap-x-4 sm:text-[13px]">
                 <span className="flex items-center gap-1.5 uppercase">
-                    <span>🔥</span>  DISKON KEMERDEKAAN 68% to FLASH SALE SEPTEMBER
+                    <span>🔥</span> FLASH SALE SEPTEMBER
                 </span>
 
                 <span
