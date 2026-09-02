@@ -1,6 +1,8 @@
 const CS_LIST = [
-    { name: 'Mr. Choiri', number: '6288744875322', weight: 50 },
-    { name: 'Ms. Fini', number: '6285255499299', weight: 50 }
+    { name: 'Mr. Choiri', number: '6288744875322', weight: 40 },
+    { name: 'Ms. Fini', number: '6285255499299', weight: 30 },
+    { name: 'Ms. Aini', number: '6281959486507', weight: 30 }
+    
 ];
 // Dipilih sekali saat halaman dimuat, konsisten sepanjang sesi
 function pickNumber(): string {
