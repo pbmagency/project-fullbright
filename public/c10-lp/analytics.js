@@ -59,6 +59,14 @@
     });
   }
 
+  window.fbTrackCTA = function (location, text, destination) {
+    return track('cta_click', {
+      location: location,
+      text: text,
+      destination: destination || '',
+    });
+  };
+
   if (sessionStorage.getItem(VISIT_KEY) !== 'tracked') {
     sessionStorage.setItem(VISIT_KEY, 'pending');
     track('visit', { event_id: eventId() }).then(function (response) {
