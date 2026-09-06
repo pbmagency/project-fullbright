@@ -22,8 +22,8 @@
   @keyframes fbSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   @keyframes heroBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
   @media (max-width: 500px) {
-    #banner-full { display: none !important; }
-    #banner-short { display: inline !important; font-size: 12.5px !important; }
+    #banner-full { display: inline !important; font-size: 11px !important; }
+    #banner-short { display: none !important; }
     #banner-timer-label { display: none !important; }
     #urgency-banner { padding: 10px 12px !important; }
     #urgency-banner span span { font-size: 14px !important; }
@@ -915,7 +915,7 @@
               <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:rgba(255,255,255,0.08);color:#9ca3af;">✉</div>
               <div>
                 <p style="margin:0 0 2px;font-size:12px;font-weight:600;color:#fff;">Email</p>
-                <a href="mailto:info@fullbrightindonesia.org" style="font-size:12px;color:#9ca3af;text-decoration:none;">info@fullbrightindonesia.org</a>
+                <a href="mailto:info@fullbrightindonesia.org" style="font-size:12px;color:#9ca3af;text-decoration:none;">info&#64;fullbrightindonesia.org</a>
               </div>
             </li>
             <li style="display:flex;align-items:flex-start;gap:12px;">
@@ -988,7 +988,8 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const WA_NUMBER = '6285255499299';
+const WA_NUMBERS = ['6288744875322', '6285255499299', '6281959486507'];
+const WA_NUMBER = WA_NUMBERS[Math.floor(Math.random() * WA_NUMBERS.length)];
 function waUrl(text) { return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`; }
 
 const FLASH_WINDOW_MS = 12 * 60 * 60 * 1000;
