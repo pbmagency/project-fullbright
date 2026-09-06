@@ -21,8 +21,10 @@ Route::inertia('/toefl-hack', 'cycle8/angle-1')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle7/angle-3')->name('home4');
 Route::redirect('/c10-lp', '/c10-lp/')->name('cycle10.landing');
 
-// ── Analytics tracking endpoint (public, uses session CSRF) ──────────────────
-Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
+// ── Analytics tracking endpoint (public, validated and rate-limited) ─────────
+Route::post('/analytics/track', [AnalyticsController::class, 'track'])
+    ->middleware('throttle:120,1')
+    ->name('analytics.track');
 
 // ── Authenticated routes ──────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {

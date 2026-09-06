@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // Static landing pages (for example /c10-lp/) cannot receive the
+        // Blade-generated CSRF token, but still need to submit analytics.
+        // The endpoint only accepts a tightly validated, rate-limited payload.
+        $middleware->validateCsrfTokens(except: [
+            'analytics/track',
+        ]);
+
         $middleware->web(append: [
             CacheLandingPage::class,
             HandleAppearance::class,
