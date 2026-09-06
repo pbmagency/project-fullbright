@@ -28,7 +28,7 @@ export default defineConfig({
         tailwindcss(),
         ...(process.env.CI !== 'true' ? [wayfinder({
             formVariants: true,
-            phpBinary: 'C:\\Users\\User\\.config\\herd\\bin\\php84\\php.exe',
+            phpBinary: 'php',
             generateTypes: true,
         })] : []),
         compression({ algorithm: 'gzip', exclude: [/\.(br)$/, /\.(gz)$/] }),

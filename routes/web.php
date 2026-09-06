@@ -19,6 +19,7 @@ Route::inertia('/c8-angle-1', 'cycle8/angle-1')->name('cycle8.angle.v1');
 Route::inertia('/bio-ig-toefl-hack', 'cycle8/angle-1')->name('home2');
 Route::inertia('/toefl-hack', 'cycle8/angle-1')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle7/angle-3')->name('home4');
+Route::redirect('/c10-lp', '/c10-lp/')->name('cycle10.landing');
 
 // ── Analytics tracking endpoint (public, uses session CSRF) ──────────────────
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])->name('analytics.track');
