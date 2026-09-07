@@ -35,7 +35,7 @@ const Navbar = memo(() => {
     useEffect(() => {
         const updateHeight = () => {
             const prev = headerRef.current?.previousElementSibling;
-            
+
             if (prev && (prev.tagName === 'A' || prev.tagName === 'BUTTON')) {
                 setBannerHeight(prev.getBoundingClientRect().height);
             } else {
@@ -54,7 +54,9 @@ const Navbar = memo(() => {
             updateHeight();
         });
         if (headerRef.current?.parentElement) {
-            observer.observe(headerRef.current.parentElement, { childList: true });
+            observer.observe(headerRef.current.parentElement, {
+                childList: true,
+            });
         }
 
         return () => {
@@ -82,7 +84,9 @@ const Navbar = memo(() => {
 
                 <a
                     href="#pricing"
-                    onClick={() => trackCTA('navbar', 'Amankan Seat', '#pricing')}
+                    onClick={() =>
+                        trackCTA('navbar', 'Amankan Seat', '#pricing')
+                    }
                     className="group flex flex-col justify-center gap-px rounded-full bg-[#D70808] px-4 py-[7px] shadow-lg transition-all duration-200 hover:shadow-xl hover:brightness-110"
                 >
                     <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
@@ -93,10 +97,10 @@ const Navbar = memo(() => {
                             Rp250rb
                         </span>
                         <span className="text-sm font-black whitespace-nowrap text-white">
-                            Rp81rb
+                            Rp99rb
                         </span>
                         <span className="rounded-full bg-amber-500 px-[7px] py-0.5 text-[10px] font-black whitespace-nowrap text-[#151515]">
-                            -68%
+                            -60%
                         </span>
                     </span>
                 </a>

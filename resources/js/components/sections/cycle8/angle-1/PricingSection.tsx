@@ -37,10 +37,17 @@ type FeatureItem =
 
 const starterFeatures: FeatureItem[] = [
     { type: 'check', text: 'LIVE ZOOM 10 Hari', bold: true },
-    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 370+ Soal)', bold: true },
+    {
+        type: 'check',
+        text: 'Akses Latihan Soal di LMS (Total 370+ Soal)',
+        bold: true,
+    },
     { type: 'check', text: 'Post Test (Full Test) 1x', bold: true },
     { type: 'check', text: 'Evaluasi Progress Mingguan' },
-    { type: 'check', text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi' },
+    {
+        type: 'check',
+        text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi',
+    },
     { type: 'check', text: 'Rekaman ZOOM jika tidak hadir' },
     { type: 'check', text: '30+ Video Materi Pembelajaran' },
     { type: 'check', text: 'E-Book Structure' },
@@ -51,7 +58,10 @@ const starterFeatures: FeatureItem[] = [
     { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
     { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
-    { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
+    {
+        type: 'globe',
+        text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.',
+    },
     { type: 'label', text: 'Bonus Spesial' },
     { type: 'check', text: 'Sertifikat TOEFL' },
     { type: 'cross', text: 'Tidak termasuk garansi mengulang 1 bulan' },
@@ -59,10 +69,21 @@ const starterFeatures: FeatureItem[] = [
 
 const intermediateFeatures: FeatureItem[] = [
     { type: 'check', text: 'LIVE ZOOM 15 Hari', bold: true },
-    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 1000+ Soal)', bold: true },
-    { type: 'check', text: 'Progress Test & Post Test (Full Test) 2x', bold: true },
+    {
+        type: 'check',
+        text: 'Akses Latihan Soal di LMS (Total 1000+ Soal)',
+        bold: true,
+    },
+    {
+        type: 'check',
+        text: 'Progress Test & Post Test (Full Test) 2x',
+        bold: true,
+    },
     { type: 'check', text: 'Evaluasi Progress Mingguan' },
-    { type: 'check', text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi' },
+    {
+        type: 'check',
+        text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi',
+    },
     { type: 'check', text: 'Rekaman ZOOM jika tidak hadir' },
     { type: 'check', text: '60+ Video Materi Pembelajaran' },
     { type: 'check', text: 'E-Book Structure' },
@@ -73,7 +94,10 @@ const intermediateFeatures: FeatureItem[] = [
     { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
     { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
-    { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
+    {
+        type: 'globe',
+        text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.',
+    },
     { type: 'label', text: 'Bonus Spesial' },
     { type: 'check', text: 'Sertifikat TOEFL' },
     { type: 'cross', text: 'Tidak termasuk garansi mengulang 1 bulan' },
@@ -81,10 +105,21 @@ const intermediateFeatures: FeatureItem[] = [
 
 const bundlingFeatures: FeatureItem[] = [
     { type: 'check', text: 'LIVE ZOOM 25 Hari', bold: true },
-    { type: 'check', text: 'Akses Latihan Soal di LMS (Total 1.370+ Soal)', bold: true },
-    { type: 'check', text: 'Progress Test & Post Test (Full Test) 3x', bold: true },
+    {
+        type: 'check',
+        text: 'Akses Latihan Soal di LMS (Total 1.370+ Soal)',
+        bold: true,
+    },
+    {
+        type: 'check',
+        text: 'Progress Test & Post Test (Full Test) 3x',
+        bold: true,
+    },
     { type: 'check', text: 'Evaluasi Progress Mingguan' },
-    { type: 'check', text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi' },
+    {
+        type: 'check',
+        text: 'Strategi Submit Sesuai Jurusan & Rencana Kontribusi',
+    },
     { type: 'check', text: 'Rekaman ZOOM jika tidak hadir' },
     { type: 'check', text: '90+ Video Materi Pembelajaran' },
     { type: 'check', text: 'E-Book Structure (500+ Soal)' },
@@ -92,19 +127,28 @@ const bundlingFeatures: FeatureItem[] = [
     { type: 'check', text: 'Grup WA Diskusi' },
     { type: 'check', text: 'Placement Test / Pre-Test' },
     { type: 'check', text: '25 Link Soal Tambahan saat LIVE ZOOM' },
-    { type: 'check', text: 'Free mengulang 1 bulan jika belum capai skor 500+' },
+    {
+        type: 'check',
+        text: 'Free mengulang 1 bulan jika belum capai skor 500+',
+    },
     { type: 'check', text: 'Tutor Tanya AI 24 Jam di setiap materi' },
     { type: 'check', text: 'Pembahasan setiap soal di LMS' },
     { type: 'globe', text: 'Webinar Beasiswa Luar Negeri' },
-    { type: 'globe', text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.' },
+    {
+        type: 'globe',
+        text: 'Konsultasi Kampus Luar Negeri, urus LoA, Visa, dll.',
+    },
     { type: 'label', text: 'Bonus Spesial' },
     { type: 'check', text: 'Sertifikat TOEFL' },
-
 ];
 
 const selfFeatures: FeatureItem[] = [
     { type: 'check', text: '60+ Video Materi Pembelajaran', bold: true },
-    { type: 'check', text: 'Materi Hari ke-1 s/d ke-15 (Roadmap Lengkap)', bold: true },
+    {
+        type: 'check',
+        text: 'Materi Hari ke-1 s/d ke-15 (Roadmap Lengkap)',
+        bold: true,
+    },
     { type: 'check', text: 'Lebih dari 1.000+ Nomor Latihan Soal', bold: true },
     { type: 'check', text: 'Grup WA Diskusi' },
     { type: 'check', text: 'Diagnostic Test' },
@@ -137,7 +181,13 @@ function StarRow() {
     );
 }
 
-function WhatsAppIcon({ size = 18, color = '#25D366' }: { size?: number; color?: string }) {
+function WhatsAppIcon({
+    size = 18,
+    color = '#25D366',
+}: {
+    size?: number;
+    color?: string;
+}) {
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -146,7 +196,17 @@ function WhatsAppIcon({ size = 18, color = '#25D366' }: { size?: number; color?:
     );
 }
 
-function PayButton({ href, label, onClick, green }: { href: string; label: string; onClick?: () => void; green?: boolean }) {
+function PayButton({
+    href,
+    label,
+    onClick,
+    green,
+}: {
+    href: string;
+    label: string;
+    onClick?: () => void;
+    green?: boolean;
+}) {
     const bgClass = green ? 'bg-[#16a34a]' : 'bg-[#D70808]';
     const shadowClass = green
         ? 'shadow-[0_6px_24px_rgba(22,163,74,0.4)]'
@@ -162,13 +222,17 @@ function PayButton({ href, label, onClick, green }: { href: string; label: strin
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onClick}
-                className={`inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-5 py-4 text-[16px] font-[900] text-white transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 sm:text-base sm:font-black active:translate-y-0 active:shadow-none ${bgClass} ${shadowClass} ${hoverClass}`}
+                className={`inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-5 py-4 text-[16px] font-[900] text-white transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-none sm:text-base sm:font-black ${bgClass} ${shadowClass} ${hoverClass}`}
                 style={{ fontFamily: 'var(--font-heading)' }}
             >
                 {label}
             </a>
-            <p className="flex items-center justify-center gap-1 text-center text-[11px] text-[#9ca3af]" style={{ fontFamily: 'var(--font-heading)' }}>
-                <Lock size={10} strokeWidth={2.5} /> Pembayaran aman & terenkripsi
+            <p
+                className="flex items-center justify-center gap-1 text-center text-[11px] text-[#9ca3af]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+            >
+                <Lock size={10} strokeWidth={2.5} /> Pembayaran aman &
+                terenkripsi
             </p>
         </div>
     );
@@ -196,7 +260,13 @@ function WaButton({ onClick, label }: { onClick: () => void; label: string }) {
     );
 }
 
-function FeatureList({ features, isBundling }: { features: FeatureItem[]; isBundling?: boolean }) {
+function FeatureList({
+    features,
+    isBundling,
+}: {
+    features: FeatureItem[];
+    isBundling?: boolean;
+}) {
     return (
         <div className="mb-3 flex flex-col">
             <ul className="flex flex-col gap-2">
@@ -220,7 +290,11 @@ function FeatureList({ features, isBundling }: { features: FeatureItem[]; isBund
                                 className={`flex items-start gap-2 text-[14px] md:text-sm ${f.bold ? 'font-[700] text-[#151515] sm:font-bold' : 'text-[#3d3d3d]'}`}
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
-                                <Globe size={14} className="mt-0.5 shrink-0" color="#3b82f6" />
+                                <Globe
+                                    size={14}
+                                    className="mt-0.5 shrink-0"
+                                    color="#3b82f6"
+                                />
                                 <span>{f.text}</span>
                             </li>
                         );
@@ -230,10 +304,14 @@ function FeatureList({ features, isBundling }: { features: FeatureItem[]; isBund
                         return (
                             <li
                                 key={i}
-                                className={`mt-2 flex items-start gap-2 border-t border-gray-100 pt-3 text-[14px] md:text-sm text-[#9ca3af] ${f.bold ? 'font-[700] sm:font-bold' : ''}`}
+                                className={`mt-2 flex items-start gap-2 border-t border-gray-100 pt-3 text-[14px] text-[#9ca3af] md:text-sm ${f.bold ? 'font-[700] sm:font-bold' : ''}`}
                                 style={{ fontFamily: "'Nunito', sans-serif" }}
                             >
-                                <XCircle size={14} className="mt-0.5 shrink-0" color="#d1d5db" />
+                                <XCircle
+                                    size={14}
+                                    className="mt-0.5 shrink-0"
+                                    color="#d1d5db"
+                                />
                                 <span>{f.text}</span>
                             </li>
                         );
@@ -245,7 +323,11 @@ function FeatureList({ features, isBundling }: { features: FeatureItem[]; isBund
                             className={`flex items-start gap-2 text-[14px] md:text-sm ${f.bold ? 'font-[700] text-[#151515] sm:font-bold' : 'text-[#3d3d3d]'}`}
                             style={{ fontFamily: "'Nunito', sans-serif" }}
                         >
-                            <CheckCircle2 size={14} className="mt-0.5 shrink-0" color="#16a34a" />
+                            <CheckCircle2
+                                size={14}
+                                className="mt-0.5 shrink-0"
+                                color="#16a34a"
+                            />
                             <span>{f.text}</span>
                         </li>
                     );
@@ -267,17 +349,22 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 250000
+                ? 200000
                 : level === 'Intermediate'
-                  ? 350000
+                  ? 280000
                   : level === 'Bundling'
-                  ? 375000
-                  : 81000;
+                    ? 325000
+                    : 200000;
 
         try {
             (
                 window as {
-                    fbq?: (e: string, n: string, p?: object, o?: object) => void;
+                    fbq?: (
+                        e: string,
+                        n: string,
+                        p?: object,
+                        o?: object,
+                    ) => void;
                 }
             ).fbq?.(
                 'track',
@@ -308,17 +395,22 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 250000
+                ? 200000
                 : level === 'Intermediate'
-                  ? 350000
+                  ? 280000
                   : level === 'Bundling'
-                  ? 375000
-                  : 81000;
+                    ? 325000
+                    : 200000;
 
         try {
             (
                 window as {
-                    fbq?: (e: string, n: string, p?: object, o?: object) => void;
+                    fbq?: (
+                        e: string,
+                        n: string,
+                        p?: object,
+                        o?: object,
+                    ) => void;
                 }
             ).fbq?.(
                 'track',
@@ -348,13 +440,13 @@ export default function PricingSection() {
             {/* ── Updated Header ── */}
             <div className="mb-14 text-center">
                 <div
-                    className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ffb3b3] bg-[#FFF0F0] px-4 py-[6px] text-[12px] font-[800] tracking-widest uppercase text-[#D70808] sm:py-1.5 sm:text-xs sm:font-bold"
+                    className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ffb3b3] bg-[#FFF0F0] px-4 py-[6px] text-[12px] font-[800] tracking-widest text-[#D70808] uppercase sm:py-1.5 sm:text-xs sm:font-bold"
                     style={{ fontFamily: 'var(--font-heading)' }}
                 >
                     <span>⏳</span> Mulai dari Sekarang, Bukan Nanti
                 </div>
                 <h2
-                    className="mb-4 text-[clamp(30px,4vw,48px)] font-black leading-[1.2] text-[#151515] md:text-4xl lg:text-5xl"
+                    className="mb-4 text-[clamp(30px,4vw,48px)] leading-[1.2] font-black text-[#151515] md:text-4xl lg:text-5xl"
                     style={{ fontFamily: 'var(--font-heading)' }}
                 >
                     Persiapkan Sekarang,{' '}
@@ -364,8 +456,9 @@ export default function PricingSection() {
                     className="mx-auto max-w-2xl text-[16px] leading-[1.6] text-[#3d3d3d]"
                     style={{ fontFamily: 'var(--font-heading)' }}
                 >
-                    Semakin cepat kamu mulai, semakin besar peluang kamu diterima
-                    beasiswa karena skor 500+ tercapai sebelum deadline submission.
+                    Semakin cepat kamu mulai, semakin besar peluang kamu
+                    diterima beasiswa karena skor 500+ tercapai sebelum deadline
+                    submission.
                 </p>
             </div>
 
@@ -383,7 +476,7 @@ export default function PricingSection() {
                         className={`rounded-full px-5 py-2.5 text-[15px] font-[800] transition-all ${
                             mode === 'self'
                                 ? 'bg-[#D70808] text-white shadow-md hover:brightness-110 active:scale-[0.98]'
-                                : 'text-gray-500 hover:text-gray-700 underline decoration-dotted decoration-gray-400 decoration-[1.5px] underline-offset-[5px]'
+                                : 'text-gray-500 underline decoration-gray-400 decoration-dotted decoration-[1.5px] underline-offset-[5px] hover:text-gray-700'
                         }`}
                         style={{ fontFamily: 'var(--font-heading)' }}
                     >
@@ -394,7 +487,7 @@ export default function PricingSection() {
                         className={`rounded-full px-5 py-2.5 text-[15px] font-[800] transition-all ${
                             mode === 'tutor'
                                 ? 'bg-[#D70808] text-white shadow-md hover:brightness-110 active:scale-[0.98]'
-                                : 'text-gray-500 hover:text-gray-700 underline decoration-dotted decoration-gray-400 decoration-[1.5px] underline-offset-[5px]'
+                                : 'text-gray-500 underline decoration-gray-400 decoration-dotted decoration-[1.5px] underline-offset-[5px] hover:text-gray-700'
                         }`}
                         style={{ fontFamily: 'var(--font-heading)' }}
                     >
@@ -412,20 +505,25 @@ export default function PricingSection() {
                             <div className="mb-1 flex items-start justify-between">
                                 <div>
                                     <p
-                                        className="mb-1 text-[10px] font-[700] tracking-widest uppercase text-[#9ca3af] sm:font-bold"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        className="mb-1 text-[10px] font-[700] tracking-widest text-[#9ca3af] uppercase sm:font-bold"
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Paket
                                     </p>
                                     <h3
                                         className="text-[24px] font-[900] text-[#151515] sm:text-2xl sm:font-black"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Starter
                                     </h3>
                                 </div>
                                 <span className="flex items-center gap-1 rounded-full bg-[#F0FDF4] px-2.5 py-1 text-[10px] font-semibold text-[#16a34a]">
-                                    <StarRow /> <span className="ml-1">5.0</span>
+                                    <StarRow />{' '}
+                                    <span className="ml-1">5.0</span>
                                 </span>
                             </div>
                             <p
@@ -433,27 +531,35 @@ export default function PricingSection() {
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
                                 Target Skor:{' '}
-                                <span className="font-black text-[#16a34a]">450+</span>
+                                <span className="font-black text-[#16a34a]">
+                                    450+
+                                </span>
                                 {' - '}
-                                <span className="font-black text-[#151515]">10 Hari (2 Minggu)</span>
+                                <span className="font-black text-[#151515]">
+                                    10 Hari (2 Minggu)
+                                </span>
                             </p>
                             <div className="mb-5 rounded-2xl border-[1.5px] border-[#ffb3b3] bg-[#FFF0F0] p-4">
                                 <div className="mb-1 flex items-center gap-2">
                                     <span
-                                        className="text-[14px] font-[600] line-through text-[#9ca3af] sm:text-sm sm:font-semibold"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        className="text-[14px] font-[600] text-[#9ca3af] line-through sm:text-sm sm:font-semibold"
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Rp 1.000.000
                                     </span>
-                                    <span className="rounded-full bg-[#D70808] px-2 py-0.5 text-[10px] font-black text-white">
-                                        HEMAT 81%
+                                    <span className="rounded-full bg-[#D70808] px-3 py-1 text-[10px] font-black text-white">
+                                        HEMAT 80%
                                     </span>
                                 </div>
                                 <p
                                     className="text-[30px] font-[900] text-[#D70808] sm:text-3xl sm:font-black"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
-                                    Rp 190.000
+                                    Rp 200.000
                                 </p>
                             </div>
 
@@ -462,11 +568,15 @@ export default function PricingSection() {
                             <PayButton
                                 href={PG_STARTER}
                                 label="Apply Sekarang →"
-                                onClick={() => handlePayClick('Starter', PG_STARTER)}
+                                onClick={() =>
+                                    handlePayClick('Starter', PG_STARTER)
+                                }
                             />
                             <OrDivider />
                             <WaButton
-                                onClick={() => handleWaClick('Starter', WA_STARTER)}
+                                onClick={() =>
+                                    handleWaClick('Starter', WA_STARTER)
+                                }
                                 label="Tanya via WhatsApp"
                             />
                             <div className="mt-4 flex justify-center">
@@ -476,32 +586,39 @@ export default function PricingSection() {
 
                         {/* ── Bundling ── HIGHLIGHTED */}
                         <div className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-[#16a34a] bg-[linear-gradient(165deg,#ffffff_0%,#f0fdf4_100%)] p-6 shadow-[0_16px_56px_rgba(22,163,74,0.2),0_0_0_1px_rgba(22,163,74,0.08)] md:p-7">
-                            <div className="font-['var(--font-heading)'] absolute top-0 right-0 rounded-bl-2xl bg-[#16a34a] px-4 py-2 text-[10px] font-black text-white">
+                            <div className="absolute top-0 right-0 rounded-bl-2xl bg-[#16a34a] px-4 py-2 font-['var(--font-heading)'] text-[10px] font-black text-white">
                                 ⭐ PALING HEMAT
                             </div>
                             <div className="mt-4 mb-1 flex items-start justify-between">
                                 <div>
                                     <p
-                                        className="mb-1 text-[10px] font-[700] tracking-widest uppercase text-[#D70808] sm:font-bold"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        className="mb-1 text-[10px] font-[700] tracking-widest text-[#D70808] uppercase sm:font-bold"
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Paket
                                     </p>
                                     <h3
                                         className="text-[24px] font-[900] text-[#151515] sm:text-2xl sm:font-black"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Bundling
                                     </h3>
                                     <p
                                         className="mt-0.5 text-[11px] font-[600] text-[#D70808] sm:font-semibold"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Starter + Intermediate
                                     </p>
                                 </div>
                                 <span className="flex items-center gap-1 rounded-full bg-[#FFF0F0] px-2.5 py-1 text-[10px] font-semibold text-[#D70808]">
-                                    <StarRow /> <span className="ml-1">5.0</span>
+                                    <StarRow />{' '}
+                                    <span className="ml-1">5.0</span>
                                 </span>
                             </div>
                             <p
@@ -509,37 +626,50 @@ export default function PricingSection() {
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
                                 Target Skor:{' '}
-                                <span className="font-black text-[#D70808]">500+</span>
+                                <span className="font-black text-[#D70808]">
+                                    500+
+                                </span>
                                 {' - '}
-                                <span className="font-black text-[#151515]">25 Hari Total</span>
+                                <span className="font-black text-[#151515]">
+                                    25 Hari Total
+                                </span>
                             </p>
                             <div className="mb-5 rounded-2xl border-[1.5px] border-[#ffb3b3] bg-[#FFF0F0] p-4">
                                 <div className="mb-1 flex items-center gap-2">
                                     <span
-                                        className="text-[14px] font-[600] line-through text-[#9ca3af] sm:text-sm sm:font-semibold"
-                                        style={{ fontFamily: 'var(--font-heading)' }}
+                                        className="text-[14px] font-[600] text-[#9ca3af] line-through sm:text-sm sm:font-semibold"
+                                        style={{
+                                            fontFamily: 'var(--font-heading)',
+                                        }}
                                     >
                                         Rp 1.875.000
                                     </span>
-                                    <span className="rounded-full bg-[#D70808] px-2 py-0.5 text-[10px] font-black text-white">
-                                        DISKON 84%
+                                    <span className="rounded-full bg-[#D70808] px-3 py-1 text-[10px] font-black text-white">
+                                        DISKON 80% + 50rb
                                     </span>
                                 </div>
                                 <p
                                     className="mb-1 text-[30px] font-[900] text-[#D70808] sm:text-3xl sm:font-black"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
-                                    Rp 300.000
+                                    Rp 325.000
                                 </p>
                                 <p
                                     className="text-[11px] font-[600] text-[#D70808] sm:font-semibold"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
-                                    Hemat Rp 1.500.000 dari harga normal!
+                                    Hemat Rp 1.550.000 dari harga normal!
                                 </p>
                             </div>
 
-                            <FeatureList features={bundlingFeatures} isBundling={true} />
+                            <FeatureList
+                                features={bundlingFeatures}
+                                isBundling={true}
+                            />
 
                             {/* Guarantees inside Bundling */}
                             <div className="mb-5 flex flex-col gap-3">
@@ -549,18 +679,28 @@ export default function PricingSection() {
                                         className="flex items-start gap-3 rounded-2xl border border-[#f3f4f6] bg-[#F9FAFB] p-4"
                                     >
                                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FEF3C7]">
-                                            <Icon size={18} color="#D97706" fill="#D97706" />
+                                            <Icon
+                                                size={18}
+                                                color="#D97706"
+                                                fill="#D97706"
+                                            />
                                         </div>
                                         <div>
                                             <p
-                                                className="mb-1 text-[13px] font-[900] leading-[1.2] text-[#151515] sm:font-black sm:leading-tight"
-                                                style={{ fontFamily: "'Nunito', sans-serif" }}
+                                                className="mb-1 text-[13px] leading-[1.2] font-[900] text-[#151515] sm:leading-tight sm:font-black"
+                                                style={{
+                                                    fontFamily:
+                                                        "'Nunito', sans-serif",
+                                                }}
                                             >
                                                 {title}
                                             </p>
                                             <p
                                                 className="text-[11px] leading-[1.6] text-[#6B7280] sm:leading-relaxed"
-                                                style={{ fontFamily: "'Nunito', sans-serif" }}
+                                                style={{
+                                                    fontFamily:
+                                                        "'Nunito', sans-serif",
+                                                }}
                                             >
                                                 {desc}
                                             </p>
@@ -572,7 +712,9 @@ export default function PricingSection() {
                             <PayButton
                                 href={PG_BUNDLING}
                                 label="Apply Sekarang →"
-                                onClick={() => handlePayClick('Bundling', PG_BUNDLING)}
+                                onClick={() =>
+                                    handlePayClick('Bundling', PG_BUNDLING)
+                                }
                                 green
                             />
                             <p
@@ -583,7 +725,9 @@ export default function PricingSection() {
                             </p>
                             <OrDivider />
                             <WaButton
-                                onClick={() => handleWaClick('Bundling', WA_BUNDLING)}
+                                onClick={() =>
+                                    handleWaClick('Bundling', WA_BUNDLING)
+                                }
                                 label="Tanya via WhatsApp"
                             />
                             <div className="mt-4 flex justify-center">
@@ -596,20 +740,25 @@ export default function PricingSection() {
                             <div className="mb-1 flex items-start justify-between">
                                 <div>
                                     <p
-                                        className="mb-1 text-[10px] font-[700] tracking-widest uppercase text-[#9ca3af] sm:font-bold"
-                                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                                        className="mb-1 text-[10px] font-[700] tracking-widest text-[#9ca3af] uppercase sm:font-bold"
+                                        style={{
+                                            fontFamily: "'Nunito', sans-serif",
+                                        }}
                                     >
                                         Paket
                                     </p>
                                     <h3
                                         className="text-[24px] font-[900] text-[#151515] sm:text-2xl sm:font-black"
-                                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                                        style={{
+                                            fontFamily: "'Nunito', sans-serif",
+                                        }}
                                     >
                                         Intermediate
                                     </h3>
                                 </div>
                                 <span className="flex items-center gap-1 rounded-full bg-[#F0FDF4] px-2.5 py-1 text-[10px] font-semibold text-[#16a34a]">
-                                    <StarRow /> <span className="ml-1">5.0</span>
+                                    <StarRow />{' '}
+                                    <span className="ml-1">5.0</span>
                                 </span>
                             </div>
                             <p
@@ -617,28 +766,36 @@ export default function PricingSection() {
                                 style={{ fontFamily: "'Nunito', sans-serif" }}
                             >
                                 Target Skor:{' '}
-                                <span className="font-black text-[#16a34a]">500+</span>
+                                <span className="font-black text-[#16a34a]">
+                                    500+
+                                </span>
                                 {' - '}
-                                <span className="font-black text-[#151515]">15 Hari</span>
+                                <span className="font-black text-[#151515]">
+                                    15 Hari
+                                </span>
                                 {' - Min. 430'}
                             </p>
                             <div className="mb-5 rounded-2xl border-[1.5px] border-[#ffb3b3] bg-[#FFF0F0] p-4">
                                 <div className="mb-1 flex items-center gap-2">
                                     <span
-                                        className="text-[14px] font-[600] line-through text-[#9ca3af] sm:text-sm sm:font-semibold"
-                                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                                        className="text-[14px] font-[600] text-[#9ca3af] line-through sm:text-sm sm:font-semibold"
+                                        style={{
+                                            fontFamily: "'Nunito', sans-serif",
+                                        }}
                                     >
                                         Rp 1.400.000
                                     </span>
-                                    <span className="rounded-full bg-[#D70808] px-2 py-0.5 text-[10px] font-black text-white">
-                                        DISKON 81%
+                                    <span className="rounded-full bg-[#D70808] px-3 py-1 text-[10px] font-black text-white">
+                                        DISKON 80%
                                     </span>
                                 </div>
                                 <p
                                     className="text-[30px] font-[900] text-[#D70808] sm:text-3xl sm:font-black"
-                                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                                    style={{
+                                        fontFamily: "'Nunito', sans-serif",
+                                    }}
                                 >
-                                    Rp 266.000
+                                    Rp 280.000
                                 </p>
                             </div>
 
@@ -647,11 +804,15 @@ export default function PricingSection() {
                             <PayButton
                                 href={PG_INTER}
                                 label="Apply Sekarang →"
-                                onClick={() => handlePayClick('Intermediate', PG_INTER)}
+                                onClick={() =>
+                                    handlePayClick('Intermediate', PG_INTER)
+                                }
                             />
                             <OrDivider />
                             <WaButton
-                                onClick={() => handleWaClick('Intermediate', WA_INTER)}
+                                onClick={() =>
+                                    handleWaClick('Intermediate', WA_INTER)
+                                }
                                 label="Tanya via WhatsApp"
                             />
                             <div className="mt-4 flex justify-center">
@@ -663,7 +824,7 @@ export default function PricingSection() {
                     {/* Legalitas (Hanya terlihat di Tutor Mode) */}
                     <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-[#e5e7eb] bg-[#F3F3F3] px-6 py-4">
                         <p
-                            className="mb-3 text-[12px] font-[900] tracking-widest uppercase text-[#9ca3af] sm:text-xs sm:font-black"
+                            className="mb-3 text-[12px] font-[900] tracking-widest text-[#9ca3af] uppercase sm:text-xs sm:font-black"
                             style={{ fontFamily: "'Nunito', sans-serif" }}
                         >
                             Legalitas Resmi
@@ -673,13 +834,15 @@ export default function PricingSection() {
                                 className="text-[12px] font-[600] text-[#151515] sm:text-xs sm:font-semibold"
                                 style={{ fontFamily: "'Nunito', sans-serif" }}
                             >
-                                ✓ SK Kemenkumham RI Nomor AHU-0055720-AH.0114 Tahun 2020
+                                ✓ SK Kemenkumham RI Nomor AHU-0055720-AH.0114
+                                Tahun 2020
                             </span>
                             <span
                                 className="text-[12px] font-[600] text-[#151515] sm:text-xs sm:font-semibold"
                                 style={{ fontFamily: "'Nunito', sans-serif" }}
                             >
-                                ✓ SK Izin Operasional LKP 503/20177/LKP/DPM-PTSP/8/2024
+                                ✓ SK Izin Operasional LKP
+                                503/20177/LKP/DPM-PTSP/8/2024
                             </span>
                             <span
                                 className="text-[12px] font-[600] text-[#151515] sm:text-xs sm:font-semibold"
@@ -700,8 +863,7 @@ export default function PricingSection() {
                             rel="noopener noreferrer"
                             className="mt-3 inline-block text-[12px] font-[600] text-[#D70808] hover:underline sm:text-xs sm:font-semibold"
                             style={{ fontFamily: "'Nunito', sans-serif" }}
-                        >
-                        </a>
+                        ></a>
                     </div>
                 </>
             )}
@@ -710,21 +872,25 @@ export default function PricingSection() {
             {mode === 'self' && (
                 <div className="mx-auto mb-14 w-full max-w-[500px]">
                     <div className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-[#F5B700] bg-[linear-gradient(165deg,#ffffff_0%,#fffbf0_100%)] p-6 shadow-[0_16px_56px_rgba(245,183,0,0.15),0_0_0_1px_rgba(245,183,0,0.08)] md:p-7">
-                        <div className="font-['var(--font-heading)'] absolute top-0 right-0 rounded-bl-2xl bg-[#F5B700] px-4 py-2 text-[10px] font-black text-white">
+                        <div className="absolute top-0 right-0 rounded-bl-2xl bg-[#F5B700] px-4 py-2 font-['var(--font-heading)'] text-[10px] font-black text-white">
                             🔥 POPULAR
                         </div>
-                        
-                        <div className="mb-1 mt-4 flex items-start justify-between">
+
+                        <div className="mt-4 mb-1 flex items-start justify-between">
                             <div>
                                 <p
-                                    className="mb-1 text-[10px] font-[700] tracking-widest uppercase text-[#9ca3af] sm:font-bold"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    className="mb-1 text-[10px] font-[700] tracking-widest text-[#9ca3af] uppercase sm:font-bold"
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
                                     E-Course
                                 </p>
                                 <h3
                                     className="text-[24px] font-[900] text-[#151515] sm:text-2xl sm:font-black"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
                                     Self-Study LMS
                                 </h3>
@@ -733,22 +899,28 @@ export default function PricingSection() {
                                 📚 Mandiri
                             </span>
                         </div>
-                        
+
                         <p
                             className="mb-4 text-[14px] font-[600] text-[#9ca3af] sm:text-sm sm:font-semibold"
                             style={{ fontFamily: 'var(--font-heading)' }}
                         >
                             Target Skor:{' '}
-                            <span className="font-black text-[#16a34a]">500+</span>
+                            <span className="font-black text-[#16a34a]">
+                                500+
+                            </span>
                             {' - '}
-                            <span className="font-black text-[#151515]">Belajar Kapan Saja</span>
+                            <span className="font-black text-[#151515]">
+                                Belajar Kapan Saja
+                            </span>
                         </p>
 
                         <div className="mb-5 rounded-2xl border-[1.5px] border-[#ffb3b3] bg-[#FFF0F0] p-4">
                             <div className="mb-1 flex items-center gap-2">
                                 <span
-                                    className="text-[14px] font-[600] line-through text-[#9ca3af] sm:text-sm sm:font-semibold"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    className="text-[14px] font-[600] text-[#9ca3af] line-through sm:text-sm sm:font-semibold"
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
                                     Rp 250.000
                                 </span>
@@ -784,33 +956,40 @@ export default function PricingSection() {
                     {/* Testimonial Section added right below the card */}
                     <div className="mt-8">
                         <p
-                            className="mb-4 text-center text-[10px] font-[900] tracking-widest uppercase text-[#9ca3af]"
+                            className="mb-4 text-center text-[10px] font-[900] tracking-widest text-[#9ca3af] uppercase"
                             style={{ fontFamily: 'var(--font-heading)' }}
                         >
                             Kata Mereka yang Belajar Mandiri
                         </p>
                         <div className="rounded-2xl border border-[#ececec] bg-[#F9F9F9] p-5">
-                            <p className="mb-2 text-[12px] text-[#F59E0B]">⭐⭐⭐⭐⭐</p>
+                            <p className="mb-2 text-[12px] text-[#F59E0B]">
+                                ⭐⭐⭐⭐⭐
+                            </p>
                             <p
-                                className="mb-4 text-[13px] font-[600] leading-[1.5] text-[#3d3d3d] sm:text-[14px]"
+                                className="mb-4 text-[13px] leading-[1.5] font-[600] text-[#3d3d3d] sm:text-[14px]"
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
-                                "Trm kasih Full Bright Indonesia yg sudah memberikan kesempatan belajar Bhs
-                                Inggris, belajar disini bisa menjadi alternatif bagi individu yg ingin belajar sambil
-                                bekerja, LMS bisa diakses kapan pun!"
+                                "Trm kasih Full Bright Indonesia yg sudah
+                                memberikan kesempatan belajar Bhs Inggris,
+                                belajar disini bisa menjadi alternatif bagi
+                                individu yg ingin belajar sambil bekerja, LMS
+                                bisa diakses kapan pun!"
                             </p>
                             <div className="flex items-center gap-3">
                                 <img
                                     src="/people/nina.webp"
                                     alt="Nina Hernawati"
-                                    className="h-8 w-8 rounded-full object-cover bg-gray-200"
+                                    className="h-8 w-8 rounded-full bg-gray-200 object-cover"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Nina+Hernawati&background=random';
+                                        (e.target as HTMLImageElement).src =
+                                            'https://ui-avatars.com/api/?name=Nina+Hernawati&background=random';
                                     }}
                                 />
                                 <p
                                     className="text-[12px] font-[800] text-[#151515] sm:text-[13px]"
-                                    style={{ fontFamily: 'var(--font-heading)' }}
+                                    style={{
+                                        fontFamily: 'var(--font-heading)',
+                                    }}
                                 >
                                     Nina Hernawati
                                 </p>
