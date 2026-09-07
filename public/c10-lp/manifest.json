@@ -13,9 +13,9 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/c10-lp/public/hero-consultant.png",
+      "src": "/c10-lp/public/hero-consultant.webp",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "any maskable"
     }
   ]
