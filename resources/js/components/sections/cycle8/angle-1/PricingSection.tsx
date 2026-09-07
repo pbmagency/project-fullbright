@@ -925,14 +925,14 @@ export default function PricingSection() {
                                     Rp 250.000
                                 </span>
                                 <span className="rounded-full bg-[#D70808] px-2 py-0.5 text-[10px] font-black text-white">
-                                    HEMAT 68%
+                                    HEMAT 60%
                                 </span>
                             </div>
                             <p
                                 className="text-[30px] font-[900] text-[#D70808] sm:text-3xl sm:font-black"
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
-                                Rp 81.000
+                                Rp 99.000
                             </p>
                         </div>
 
