@@ -3,10 +3,18 @@
 
   const PAGE = '/c10-lp/';
   const ENDPOINT = '/analytics/track';
+  let isTrackingDisabled = false;
+try {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    isTrackingDisabled = true;
+  }
+} catch (e) {
+  // ignore
+}
   const VISIT_KEY = 'analytics_visit_tracked:' + PAGE;
   const SCROLL_MILESTONES = [25, 50, 75, 90];
-  const trackedScrolls = new Set();
-  const trackedSections = new Set();
+  const trackedScrolls = new WeakSet();
+  const trackedSections = new WeakSet();
   const params = new URLSearchParams(window.location.search);
 
   function eventId() {
@@ -67,22 +75,39 @@
     });
   };
 
-  if (sessionStorage.getItem(VISIT_KEY) !== 'tracked') {
-    sessionStorage.setItem(VISIT_KEY, 'pending');
-    track('visit', { event_id: eventId() }).then(function (response) {
-      if (response && response.ok) {
-        sessionStorage.setItem(VISIT_KEY, 'tracked');
-      } else {
-        sessionStorage.removeItem(VISIT_KEY);
+  try {
+  if (!isTrackingDisabled) {
+    try {
+      if (sessionStorage.getItem(VISIT_KEY) !== 'tracked') {
+        sessionStorage.setItem(VISIT_KEY, 'pending');
+        track('visit', { event_id: eventId() }).then(function (response) {
+          if (response && response.ok) {
+            sessionStorage.setItem(VISIT_KEY, 'tracked');
+          } else {
+            sessionStorage.removeItem(VISIT_KEY);
+          }
+        });
       }
-    });
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
+  } catch (e) {
+    // ignore storage errors
   }
 
-  window.setTimeout(function () {
-    track('engagement', { type: 'dwell_ping', duration: 15000, is_initial: true });
-  }, 15000);
+  if (!isTrackingDisabled) {
+    window.setTimeout(function () {
+      try {
+        track('engagement', { type: 'dwell_ping', duration: 15000, is_initial: true });
+      } catch (e) {
+        // ignore
+      }
+    }, 15000);
+  }
 
   window.addEventListener('scroll', function () {
+    if (isTrackingDisabled) return;
     const available = document.documentElement.scrollHeight - window.innerHeight;
     if (available <= 0) return;
 
@@ -93,9 +118,10 @@
         track('scroll', { depth: milestone });
       }
     });
-  }, { passive: true });
+  }, { passive: true, capture: false });
 
   document.addEventListener('click', function (event) {
+    if (isTrackingDisabled) return;
     const link = event.target.closest('a[href]');
     if (!link) return;
 

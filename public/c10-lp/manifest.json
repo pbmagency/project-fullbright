@@ -1,0 +1,22 @@
+{
+  "name": "Full Bright Indonesia - TOEFL 500+ dalam 15 Hari",
+  "short_name": "FullBright",
+  "start_url": "/c10-lp/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#D70808",
+  "icons": [
+    {
+      "src": "/c10-lp/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/c10-lp/public/hero-consultant.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
