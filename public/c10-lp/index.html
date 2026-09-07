@@ -21,38 +21,16 @@
   x-dc{display:none!important}
   @media (max-width:500px){html{scroll-behavior:auto}}
   #agitation,#value,#proof,#lms,#testimonials,#pricing,#faq,#survey,footer{content-visibility:auto;contain-intrinsic-size:auto 900px}
-  .critical-hero{background:linear-gradient(160deg,#fff 55%,#fff5f5);color:#151515;font-family:Nunito,system-ui,sans-serif}
-  .critical-nav{height:64px;display:flex;align-items:center;justify-content:space-between;max-width:1152px;margin:auto;padding:0 24px;box-sizing:border-box;border-bottom:1px solid #f3f4f6}
-  .critical-inner{max-width:1152px;margin:auto;padding:40px 24px 24px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;box-sizing:border-box}
-  .critical-copy{display:flex;flex-direction:column;gap:16px}.critical-copy h1{margin:0;font-size:clamp(30px,4vw,44px);line-height:1.15;font-weight:900}.critical-copy p{margin:0;font-size:16px;line-height:1.6;color:#3d3d3d}.critical-img{display:block;width:100%;height:auto;max-height:560px;object-fit:contain;object-position:bottom}
-  #dc-root>.sc-host>div>.skip-link,#dc-root>.sc-host>div>#urgency-banner,#dc-root>.sc-host>div>header:first-of-type,#dc-root>.sc-host>div>section:first-of-type,#dc-root>.sc-host>div>section:first-of-type+div{display:none!important}
-  @media(max-width:899px){.critical-inner{grid-template-columns:1fr;padding-top:24px}.critical-media{display:none}.critical-copy h1{font-size:clamp(24px,7vw,30px)}.critical-copy p{font-size:14px}}
 </style>
-<script>
-  (()=>{let started=false;const load=()=>{if(started)return;started=true;['./react.production.min.js','./react-dom.production.min.js','./support.min.js'].reduce((p,src)=>p.then(()=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})),Promise.resolve()).catch(console.error)};['scroll','pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,load,{once:true,passive:true}));setTimeout(load,8000)})();
-</script>
+<script defer src="./react.production.min.js"></script>
+<script defer src="./react-dom.production.min.js"></script>
+<script defer src="./support.min.js"></script>
 <script defer src="./analytics.js"></script>
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="manifest" href="/c10-lp/manifest.json">
-<link rel="icon" href="/c10-lp/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/c10-lp/public/logo/fullbright.webp" type="image/webp">
+<link rel="apple-touch-icon" href="/c10-lp/public/logo/fullbright.webp">
 <link rel="preload" as="image" href="/c10-lp/public/hero-consultant.webp" fetchpriority="high">
 <body>
-<div class="critical-hero">
-  <a href="#pricing" style="display:flex;align-items:center;justify-content:center;background:#c10707;color:#fff;padding:9px 12px;text-decoration:none;font-size:13px;font-weight:900">🔥 FLASH SALE SEPTEMBER · DISKON 60%</a>
-  <header><nav class="critical-nav" aria-label="Navigasi utama">
-    <a href="#" aria-label="Full Bright Indonesia"><img src="public/logo/fullbright.webp" alt="Logo Full Bright Indonesia" width="160" height="40" style="display:block;width:160px;height:auto"></a>
-    <a href="#pricing" style="border-radius:999px;background:#d70808;color:#fff;text-decoration:none;padding:10px 18px;font-size:14px;font-weight:900">🎓 Amankan Seat · Rp99rb</a>
-  </nav></header>
-  <main class="critical-inner">
-    <div class="critical-copy">
-      <span style="display:inline-flex;width:max-content;border:1.5px solid #151515;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:800">★★★★★ &nbsp; 45.000+ ALUMNI</span>
-      <h1>Serius Soal Beasiswa &amp; CPNS?<br>Capai <span style="text-decoration:underline;text-decoration-color:#f5b700;text-decoration-thickness:10px;text-underline-offset:-7px">TOEFL 500+ dalam 15 Hari Saja</span></h1>
-      <p><strong>Persiapkan dari sekarang</strong> dengan strategi <strong>belajar 1 jam sehari</strong> yang telah membantu <strong>45.000+ alumni</strong> meraih beasiswa impian mereka.</p>
-      <div><a href="#pricing" style="display:inline-flex;border-radius:16px;background:#d70808;color:#fff;text-decoration:none;padding:14px 24px;font-size:16px;font-weight:900">Mulai Belajar Sekarang →</a></div>
-    </div>
-    <div class="critical-media"><img class="critical-img" src="public/hero-consultant.webp" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" width="900" height="1098" fetchpriority="high"></div>
-  </main>
-</div>
 <x-dc>
 <helmet>
 <style>

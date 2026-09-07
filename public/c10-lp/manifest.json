@@ -7,10 +7,10 @@
   "theme_color": "#D70808",
   "icons": [
     {
-      "src": "/c10-lp/favicon.svg",
+      "src": "/c10-lp/public/logo/fullbright.webp",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/webp",
+      "purpose": "any"
     },
     {
       "src": "/c10-lp/public/hero-consultant.webp",
