@@ -1,0 +1,30 @@
+name: Fix C10 Redirect
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Route C10 directly through Laravel
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: '72.61.210.213'
+          username: 'root'
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            htaccess=/home/fullbrightindonesia.org/toefl/.htaccess
+            test -f "$htaccess"
+
+            if ! grep -q 'C10 Laravel route override' "$htaccess"; then
+              cp -p "$htaccess" "$htaccess.before-c10-fix"
+              sed -i '/RewriteEngine On/a\
+\    # C10 Laravel route override: bypass legacy slash redirects\
+\    RewriteRule ^c10-lp/?$ index.php [L]\
+' "$htaccess"
+            fi
+
+            cd /home/fullbrightindonesia.org/laravel-toefl
+            php artisan optimize:clear
