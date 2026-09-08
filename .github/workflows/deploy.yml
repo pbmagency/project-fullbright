@@ -88,7 +88,7 @@ jobs:
       - name: Sync Public Assets to public_html
         run: |
           rsync -avz --delete \
-          --exclude='index.php' \
+          --exclude='/index.php' \
           --exclude='.htaccess' \
           ./public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}
 
@@ -110,17 +110,6 @@ jobs:
           username: ${{ env.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # The old static landing page left this physical directory behind.
-            # LiteSpeed adds a trailing slash for the directory while Laravel
-            # removes it for the /c10-lp route, causing an infinite redirect.
-            legacy_c10_dir="${{ env.TARGET_DIR_PUBLIC }}/c10-lp"
-            expected_legacy_c10_dir="/home/fullbrightindonesia.org/toefl/c10-lp"
-            if [ "$legacy_c10_dir" != "$expected_legacy_c10_dir" ]; then
-              echo "Refusing to remove unexpected path: $legacy_c10_dir"
-              exit 1
-            fi
-            rm -rf -- "$legacy_c10_dir"
-
             mkdir -p ${{ env.TARGET_DIR_LARAVEL }}/public/build
             cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
 
