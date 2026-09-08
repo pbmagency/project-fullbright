@@ -20,10 +20,17 @@ jobs:
 
             if ! grep -q 'C10 Laravel route override' "$htaccess"; then
               cp -p "$htaccess" "$htaccess.before-c10-fix"
-              sed -i '/RewriteEngine On/a\
-\    # C10 Laravel route override: bypass legacy slash redirects\
-\    RewriteRule ^c10-lp/?$ index.php [L]\
-' "$htaccess"
+              awk '
+                { print }
+                /RewriteEngine On/ {
+                  print ""
+                  print "    # C10 Laravel route override: bypass legacy slash redirects"
+                  print "    RewriteRule ^c10-lp/?$ index.php [L]"
+                }
+              ' "$htaccess" > "$htaccess.c10-fix"
+              chown --reference="$htaccess" "$htaccess.c10-fix"
+              chmod --reference="$htaccess" "$htaccess.c10-fix"
+              mv "$htaccess.c10-fix" "$htaccess"
             fi
 
             cd /home/fullbrightindonesia.org/laravel-toefl
