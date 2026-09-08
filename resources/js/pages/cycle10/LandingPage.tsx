@@ -155,7 +155,7 @@ function css(decl: string): CSSProperties {
 }
 
 const navStyle = (scrolled: boolean, bannerH: number): string =>
-  `position:sticky;top:${bannerH}px;z-index:50;transition:all 0.3s;border-bottom:1px solid #f3f4f6;` +
+  `position:-webkit-sticky;position:sticky;top:${bannerH}px;z-index:50;transition:all 0.3s;border-bottom:1px solid #f3f4f6;` +
   (scrolled
     ? 'background:rgba(255,255,255,0.95);box-shadow:0 4px 12px rgba(0,0,0,0.08);backdrop-filter:blur(8px);'
     : 'background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);');
@@ -445,6 +445,7 @@ export default function LandingPage() {
 
   return (
     <>
+      <Head title="Full Bright Indonesia" />
       <style>{KEYFRAMES}</style>
       
       
@@ -452,7 +453,7 @@ export default function LandingPage() {
       
         {/* Urgency Banner */}
         {flashVisible ? (<>
-          <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[position:sticky] [top:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
+          <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[position:-webkit-sticky] [position:sticky] [top:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
             <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
             <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 FLASH SALE SEPTEMBER · 60%</span>
             <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
