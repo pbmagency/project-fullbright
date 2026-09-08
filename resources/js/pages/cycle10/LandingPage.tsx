@@ -155,12 +155,6 @@ function css(decl: string): CSSProperties {
   return out as CSSProperties;
 }
 
-const navStyle = (scrolled: boolean): string =>
-  `[position:-webkit-sticky] [position:sticky] [z-index:50] [transition:all_0.3s] [border-bottom:1px_solid_#f3f4f6] ` +
-  (scrolled
-    ? '[background:rgba(255,255,255,0.95)] [box-shadow:0_4px_12px_rgba(0,0,0,0.08)] [backdrop-filter:blur(8px)]'
-    : '[background:#fff] [box-shadow:0_1px_3px_rgba(0,0,0,0.05)]');
-
 const cmpHeaderStyle = (): string =>
   `[position:-webkit-sticky] [position:sticky] [z-index:20] [display:grid] [grid-template-columns:1.5fr_0.85fr_0.85fr_0.9fr] [background:#F9F9F9] [border-bottom:1px_solid_#ececec] [border-radius:20px_20px_0_0] [align-items:stretch] [overflow:hidden]`;
 
@@ -452,34 +446,39 @@ export default function LandingPage() {
       
       <div onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
       
-        {/* Urgency Banner */}
-        {flashVisible ? (<>
-          <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[position:-webkit-sticky] [position:sticky] [top:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
-            <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
-            <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 FLASH SALE SEPTEMBER · 60%</span>
-            <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
-              <span id="banner-timer-label" className="[font-size:11px] [font-weight:800] [letter-spacing:0.04em] [text-transform:uppercase] max-[500px]:[display:none]">⏱ Berakhir</span>
-              <CountdownText />
-            </span>
-          </a>
-        </>) : null}
-      
-        {/* Navbar */}
-        <header className={navStyle(scrolled)} style={{ top: bannerH }}>
-          <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px]">
-            <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
-              <img src="https://toefl.fullbrightindonesia.org/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" className="[height:auto] [width:160px] [object-fit:contain]" />
-            </a>
-            <a href="#pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
-              <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
-              <span className="[display:flex] [align-items:center] [gap:5px]">
-                <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.92)] [white-space:nowrap]">Rp250rb</span>
-                <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp99rb</span>
-                <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-60%</span>
+        {/* Urgency Banner + Navbar — fixed so no overflow ancestor can hide them */}
+        <div className="[position:fixed] [top:0] [left:0] [right:0] [z-index:50]">
+          {flashVisible ? (
+            <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
+              <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
+              <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 FLASH SALE SEPTEMBER · 60%</span>
+              <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
+                <span id="banner-timer-label" className="[font-size:11px] [font-weight:800] [letter-spacing:0.04em] [text-transform:uppercase] max-[500px]:[display:none]">⏱ Berakhir</span>
+                <CountdownText />
               </span>
             </a>
-          </div>
-        </header>
+          ) : null}
+      
+          {/* Navbar */}
+          <header className={`[border-bottom:1px_solid_#f3f4f6] [transition:all_0.3s] ${scrolled ? '[background:rgba(255,255,255,0.95)] [box-shadow:0_4px_12px_rgba(0,0,0,0.08)] [backdrop-filter:blur(8px)]' : '[background:#fff] [box-shadow:0_1px_3px_rgba(0,0,0,0.05)]'}`}>
+            <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px]">
+              <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
+                <img src="https://toefl.fullbrightindonesia.org/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" className="[height:auto] [width:160px] [object-fit:contain]" />
+              </a>
+              <a href="#pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
+                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
+                <span className="[display:flex] [align-items:center] [gap:5px]">
+                  <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.92)] [white-space:nowrap]">Rp250rb</span>
+                  <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp99rb</span>
+                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-60%</span>
+                </span>
+              </a>
+            </div>
+          </header>
+        </div>
+
+        {/* Spacer to push content below the fixed banner + navbar */}
+        <div style={{ height: bannerH + 64 }} />
       
         {/* Hero */}
         <section id="hero" className="[position:relative] [overflow:hidden] [background:linear-gradient(160deg,#fff_55%,#FFF5F5_100%)]">
