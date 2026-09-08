@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react';
 import { generateEventId, useAnalytics } from '@/hooks/use-analytics';
@@ -155,14 +155,14 @@ function css(decl: string): CSSProperties {
   return out as CSSProperties;
 }
 
-const navStyle = (scrolled: boolean, bannerH: number): string =>
-  `position:-webkit-sticky;position:sticky;top:${bannerH}px;z-index:50;transition:all 0.3s;border-bottom:1px solid #f3f4f6;` +
+const navStyle = (scrolled: boolean): string =>
+  `[position:-webkit-sticky] [position:sticky] [z-index:50] [transition:all_0.3s] [border-bottom:1px_solid_#f3f4f6] ` +
   (scrolled
-    ? 'background:rgba(255,255,255,0.95);box-shadow:0 4px 12px rgba(0,0,0,0.08);backdrop-filter:blur(8px);'
-    : 'background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);');
+    ? '[background:rgba(255,255,255,0.95)] [box-shadow:0_4px_12px_rgba(0,0,0,0.08)] [backdrop-filter:blur(8px)]'
+    : '[background:#fff] [box-shadow:0_1px_3px_rgba(0,0,0,0.05)]');
 
-const cmpHeaderStyle = (bannerH: number): string =>
-  `position:sticky;top:${bannerH + 64}px;z-index:20;display:grid;grid-template-columns:1.5fr 0.85fr 0.85fr 0.9fr;background:#F9F9F9;border-bottom:1px solid #ececec;border-radius:20px 20px 0 0;align-items:stretch;overflow:hidden;`;
+const cmpHeaderStyle = (): string =>
+  `[position:-webkit-sticky] [position:sticky] [z-index:20] [display:grid] [grid-template-columns:1.5fr_0.85fr_0.85fr_0.9fr] [background:#F9F9F9] [border-bottom:1px_solid_#ececec] [border-radius:20px_20px_0_0] [align-items:stretch] [overflow:hidden]`;
 
 const toggleBtnStyle = (active: boolean): string =>
   `position:relative;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;padding:12px 26px;border-radius:9999px;transition:all 0.2s ease;background:${active ? '#D70808' : 'transparent'};color:${active ? '#fff' : '#6b7280'};box-shadow:${active ? '0 4px 14px rgba(215,8,8,0.28)' : 'none'};text-decoration:${active ? 'none' : 'underline dotted'};text-underline-offset:4px;text-decoration-thickness:2px;`;
@@ -465,7 +465,7 @@ export default function LandingPage() {
         </>) : null}
       
         {/* Navbar */}
-        <header style={css(navStyle(scrolled, bannerH))}>
+        <header className={navStyle(scrolled)} style={{ top: bannerH }}>
           <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px]">
             <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
               <img src="https://toefl.fullbrightindonesia.org/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" className="[height:auto] [width:160px] [object-fit:contain]" />
@@ -728,7 +728,7 @@ export default function LandingPage() {
             </div>
       
             <div className="[max-width:760px] [margin:0_auto_56px] [border-radius:20px] [border:1px_solid_#ececec] [background:#fff] [box-shadow:0_4px_24px_rgba(0,0,0,0.05)]">
-              <div style={css(cmpHeaderStyle(bannerH))}>
+              <div className={cmpHeaderStyle()} style={{ top: bannerH + 64 }}>
                 <div className="[padding:16px] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#6b7280]">Kriteria</div>
                 <div className="[padding:16px_8px] [text-align:center] [font-size:13px] [line-height:1.25] [font-weight:800] [font-family:Nunito,sans-serif] [color:#6b7280]">Belajar Otodidak</div>
                 <div className="[padding:16px_8px] [text-align:center] [font-size:13px] [line-height:1.25] [font-weight:800] [font-family:Nunito,sans-serif] [color:#6b7280]">Kursus Lain</div>
