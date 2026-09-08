@@ -13,8 +13,8 @@ class MetaConversionService
 
     public function __construct()
     {
-        $this->pixelId      = config('services.meta.pixel_id', '');
-        $this->accessToken  = config('services.meta.access_token', '');
+        $this->pixelId      = (string) (config('services.meta.pixel_id') ?? '');
+        $this->accessToken  = (string) (config('services.meta.access_token') ?? '');
         $this->sdkAvailable = class_exists('\FacebookAds\Api');
 
         if ($this->isConfigured() && $this->sdkAvailable) {
@@ -54,8 +54,8 @@ class MetaConversionService
 
         $userData = $this->buildUserData($request);
 
-        $level       = $eventData['level'] ?? 'Starter';
-        $price       = match ($level) {
+        $level       = $eventData['level'] ?? $eventData['package'] ?? 'Starter';
+        $price       = $eventData['price'] ?? match ($level) {
             'Intermediate' => 350000,
             'Bundling'     => 375000,
             default        => 250000,

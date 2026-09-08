@@ -2,19 +2,30 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
 
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DJG744VCZF"></script>
+    <!-- Google tag (gtag.js) - deferred to load so it doesn't block the critical path -->
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-DJG744VCZF');
+        window.addEventListener('load', function() {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-DJG744VCZF';
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DJG744VCZF');
+        });
     </script>
     <!-- End Google tag (gtag.js) -->
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Persiapkan TOEFL 500+ dalam 15 hari dengan metode belajar terstruktur dari Full Bright Indonesia. Sudah membantu 45.000+ alumni meraih beasiswa & CPNS. Mulai dari Rp99rb.">
+
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://connect.facebook.net">
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <link rel="dns-prefetch" href="https://www.clarity.ms">
+    <link rel="dns-prefetch" href="https://a.plerdy.com">
 
     <script>
         (function() {
@@ -87,19 +98,23 @@
         src="https://www.facebook.com/tr?id={{ config('services.meta.pixel_id', 'YOUR_PIXEL_ID') }}&ev=PageView&noscript=1" /></noscript>
 
     <!-- BEGIN PLERDY CODE -->
-    <script data-plerdy_code='1'>
-    (function(w,d){
-        if(w.__plerdyCode)return;
-        w.__plerdyCode=1;
-        w._protocol=w.location.protocol=="https:"?"https://":"http://";
-        w._site_hash_code="e5ad2bad413372216eb0cbf6646f35c3";
-        w._suid=79951;
-        var s=d.createElement("script");
-        s.async=true;
-        s.referrerPolicy="strict-origin-when-cross-origin";
-        s.src="https://a.plerdy.com/public/js/click/main.js?v="+Math.random();
-        d.head.appendChild(s);
-    })(window,document);
+    <!-- Deferred to the load event (same as Clarity/Meta Pixel) so Plerdy's heavy
+         monitoring scripts don't compete with the critical rendering path. -->
+    <script>
+    window.addEventListener('load', function() {
+        (function(w,d){
+            if(w.__plerdyCode)return;
+            w.__plerdyCode=1;
+            w._protocol=w.location.protocol=="https:"?"https://":"http://";
+            w._site_hash_code="e5ad2bad413372216eb0cbf6646f35c3";
+            w._suid=79951;
+            var s=d.createElement("script");
+            s.async=true;
+            s.referrerPolicy="strict-origin-when-cross-origin";
+            s.src="https://a.plerdy.com/public/js/click/main.js?v="+Math.random();
+            d.head.appendChild(s);
+        })(window,document);
+    });
     </script>
     <!-- END PLERDY CODE -->
 </body>
