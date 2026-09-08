@@ -2,27 +2,12 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
 
 <head>
-    <!-- Google tag (gtag.js) - deferred to load so it doesn't block the critical path -->
-    <script>
-        window.addEventListener('load', function() {
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-DJG744VCZF';
-            document.head.appendChild(s);
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-DJG744VCZF');
-        });
-    </script>
-    <!-- End Google tag (gtag.js) -->
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Persiapkan TOEFL 500+ dalam 15 hari dengan metode belajar terstruktur dari Full Bright Indonesia. Sudah membantu 45.000+ alumni meraih beasiswa & CPNS. Mulai dari Rp99rb.">
 
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    <link rel="preconnect" href="https://connect.facebook.net">
+    <!-- Third-party telemetry is intentionally not preconnected. It is loaded
+         after real interaction/idle time and must not compete with LCP. -->
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="dns-prefetch" href="https://www.clarity.ms">
     <link rel="dns-prefetch" href="https://a.plerdy.com">
@@ -49,7 +34,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="preload" href="/logo/Primary%20Logo.webp" as="image" fetchpriority="high">
+    <link rel="preload" href="/logo/Logo-Fullbright.webp" as="image" type="image/webp" fetchpriority="high">
 
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
@@ -61,9 +46,30 @@
 <body class="font-sans antialiased">
     <x-inertia::app />
 
-    <!-- Microsoft Clarity -->
+    <!-- Load non-essential telemetry outside the critical Lighthouse/user path.
+         Our first-party /analytics/track still records the initial visit. -->
     <script>
-        window.addEventListener('load', function() {
+        (function () {
+            var loaded = false;
+
+            function appendScript(src) {
+                var script = document.createElement('script');
+                script.async = true;
+                script.referrerPolicy = 'strict-origin-when-cross-origin';
+                script.src = src;
+                document.head.appendChild(script);
+            }
+
+            function loadTelemetry() {
+                if (loaded) return;
+                loaded = true;
+
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+                window.gtag('js', new Date());
+                window.gtag('config', 'G-DJG744VCZF');
+                appendScript('https://www.googletagmanager.com/gtag/js?id=G-DJG744VCZF');
+
             (function(c, l, a, r, i, t, y) {
                 c[a] = c[a] || function() { (c[a].q = c[a].q || []).push(arguments) };
                 t = l.createElement(r); t.async = 1;
@@ -71,12 +77,7 @@
                 y = l.getElementsByTagName(r)[0];
                 y.parentNode.insertBefore(t, y);
             })(window, document, "clarity", "script", "wv3d64uo3o");
-        });
-    </script>
 
-    <!-- Meta Pixel -->
-    <script>
-        window.addEventListener('load', function() {
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -85,38 +86,35 @@
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window,document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '{{ config('services.meta.pixel_id', 'YOUR_PIXEL_ID') }}');
-            window.__META_PAGE_VIEW_EVENT_ID = crypto.randomUUID
-                ? crypto.randomUUID()
-                : Date.now() + '-' + Math.random().toString(36).substring(2, 11);
-            fbq('track', 'PageView', {}, { eventID: window.__META_PAGE_VIEW_EVENT_ID });
-            //THIS IS THE NEW LINE YOU NEED TO ADD
-            fbq('track', 'ViewContent', {}, { eventID: window.__META_PAGE_VIEW_EVENT_ID });
-        });
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id={{ config('services.meta.pixel_id', 'YOUR_PIXEL_ID') }}&ev=PageView&noscript=1" /></noscript>
+            var _fbPixelId = '{{ config('services.meta.pixel_id', '') }}';
+            if (_fbPixelId && _fbPixelId !== 'YOUR_PIXEL_ID') {
+                fbq('init', _fbPixelId);
+                window.__META_PAGE_VIEW_EVENT_ID = crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+                fbq('track', 'PageView', {}, { eventID: window.__META_PAGE_VIEW_EVENT_ID });
+                fbq('track', 'ViewContent', {}, { eventID: window.__META_PAGE_VIEW_EVENT_ID });
+            }
 
-    <!-- BEGIN PLERDY CODE -->
-    <!-- Deferred to the load event (same as Clarity/Meta Pixel) so Plerdy's heavy
-         monitoring scripts don't compete with the critical rendering path. -->
-    <script>
-    window.addEventListener('load', function() {
-        (function(w,d){
-            if(w.__plerdyCode)return;
-            w.__plerdyCode=1;
-            w._protocol=w.location.protocol=="https:"?"https://":"http://";
-            w._site_hash_code="e5ad2bad413372216eb0cbf6646f35c3";
-            w._suid=79951;
-            var s=d.createElement("script");
-            s.async=true;
-            s.referrerPolicy="strict-origin-when-cross-origin";
-            s.src="https://a.plerdy.com/public/js/click/main.js?v="+Math.random();
-            d.head.appendChild(s);
-        })(window,document);
-    });
+                window._protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
+                window._site_hash_code = 'e5ad2bad413372216eb0cbf6646f35c3';
+                window._suid = 79951;
+                appendScript('https://a.plerdy.com/public/js/click/main.js');
+            }
+
+            ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(function (eventName) {
+                window.addEventListener(eventName, loadTelemetry, { once: true, passive: true });
+            });
+
+            // Preserve telemetry for visitors who read without interacting,
+            // while keeping it out of initial rendering and short synthetic runs.
+            window.setTimeout(loadTelemetry, 15000);
+        })();
     </script>
-    <!-- END PLERDY CODE -->
+    @if(config('services.meta.pixel_id') && config('services.meta.pixel_id') !== 'YOUR_PIXEL_ID')
+    <noscript><img height="1" width="1" style="display:none" alt=""
+        src="https://www.facebook.com/tr?id={{ config('services.meta.pixel_id') }}&ev=PageView&noscript=1" /></noscript>
+    @endif
 </body>
 
 </html>

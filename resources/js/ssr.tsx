@@ -38,7 +38,7 @@ createServer((page) =>
         },
         setup({ App, props }) {
             return (
-                <AppProviders>
+                <AppProviders lean={page.component.startsWith('cycle10/')}>
                     <App {...props} />
                 </AppProviders>
             );

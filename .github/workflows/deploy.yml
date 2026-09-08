@@ -149,6 +149,43 @@ jobs:
               mv "$htaccess.c10-fix" "$htaccess"
             fi
 
+            # public/.htaccess is deliberately excluded from rsync because the
+            # host owns additional rules. Install only our idempotent performance
+            # block so browser caching/security headers actually reach production.
+            if ! grep -q 'Full Bright performance headers' "$htaccess"; then
+              printf '%s\n' \
+                '' \
+                '# Full Bright performance headers' \
+                '<IfModule mod_expires.c>' \
+                '  ExpiresActive On' \
+                '  ExpiresByType text/css "access plus 1 year"' \
+                '  ExpiresByType application/javascript "access plus 1 year"' \
+                '  ExpiresByType text/javascript "access plus 1 year"' \
+                '  ExpiresByType font/woff2 "access plus 1 year"' \
+                '  ExpiresByType image/webp "access plus 30 days"' \
+                '  ExpiresByType image/jpeg "access plus 30 days"' \
+                '  ExpiresByType image/png "access plus 30 days"' \
+                '  ExpiresByType image/gif "access plus 30 days"' \
+                '  ExpiresByType image/svg+xml "access plus 30 days"' \
+                '  ExpiresByType video/mp4 "access plus 30 days"' \
+                '</IfModule>' \
+                '<IfModule mod_headers.c>' \
+                '  <FilesMatch "\.(js|css|woff2)$">' \
+                '    Header set Cache-Control "public, max-age=31536000, immutable"' \
+                '  </FilesMatch>' \
+                '  <FilesMatch "\.(webp|png|jpg|jpeg|gif|svg|mp4)$">' \
+                '    Header set Cache-Control "public, max-age=2592000"' \
+                '  </FilesMatch>' \
+                '  Header always set X-Content-Type-Options "nosniff"' \
+                '  Header always set X-Frame-Options "SAMEORIGIN"' \
+                '  Header always set Referrer-Policy "strict-origin-when-cross-origin"' \
+                '  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"' \
+                '</IfModule>' \
+                '<IfModule mod_deflate.c>' \
+                '  AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript text/javascript application/json image/svg+xml' \
+                '</IfModule>' >> "$htaccess"
+            fi
+
             # The old static landing page left this physical directory behind.
             # LiteSpeed adds a trailing slash for the directory while Laravel
             # removes it for the /c10-lp route, causing an infinite redirect.

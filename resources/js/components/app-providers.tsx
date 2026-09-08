@@ -1,12 +1,21 @@
-import type { ReactNode } from 'react';
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { lazy, Suspense, type ReactNode } from 'react';
 
-export default function AppProviders({ children }: { children: ReactNode }) {
+const RichAppProviders = lazy(() => import('@/components/rich-app-providers'));
+
+export default function AppProviders({
+    children,
+    lean = false,
+}: {
+    children: ReactNode;
+    lean?: boolean;
+}) {
+    if (lean) {
+        return children;
+    }
+
     return (
-        <TooltipProvider delayDuration={0}>
-            {children}
-            <Toaster />
-        </TooltipProvider>
+        <Suspense fallback={children}>
+            <RichAppProviders>{children}</RichAppProviders>
+        </Suspense>
     );
 }

@@ -16,8 +16,12 @@ return [
     */
 
     'ssr' => [
-        'enabled' => true,
-        'url' => 'http://127.0.0.1:13714',
+        // SSR must only be enabled when the Node SSR daemon is actually
+        // supervised in production. The deploy workflow does not start one,
+        // so a hard-coded `true` makes every request attempt a dead localhost
+        // connection before falling back to CSR.
+        'enabled' => env('INERTIA_SSR_ENABLED', false),
+        'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
         // 'bundle' => base_path('bootstrap/ssr/ssr.mjs'),
 
     ],

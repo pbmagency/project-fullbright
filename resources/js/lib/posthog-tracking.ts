@@ -71,4 +71,28 @@ async function initPosthogTracking(): Promise<void> {
     });
 }
 
-void initPosthogTracking();
+function schedulePosthogTracking(): void {
+    let scheduled = false;
+
+    const start = (): void => {
+        if (scheduled) {
+            return;
+        }
+
+        scheduled = true;
+        void initPosthogTracking();
+    };
+
+    for (const eventName of ['pointerdown', 'touchstart', 'keydown', 'scroll']) {
+        window.addEventListener(eventName, start, {
+            once: true,
+            passive: true,
+        });
+    }
+
+    window.setTimeout(start, 15000);
+}
+
+if (apiKey && apiHost) {
+    schedulePosthogTracking();
+}
