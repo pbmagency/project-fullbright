@@ -886,30 +886,18 @@ export default function LandingPage() {
       </p>
     </div>
 
-    {/* YOUTUBE EMBED SECTION */}
-    <div className="[max-width:840px] [margin:0_auto_44px]">
-      <div className="[position:relative] [border-radius:20px] [overflow:hidden] [background:#000] [border:1px_solid_#e5e5e5] [box-shadow:0_8px_32px_rgba(0,0,0,0.12)] [aspect-ratio:16/9] [cursor:pointer]"
-        onClick={(e) => {
-          const wrapper = e.currentTarget;
-          wrapper.innerHTML = `<iframe style="position:absolute;inset:0;width:100%;height:100%;border:none" src="https://www.youtube.com/embed/rm1IJv73Fpw?autoplay=1&rel=0" title="Video Tour LMS" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-        }}
-      >
-        {/* YT maxres thumbnail */}
-        <img
-          src="https://img.youtube.com/vi/rm1IJv73Fpw/maxresdefault.jpg"
-          alt="Video Tour LMS Full Bright Indonesia"
-          loading="lazy"
-          className="[position:absolute] [inset:0] [width:100%] [height:100%] [object-fit:cover]"
-        />
-        {/* Play button */}
-        <div className="[position:absolute] [inset:0] [display:flex] [align-items:center] [justify-content:center]">
-          <div className="[width:72px] [height:72px] [border-radius:9999px] [background:rgba(215,8,8,0.9)] [display:flex] [align-items:center] [justify-content:center] [box-shadow:0_8px_32px_rgba(0,0,0,0.3)] [transition:transform_0.2s_ease,background_0.2s_ease] hover:[transform:scale(1.1)] hover:[background:rgba(215,8,8,1)]">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-    {/* END YOUTUBE EMBED SECTION */}
+    <video
+      controls
+      preload="metadata"
+      playsInline
+      className="w-full rounded-xl"
+  >
+      <source
+          src="https://demo-fullbright.b-cdn.net/REVISI.mp4"
+          type="video/mp4"
+      />
+      Browser kamu tidak mendukung pemutaran video.
+  </video>
 
     <div className="[display:flex] [flex-direction:column] [gap:20px] [max-width:1040px] [margin:0_auto_40px]">
       
