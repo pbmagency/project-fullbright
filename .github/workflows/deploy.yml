@@ -7,6 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  inspect-c10-redirect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect LiteSpeed redirect sources
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: '72.61.210.213'
+          username: 'root'
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo '=== public target ==='
+            readlink -f /home/fullbrightindonesia.org/toefl || true
+            ls -la /home/fullbrightindonesia.org/toefl || true
+            echo '=== target htaccess ==='
+            sed -n '1,180p' /home/fullbrightindonesia.org/toefl/.htaccess || true
+            echo '=== c10 filesystem entries ==='
+            find /home -maxdepth 8 -name 'c10-lp' -print -exec ls -lad {} \; 2>/dev/null || true
+            echo '=== c10 rules in home and LiteSpeed config ==='
+            grep -Rns --include='.htaccess' 'c10-lp' /home 2>/dev/null | head -100 || true
+            grep -Rns 'c10-lp' /usr/local/lsws/conf /etc/apache2 /etc/httpd 2>/dev/null | head -100 || true
+
   deploy:
     runs-on: ubuntu-latest
     env:
