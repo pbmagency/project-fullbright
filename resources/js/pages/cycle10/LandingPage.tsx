@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { Head } from '@inertiajs/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react';
 import { generateEventId, useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
