@@ -21,6 +21,7 @@ createServer((page) =>
                 case name === 'checkout':
                 case name.startsWith('payment/'):
                 case name.startsWith('admin/'):
+                case name.startsWith('cycle10/'):
                     return null;
                 case name.startsWith('auth/'):
                     return AuthLayout;

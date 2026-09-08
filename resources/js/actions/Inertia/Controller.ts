@@ -1016,6 +1016,84 @@ Controller4910a64bdf6a5bcc60b71935e5563582.head = (options?: RouteQueryOptions):
     /**
 * @see \Inertia\Controller::__invoke
  * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+const Controller22e72a0de684440edf2941f8cdb6f9e2 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller22e72a0de684440edf2941f8cdb6f9e2.url(options),
+    method: 'get',
+})
+
+Controller22e72a0de684440edf2941f8cdb6f9e2.definition = {
+    methods: ["get","head"],
+    url: '/c10-lp',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+Controller22e72a0de684440edf2941f8cdb6f9e2.url = (options?: RouteQueryOptions) => {
+    return Controller22e72a0de684440edf2941f8cdb6f9e2.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+Controller22e72a0de684440edf2941f8cdb6f9e2.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller22e72a0de684440edf2941f8cdb6f9e2.url(options),
+    method: 'get',
+})
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+Controller22e72a0de684440edf2941f8cdb6f9e2.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller22e72a0de684440edf2941f8cdb6f9e2.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+    const Controller22e72a0de684440edf2941f8cdb6f9e2Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: Controller22e72a0de684440edf2941f8cdb6f9e2.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+        Controller22e72a0de684440edf2941f8cdb6f9e2Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Controller22e72a0de684440edf2941f8cdb6f9e2.url(options),
+            method: 'get',
+        })
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c10-lp'
+ */
+        Controller22e72a0de684440edf2941f8cdb6f9e2Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Controller22e72a0de684440edf2941f8cdb6f9e2.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    Controller22e72a0de684440edf2941f8cdb6f9e2.form = Controller22e72a0de684440edf2941f8cdb6f9e2Form
+    /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
  * @route '/dashboard'
  */
 const Controller42a740574ecbfbac32f8cc353fc32db9 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -1267,6 +1345,7 @@ const Controller = {
     '/bio-ig-toefl-hack': Controller40a01a1699aa81065f0aa8fdda0f8426,
     '/toefl-hack': Controlleref596e3b2ff77794a2ffd983d4e27298,
     '/e-course-toefl-hack': Controller4910a64bdf6a5bcc60b71935e5563582,
+    '/c10-lp': Controller22e72a0de684440edf2941f8cdb6f9e2,
     '/dashboard': Controller42a740574ecbfbac32f8cc353fc32db9,
     '/c3-problem': Controller30577f290beec2f7e645688887f0890c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,
