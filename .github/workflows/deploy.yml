@@ -110,6 +110,24 @@ jobs:
           username: ${{ env.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Route the TSX landing page through Laravel before any legacy
+            # trailing-slash rule can bounce /c10-lp and /c10-lp/ forever.
+            htaccess="${{ env.TARGET_DIR_PUBLIC }}/.htaccess"
+            if ! grep -q 'C10 Laravel route override' "$htaccess"; then
+              cp -p "$htaccess" "$htaccess.before-c10-fix"
+              awk '
+                { print }
+                /RewriteEngine On/ {
+                  print ""
+                  print "    # C10 Laravel route override: bypass legacy slash redirects"
+                  print "    RewriteRule ^c10-lp/?$ index.php [L]"
+                }
+              ' "$htaccess" > "$htaccess.c10-fix"
+              chown --reference="$htaccess" "$htaccess.c10-fix"
+              chmod --reference="$htaccess" "$htaccess.c10-fix"
+              mv "$htaccess.c10-fix" "$htaccess"
+            fi
+
             # The old static landing page left this physical directory behind.
             # LiteSpeed adds a trailing slash for the directory while Laravel
             # removes it for the /c10-lp route, causing an infinite redirect.
