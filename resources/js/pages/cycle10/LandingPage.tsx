@@ -957,6 +957,7 @@ export default function LandingPage() {
               <path d="M8 5.5v13l11-6.5z"></path>
             </svg>
           </span>
+          <span className="[font-size:13px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#fff] [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">Putar Showcase LMS</span>
         </button>
       ) : null}
     </div>
