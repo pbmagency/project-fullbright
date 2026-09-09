@@ -1,8 +1,10 @@
 import { useCallback, useEffect } from 'react';
 
 const REFERRAL_SOURCE_KEY = 'referral_source';
+const ANALYTICS_SESSION_ID_KEY = 'analytics_session_id_v1';
 const VISIT_TRACKED_PREFIX = 'analytics_visit_tracked:';
 const pendingVisitKeys = new Set<string>();
+let inMemoryAnalyticsSessionId: string | null = null;
 
 export type AnalyticsEventType =
     | 'visit'
@@ -33,6 +35,49 @@ export function generateEventId(): string {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
 
+function readSessionStorage(key: string): string | null {
+    try {
+        return sessionStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function writeSessionStorage(key: string, value: string): void {
+    try {
+        sessionStorage.setItem(key, value);
+    } catch {
+        // Analytics must still work when storage is blocked by the browser.
+    }
+}
+
+function removeSessionStorage(key: string): void {
+    try {
+        sessionStorage.removeItem(key);
+    } catch {
+        // Nothing to clean up when storage is unavailable.
+    }
+}
+
+export function getAnalyticsSessionId(): string {
+    if (inMemoryAnalyticsSessionId) {
+        return inMemoryAnalyticsSessionId;
+    }
+
+    const storedSessionId = readSessionStorage(ANALYTICS_SESSION_ID_KEY);
+
+    if (storedSessionId) {
+        inMemoryAnalyticsSessionId = storedSessionId;
+
+        return storedSessionId;
+    }
+
+    inMemoryAnalyticsSessionId = generateEventId();
+    writeSessionStorage(ANALYTICS_SESSION_ID_KEY, inMemoryAnalyticsSessionId);
+
+    return inMemoryAnalyticsSessionId;
+}
+
 function getCookieValue(name: string): string | null {
     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
 
@@ -58,7 +103,7 @@ export function useAnalytics() {
             return;
         }
 
-        if (!sessionStorage.getItem(REFERRAL_SOURCE_KEY)) {
+        if (!readSessionStorage(REFERRAL_SOURCE_KEY)) {
             const urlParams = new URLSearchParams(window.location.search);
             let externalReferrer = '';
 
@@ -74,7 +119,7 @@ export function useAnalytics() {
                 }
             }
 
-            sessionStorage.setItem(
+            writeSessionStorage(
                 REFERRAL_SOURCE_KEY,
                 urlParams.get('ref') || externalReferrer || 'direct',
             );
@@ -85,15 +130,22 @@ export function useAnalytics() {
         async (event: AnalyticsEvent): Promise<boolean> => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
+                const suppliedEventId = event.event_data?.event_id;
+                const eventId =
+                    typeof suppliedEventId === 'string'
+                        ? suppliedEventId
+                        : generateEventId();
                 const payload = {
                     ...event,
                     event_data: {
                         ...event.event_data,
+                        event_id: eventId,
+                        analytics_session_id: getAnalyticsSessionId(),
                         landing_source: getLandingSource(),
                     },
                     referral_source:
                         event.referral_source ||
-                        sessionStorage.getItem(REFERRAL_SOURCE_KEY) ||
+                        readSessionStorage(REFERRAL_SOURCE_KEY) ||
                         'direct',
                     utm_source: event.utm_source || urlParams.get('utm_source'),
                     utm_medium: event.utm_medium || urlParams.get('utm_medium'),
@@ -104,29 +156,43 @@ export function useAnalytics() {
                     utm_term: event.utm_term || urlParams.get('utm_term'),
                 };
 
-                const response = await fetch('/analytics/track', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    keepalive: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector('meta[name=csrf-token]')
-                                ?.getAttribute('content') || '',
-                    },
-                    body: JSON.stringify(payload),
-                });
+                for (let attempt = 0; attempt < 2; attempt += 1) {
+                    try {
+                        const response = await fetch('/analytics/track', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            keepalive: true,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN':
+                                    document
+                                        .querySelector('meta[name=csrf-token]')
+                                        ?.getAttribute('content') || '',
+                            },
+                            body: JSON.stringify(payload),
+                        });
 
-                if (!response.ok) {
-                    console.debug(
-                        `Analytics tracking rejected (${response.status})`,
-                    );
+                        if (response.ok) {
+                            return true;
+                        }
 
-                    return false;
+                        if (response.status < 500 && response.status !== 429) {
+                            console.debug(
+                                `Analytics tracking rejected (${response.status})`,
+                            );
+
+                            return false;
+                        }
+                    } catch (error) {
+                        if (attempt === 1) {
+                            throw error;
+                        }
+                    }
                 }
 
-                return true;
+                console.debug('Analytics tracking failed after retry');
+
+                return false;
             } catch (error) {
                 console.debug('Analytics tracking failed:', error);
 
@@ -138,10 +204,10 @@ export function useAnalytics() {
 
     const trackVisit = useCallback(() => {
         const landingSource = getLandingSource();
-        const visitKey = `${VISIT_TRACKED_PREFIX}${landingSource}`;
+        const visitKey = `${VISIT_TRACKED_PREFIX}${getAnalyticsSessionId()}:${landingSource}`;
 
         if (
-            sessionStorage.getItem(visitKey) === 'tracked' ||
+            readSessionStorage(visitKey) === 'tracked' ||
             pendingVisitKeys.has(visitKey)
         ) {
             return;
@@ -166,12 +232,12 @@ export function useAnalytics() {
             pendingVisitKeys.delete(visitKey);
 
             if (success) {
-                sessionStorage.setItem(visitKey, 'tracked');
+                writeSessionStorage(visitKey, 'tracked');
 
                 return;
             }
 
-            sessionStorage.removeItem(visitKey);
+            removeSessionStorage(visitKey);
         });
     }, [track]);
 

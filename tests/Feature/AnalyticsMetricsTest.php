@@ -16,6 +16,54 @@ class AnalyticsMetricsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_tracking_endpoint_keeps_browser_sessions_separate_and_updates_rates(): void
+    {
+        $events = [
+            ['bounce', 'visit', []],
+            ['scroll', 'visit', []],
+            ['scroll', 'scroll', ['depth' => 25]],
+            ['cta', 'visit', []],
+            ['cta', 'cta_click', ['location' => 'hero', 'destination' => '#pricing']],
+            ['survey', 'visit', []],
+            ['survey', 'engagement', ['type' => 'survey_response', 'location' => 'difficulty_survey']],
+        ];
+
+        foreach ($events as [$analyticsSessionId, $eventType, $eventData]) {
+            $this->postJson('/analytics/track', [
+                'event_type' => $eventType,
+                'event_data' => [
+                    'analytics_session_id' => "browser-{$analyticsSessionId}",
+                    'landing_source' => '/c10-lp',
+                    ...$eventData,
+                ],
+                'referral_source' => 'direct',
+            ])->assertOk();
+        }
+
+        $now = Carbon::now();
+        $stats = app(AnalyticsMetricsService::class)->dashboardStats(
+            $now->copy()->subMinute(),
+            $now->copy()->addMinute(),
+        );
+        $matrix = collect(app(AbTestingService::class)->getPerformanceMatrix(
+            $now->copy()->subMinute(),
+            $now->copy()->addMinute(),
+        ))->firstWhere('landing_source', '/c10-lp');
+
+        $this->assertSame(4, $stats['unique_visitors']);
+        $this->assertSame(3, $stats['engaged']);
+        $this->assertSame(75.0, $stats['engagement_rate']);
+        $this->assertSame(1, $stats['intent']);
+        $this->assertSame(25.0, $stats['intent_rate']);
+        $this->assertSame(3, $matrix['engaged']);
+        $this->assertSame(75.0, $matrix['engagement_rate']);
+        $this->assertSame(25.0, $matrix['intent_rate']);
+        $this->assertDatabaseHas('user_analytics', [
+            'session_id' => 'browser-survey',
+            'event_type' => 'engagement',
+        ]);
+    }
+
     public function test_engagement_uses_scroll_or_dwell_or_funnel_action(): void
     {
         $now = Carbon::now();

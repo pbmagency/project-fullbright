@@ -52,6 +52,7 @@ class AnalyticsController extends Controller
             ])],
             'event_data' => ['nullable', 'array'],
             'event_data.event_id' => ['nullable', 'string', 'max:100'],
+            'event_data.analytics_session_id' => ['nullable', 'string', 'max:100'],
             'event_data.landing_source' => ['nullable', 'string', 'max:255'],
             'event_data.type' => ['nullable', 'string', 'max:100'],
             'event_data.depth' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -92,7 +93,10 @@ class AnalyticsController extends Controller
         }
 
         UserAnalytic::create([
-            'session_id' => $request->session()->getId(),
+            // A browser-tab analytics session is more accurate than Laravel's
+            // shared session cookie, which otherwise merges independent tabs
+            // and landing-page tests into one visitor.
+            'session_id' => $eventData['analytics_session_id'] ?? $request->session()->getId(),
             'event_type' => $validated['event_type'],
             'event_data' => $eventData,
             'referral_source' => $validated['referral_source'] ?? null,

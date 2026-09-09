@@ -105,7 +105,7 @@ class AnalyticsMetricsService
                     ->where('event_data->duration', '>=', self::DWELL_THRESHOLD_MS);
             })->orWhere(function (Builder $scroll) {
                 $scroll->where('event_type', 'scroll')
-                    ->where('event_data->depth', '>', self::SCROLL_THRESHOLD);
+                    ->where('event_data->depth', '>=', self::SCROLL_THRESHOLD);
             })->orWhere(function (Builder $interaction) {
                 $this->applyEngagementInteractionConditions($interaction);
             })->orWhere(function (Builder $actions) {
@@ -195,7 +195,7 @@ class AnalyticsMetricsService
                 $scroll->from('user_analytics as scrolls')
                     ->whereColumn('scrolls.session_id', "{$visitAlias}.session_id")
                     ->where('scrolls.event_type', 'scroll')
-                    ->where('scrolls.event_data->depth', '>', self::SCROLL_THRESHOLD)
+                    ->where('scrolls.event_data->depth', '>=', self::SCROLL_THRESHOLD)
                     ->whereBetween('scrolls.created_at', [$startDate, $endDate]);
             })
             ->whereNotExists(function (Builder $dwell) use ($startDate, $endDate, $visitAlias) {

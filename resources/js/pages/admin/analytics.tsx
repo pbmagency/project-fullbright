@@ -21,8 +21,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useLiveAnalyticsRefresh } from '@/hooks/use-live-analytics-refresh';
 import AdminLayout from '@/layouts/admin-layout';
 import type { BreadcrumbItem } from '@/types';
+
+const LIVE_REFRESH_PROPS = [
+    'stats',
+    'chartData',
+    'referralData',
+    'conversionFunnel',
+];
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/admin' },
@@ -69,6 +77,8 @@ export default function Analytics({
     dateRange,
 }: AnalyticsProps) {
     const [selectedRange, setSelectedRange] = useState(dateRange);
+
+    useLiveAnalyticsRefresh(LIVE_REFRESH_PROPS);
 
     const handleRangeChange = (range: string) => {
         setSelectedRange(range);

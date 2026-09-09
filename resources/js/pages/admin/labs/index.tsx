@@ -56,6 +56,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useLiveAnalyticsRefresh } from '@/hooks/use-live-analytics-refresh';
 import AdminLayout from '@/layouts/admin-layout';
 import {
     formatDuration,
@@ -115,6 +116,18 @@ const CHART_COLORS = [
     'var(--chart-5)',
 ];
 
+const LIVE_REFRESH_PROPS = [
+    'matrix',
+    'funnel',
+    'quality',
+    'devices',
+    'cta',
+    'readers',
+    'heatmap',
+    'section_heatmap',
+    'availableSources',
+];
+
 // ==================== MAIN COMPONENT ====================
 
 export default function LabsIndex({
@@ -130,6 +143,8 @@ export default function LabsIndex({
     minimumWinnerVisits,
     filters,
 }: LabsPageProps) {
+    useLiveAnalyticsRefresh(LIVE_REFRESH_PROPS);
+
     // Normalise all props — PHP Collections can serialize as objects
     const matrix = toSafeArray<MatrixItem>(rawMatrix);
     const safeFunnel = toSafeArray<FunnelItem>(rawFunnel);
