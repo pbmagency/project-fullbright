@@ -38,11 +38,14 @@ class AbTestingService
             $ctaClicks = $typeCounts['cta_click'] ?? 0;
 
             $bounced = $bouncedBySource[$source] ?? 0;
+            $engaged = max(0, $visits - $bounced);
 
             $matrix[] = [
                 'landing_source' => $source,
                 'visits' => $visits,
                 'bounce_rate' => round($this->safePct($bounced, $visits), 2),
+                'engaged' => $engaged,
+                'engagement_rate' => round($this->safePct($engaged, $visits), 2),
                 'intent_rate' => round($this->safePct($ctaClicks, $visits), 2),
                 'direct_checkout_rate' => round($this->safePct($directCheckouts, $visits), 2),
                 'whatsapp_lead_rate' => round($this->safePct($whatsAppLeads, $visits), 2),
@@ -609,7 +612,12 @@ class AbTestingService
             ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('referral_source', $sourceFilter))
             ->distinct();
 
-        $this->metrics->applyFunnelActionEventConditions($rows);
+        $rows->where(function ($actions) {
+            $this->metrics->applyFunnelActionEventConditions($actions)
+                ->orWhere(function ($interaction) {
+                    $this->metrics->applyEngagementInteractionConditions($interaction);
+                });
+        });
 
         $rows = $rows->get();
 

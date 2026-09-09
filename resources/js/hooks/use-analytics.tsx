@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 
-const LANDING_SOURCE_KEY = 'landing_source';
 const REFERRAL_SOURCE_KEY = 'referral_source';
 const VISIT_TRACKED_PREFIX = 'analytics_visit_tracked:';
 const pendingVisitKeys = new Set<string>();
@@ -45,9 +44,10 @@ export function getLandingSource(): string {
         return 'unknown';
     }
 
-    return (
-        sessionStorage.getItem(LANDING_SOURCE_KEY) || window.location.pathname
-    );
+    // A/B analytics must describe the page where the event happened. Keeping
+    // the first page in sessionStorage misattributes later visits (for example,
+    // opening /c10-lp after another variant) and can also suppress its visit.
+    return window.location.pathname;
 }
 
 export function useAnalytics() {
@@ -56,13 +56,6 @@ export function useAnalytics() {
     useEffect(() => {
         if (typeof window === 'undefined') {
             return;
-        }
-
-        if (!sessionStorage.getItem(LANDING_SOURCE_KEY)) {
-            sessionStorage.setItem(
-                LANDING_SOURCE_KEY,
-                window.location.pathname,
-            );
         }
 
         if (!sessionStorage.getItem(REFERRAL_SOURCE_KEY)) {
@@ -212,6 +205,22 @@ export function useAnalytics() {
         [track],
     );
 
+    const trackInteraction = useCallback(
+        (location: string, text: string) => {
+            void track({
+                event_type: 'engagement',
+                event_data: {
+                    type: 'survey_response',
+                    location,
+                    text,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                },
+            });
+        },
+        [track],
+    );
+
     const trackCTA = useCallback(
         (location: string, text: string, destination = 'unknown') => {
             void track({
@@ -302,6 +311,7 @@ export function useAnalytics() {
         trackVisit,
         trackScroll,
         trackEngagement,
+        trackInteraction,
         trackCTA,
         trackInitiateCheckout,
         trackConversion,

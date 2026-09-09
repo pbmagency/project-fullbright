@@ -9,6 +9,8 @@ export interface MatrixItem {
     landing_source: string;
     visits: number;
     bounce_rate: number;
+    engaged: number;
+    engagement_rate: number;
     intent_rate: number;
     direct_checkout_rate: number;
     direct_checkouts: number;

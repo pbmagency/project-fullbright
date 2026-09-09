@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserAnalytic;
 use App\Services\AbTestingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,7 +35,11 @@ class LabsController extends Controller
 
         $sourceFilter = $request->get('source');
         $sourceKey = $sourceFilter ?? 'all';
-        $cacheKey = "ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}";
+        // Tie cached reports to the latest stored event. Without this version,
+        // Labs can show stale visit, engagement, and lead numbers for 30 minutes
+        // after a visitor interacts with a landing page.
+        $dataVersion = UserAnalytic::query()->max('id') ?? 0;
+        $cacheKey = "ab_testing_v12_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}";
 
         // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
@@ -97,7 +102,8 @@ class LabsController extends Controller
         }
 
         $sourceKey = $sourceFilter ?? 'all';
-        Cache::forget("ab_testing_v11_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}");
+        $dataVersion = UserAnalytic::query()->max('id') ?? 0;
+        Cache::forget("ab_testing_v12_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}");
 
         return response()->json(['success' => true, 'message' => 'Cache cleared successfully']);
     }

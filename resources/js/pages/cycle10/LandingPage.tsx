@@ -271,7 +271,7 @@ export default function LandingPage() {
 
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion } = useAnalytics();
+  const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction } = useAnalytics();
 
   useScrollTracking();
   useDwellTime();
@@ -404,6 +404,10 @@ export default function LandingPage() {
   const closeReview = useCallback((): void => setReviewIdx(null), []);
   const prevReview = useCallback((): void => setReviewIdx((i) => ((i ?? 0) - 1 + REVIEW_COUNT) % REVIEW_COUNT), []);
   const nextReview = useCallback((): void => setReviewIdx((i) => ((i ?? 0) + 1) % REVIEW_COUNT), []);
+  const selectSurvey = useCallback((index: number, answer: string): void => {
+    setSurveySelected(index);
+    trackInteraction('difficulty_survey', answer);
+  }, [trackInteraction]);
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
   const playVideo = useCallback((): void => { if (videoRef.current?.paused) void videoRef.current.play(); }, []);
@@ -444,7 +448,8 @@ export default function LandingPage() {
       <style>{KEYFRAMES}</style>
       
       
-      <div onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
+      <div onClickCapture={handleTrackedClick}>
+        <div className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
       
         {/* Urgency Banner + Navbar — fixed so no overflow ancestor can hide them */}
         <div className="[position:fixed] [top:0] [left:0] [right:0] [z-index:50]">
@@ -877,7 +882,7 @@ export default function LandingPage() {
     <div className="[text-align:center] [margin-bottom:48px]">
       <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">
         💻 Tampilan LMS
-      </div>
+        </div>
       <h2 className="[margin:0_0_16px] [font-size:clamp(24px,3vw,36px)] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">
         Intip Langsung <span className="[color:#D70808]">Platform Belajarnya</span>
       </h2>
@@ -2237,28 +2242,28 @@ export default function LandingPage() {
       
             <div className="[display:flex] [flex-direction:column] [gap:6px]">
               
-                <button onClick={() => setSurveySelected(0)} style={css(surveyOptStyle(surveySelected === 0))}>
+                <button onClick={() => selectSurvey(0, 'Bingung mulai belajar dari mana')} style={css(surveyOptStyle(surveySelected === 0))}>
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Bingung mulai belajar dari mana</span>
                   {surveySelected === 0 ? (<>
                     <span className="flex shrink-0 items-center justify-center [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(1)} style={css(surveyOptStyle(surveySelected === 1))}>
+                <button onClick={() => selectSurvey(1, 'Sudah belajar tapi skor masih stuck')} style={css(surveyOptStyle(surveySelected === 1))}>
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Sudah belajar tapi skor masih stuck</span>
                   {surveySelected === 1 ? (<>
                     <span className="flex shrink-0 items-center justify-center [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(2)} style={css(surveyOptStyle(surveySelected === 2))}>
+                <button onClick={() => selectSurvey(2, 'Masih ragu apakah perlu ikut kursus')} style={css(surveyOptStyle(surveySelected === 2))}>
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Masih ragu apakah perlu ikut kursus</span>
                   {surveySelected === 2 ? (<>
                     <span className="flex shrink-0 items-center justify-center [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(3)} style={css(surveyOptStyle(surveySelected === 3))}>
+                <button onClick={() => selectSurvey(3, 'Lainnya')} style={css(surveyOptStyle(surveySelected === 3))}>
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Lainnya</span>
                   {surveySelected === 3 ? (<>
                     <span className="flex shrink-0 items-center justify-center [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
@@ -2412,7 +2417,7 @@ export default function LandingPage() {
           </a>
         </div>
       
-      
+      </div>
     </>
   );
 }

@@ -12,6 +12,10 @@ class AnalyticsMetricsService
 
     public const SCROLL_THRESHOLD = 25;
 
+    public const ENGAGEMENT_INTERACTION_TYPES = [
+        'survey_response',
+    ];
+
     public const FUNNEL_ACTION_EVENTS = [
         'cta_click',
         'initiate_checkout',
@@ -102,10 +106,18 @@ class AnalyticsMetricsService
             })->orWhere(function (Builder $scroll) {
                 $scroll->where('event_type', 'scroll')
                     ->where('event_data->depth', '>', self::SCROLL_THRESHOLD);
+            })->orWhere(function (Builder $interaction) {
+                $this->applyEngagementInteractionConditions($interaction);
             })->orWhere(function (Builder $actions) {
                 $this->applyFunnelActionEventConditions($actions);
             });
         });
+    }
+
+    public function applyEngagementInteractionConditions(Builder $query): Builder
+    {
+        return $query->where('event_type', 'engagement')
+            ->whereIn('event_data->type', self::ENGAGEMENT_INTERACTION_TYPES);
     }
 
     public function applyFunnelActionEventConditions(Builder $query): Builder
@@ -193,6 +205,13 @@ class AnalyticsMetricsService
                     ->where('dwell.event_data->type', 'dwell_ping')
                     ->where('dwell.event_data->duration', '>=', self::DWELL_THRESHOLD_MS)
                     ->whereBetween('dwell.created_at', [$startDate, $endDate]);
+            })
+            ->whereNotExists(function (Builder $interaction) use ($startDate, $endDate, $visitAlias) {
+                $interaction->from('user_analytics as interactions')
+                    ->whereColumn('interactions.session_id', "{$visitAlias}.session_id")
+                    ->whereBetween('interactions.created_at', [$startDate, $endDate]);
+
+                $this->applyEngagementInteractionConditions($interaction);
             })
             ->whereNotExists(function (Builder $action) use ($startDate, $endDate, $visitAlias) {
                 $action->from('user_analytics as actions')

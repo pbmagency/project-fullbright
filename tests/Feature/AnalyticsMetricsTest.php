@@ -20,7 +20,7 @@ class AnalyticsMetricsTest extends TestCase
     {
         $now = Carbon::now();
 
-        foreach (['bounce', 'dwell', 'scroll', 'action'] as $sessionId) {
+        foreach (['bounce', 'dwell', 'scroll', 'action', 'survey'] as $sessionId) {
             $this->event($sessionId, 'visit', '/', $now);
         }
 
@@ -35,13 +35,23 @@ class AnalyticsMetricsTest extends TestCase
             'duration' => 15000,
         ]);
         $this->event('action', 'cta_click', '/', $now, ['location' => 'hero']);
+        $this->event('survey', 'engagement', '/', $now, [
+            'type' => 'survey_response',
+            'location' => 'difficulty_survey',
+        ]);
 
         $metrics = app(AnalyticsMetricsService::class);
         $stats = $metrics->dashboardStats($now->copy()->subHour(), $now->copy()->addHour());
+        $matrix = collect(app(AbTestingService::class)->getPerformanceMatrix(
+            $now->copy()->subHour(),
+            $now->copy()->addHour(),
+        ))->firstWhere('landing_source', '/');
 
         $this->assertSame(1, $metrics->bouncedSessions($now->copy()->subHour(), $now->copy()->addHour()));
-        $this->assertSame(3, $stats['engaged']);
-        $this->assertSame(75.0, $stats['engagement_rate']);
+        $this->assertSame(4, $stats['engaged']);
+        $this->assertSame(80.0, $stats['engagement_rate']);
+        $this->assertSame(4, $matrix['engaged']);
+        $this->assertSame(80.0, $matrix['engagement_rate']);
 
         $engagedQuery = DB::table('user_analytics')
             ->whereBetween('created_at', [
@@ -50,7 +60,7 @@ class AnalyticsMetricsTest extends TestCase
             ]);
         $metrics->applyEngagedEventConditions($engagedQuery);
 
-        $this->assertSame(3, $engagedQuery->distinct()->count('session_id'));
+        $this->assertSame(4, $engagedQuery->distinct()->count('session_id'));
 
         $chartMethod = new \ReflectionMethod(
             AnalyticsController::class,
@@ -63,7 +73,7 @@ class AnalyticsMetricsTest extends TestCase
         );
 
         $this->assertSame(
-            3,
+            4,
             (int) $chartData->get('engagement')->first()->total,
         );
     }
@@ -164,6 +174,8 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(1, $matrix[0]['whatsapp_leads']);
         $this->assertSame(2, $matrix[0]['total_leads']);
         $this->assertSame(0.0, $matrix[0]['bounce_rate']);
+        $this->assertSame(2, $matrix[0]['engaged']);
+        $this->assertSame(100.0, $matrix[0]['engagement_rate']);
         $this->assertSame('Intent', $funnel['Direct Checkout']['from_stage']);
         $this->assertSame('checkout', $funnel['Direct Checkout']['branch']);
         $this->assertSame('Intent', $funnel['WhatsApp Leads']['from_stage']);

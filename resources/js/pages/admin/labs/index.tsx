@@ -770,6 +770,19 @@ export default function LabsIndex({
                                                     <button
                                                         onClick={() =>
                                                             handleSort(
+                                                                'engagement_rate',
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1 hover:text-foreground"
+                                                    >
+                                                        Engagement
+                                                        <ArrowUpDown className="h-3 w-3" />
+                                                    </button>
+                                                </th>
+                                                <th className="p-4 text-left text-sm font-medium text-muted-foreground">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSort(
                                                                 'intent_rate',
                                                             )
                                                         }
@@ -871,6 +884,15 @@ export default function LabsIndex({
                                                             >
                                                                 {formatPercent(
                                                                     item.bounce_rate,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <span className="text-foreground">
+                                                                {formatPercent(
+                                                                    item.engagement_rate,
                                                                     1,
                                                                 )}
                                                                 %
@@ -982,6 +1004,18 @@ export default function LabsIndex({
                                                             >
                                                                 {formatPercent(
                                                                     item.bounce_rate,
+                                                                    1,
+                                                                )}
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-muted-foreground">
+                                                                Engagement:
+                                                            </span>{' '}
+                                                            <span className="text-foreground">
+                                                                {formatPercent(
+                                                                    item.engagement_rate,
                                                                     1,
                                                                 )}
                                                                 %
