@@ -279,10 +279,12 @@ export default function LandingPage() {
   const [rpSelected, setRpSelected] = useState<number | null>(null);
   const [waBubbleOpen, setWaBubbleOpen] = useState<boolean>(false);
   const [showOverlay, setShowOverlay] = useState<boolean>(true);
+  const [showLmsOverlay, setShowLmsOverlay] = useState<boolean>(true);
   const [flashVisible, setFlashVisible] = useState<boolean>(true);
 
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction } = useAnalytics();
 
   useScrollTracking();
@@ -428,6 +430,25 @@ export default function LandingPage() {
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
   const playVideo = useCallback((): void => { if (videoRef.current?.paused) void videoRef.current.play(); }, []);
+  const showLmsPreviewFrame = useCallback((): void => {
+    const video = lmsVideoRef.current;
+
+    if (!video || !Number.isFinite(video.duration)) {
+      return;
+    }
+
+    video.currentTime = Math.min(4, Math.max(0, video.duration - 0.1));
+  }, []);
+  const playLmsVideo = useCallback((): void => {
+    const video = lmsVideoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    video.currentTime = 0;
+    void video.play();
+  }, []);
   const dismissWaBubble = useCallback((): void => {
     setWaBubbleOpen(false);
     try { sessionStorage.setItem('fb_wa_bubble_v2', '1'); } catch { /* storage disabled */ }
@@ -908,18 +929,37 @@ export default function LandingPage() {
       </p>
     </div>
 
-    <video
-      controls
-      preload="metadata"
-      playsInline
-      className="w-full rounded-xl"
-  >
-      <source
-          src="https://demo-fullbright.b-cdn.net/NEW.mp4"
+    <div className="[position:relative] [max-width:1040px] [margin:0_auto_40px] [overflow:hidden] [border-radius:18px] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0]">
+      <video
+        ref={lmsVideoRef}
+        controls
+        preload="metadata"
+        playsInline
+        onLoadedMetadata={showLmsPreviewFrame}
+        onPlay={() => setShowLmsOverlay(false)}
+        className="[display:block] [width:100%] [aspect-ratio:16/9] [object-fit:cover] [background:#151515]"
+      >
+        <source
+          src="https://demo-fullbright.b-cdn.net/NEW.mp4#t=4"
           type="video/mp4"
-      />
-      Browser kamu tidak mendukung pemutaran video.
-  </video>
+        />
+        Browser kamu tidak mendukung pemutaran video.
+      </video>
+      {showLmsOverlay ? (
+        <button
+          type="button"
+          onClick={playLmsVideo}
+          aria-label="Putar video tampilan LMS"
+          className="[position:absolute] [inset:0] [display:flex] [align-items:center] [justify-content:center] [border:0] [background:rgba(21,21,21,0.22)] [cursor:pointer] [transition:background_0.2s_ease] hover:[background:rgba(21,21,21,0.32)]"
+        >
+          <span className="[display:flex] [align-items:center] [justify-content:center] [width:80px] [height:80px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)] [transition:transform_0.2s_ease] hover:[transform:scale(1.06)]">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+              <path d="M8 5.5v13l11-6.5z"></path>
+            </svg>
+          </span>
+        </button>
+      ) : null}
+    </div>
 
     <div className="[display:flex] [flex-direction:column] [gap:20px] [max-width:1040px] [margin:0_auto_40px]">
       
