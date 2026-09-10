@@ -20,6 +20,7 @@ Route::inertia('/bio-ig-toefl-hack', 'cycle8/angle-1')->name('home2');
 Route::inertia('/toefl-hack', 'cycle8/angle-1')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle7/angle-3')->name('home4');
 Route::inertia('/c10-lp', 'cycle10/LandingPage')->name('cycle10.landing');
+Route::inertia('/c1-lp', 'c1/LandingPage')->name('c1.landing');
 
 // ── Analytics tracking endpoint (public, validated and rate-limited) ─────────
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])
