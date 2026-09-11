@@ -482,7 +482,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <Head title="Full Bright Indonesia" />
+      <Head title="Raih TOEFL 500+ Cukup 15 Hari. (LMS + Tutor AI)" />
       <style>{KEYFRAMES}</style>
       
       
