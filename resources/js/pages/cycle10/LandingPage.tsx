@@ -2454,7 +2454,7 @@ export default function LandingPage() {
         </>) : null}
       
         {/* Floating WhatsApp */}
-        <div className="[position:fixed] [right:20px] [bottom:20px] [z-index:52] [display:flex] [flex-direction:column] [align-items:flex-end] [gap:10px]">
+        <div className="[position:fixed] [right:48px] [bottom:20px] [z-index:52] [display:flex] [flex-direction:column] [align-items:flex-end] [gap:10px] max-[559px]:[right:28px]">
           {waBubbleOpen ? (<>
             <div className="max-[559px]:[max-width:208px] max-[559px]:[padding:10px_12px_10px_11px] max-[559px]:[border-radius:14px_14px_5px_14px] [position:relative] [max-width:270px] [border-radius:18px_18px_6px_18px] [background:#fff] [border:1px_solid_#e5e7eb] [box-shadow:0_10px_34px_rgba(0,0,0,0.18)] [padding:14px_16px_14px_14px]">
               <button onClick={dismissWaBubble} aria-label="Tutup" className="[position:absolute] [top:-9px] [right:-9px] [display:flex] [align-items:center] [justify-content:center] [width:24px] [height:24px] [border-radius:9999px] [background:#151515] [color:#fff] [border:2px_solid_#fff] [font-size:12px] [font-weight:900] [cursor:pointer] [line-height:1] [padding:0]">✕</button>
