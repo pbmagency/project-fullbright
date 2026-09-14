@@ -81,7 +81,7 @@ analytics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     analytics.form = analyticsForm
 /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 export const labs = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -96,7 +96,7 @@ labs.definition = {
 
 /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 labs.url = (options?: RouteQueryOptions) => {
@@ -105,7 +105,7 @@ labs.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 labs.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -114,7 +114,7 @@ labs.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 labs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -124,7 +124,7 @@ labs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
     const labsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -134,7 +134,7 @@ labs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
         labsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -143,7 +143,7 @@ labs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\LabsController::labs
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
         labsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

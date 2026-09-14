@@ -134,7 +134,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
 export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -149,7 +149,7 @@ exportMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
 exportMethod.url = (options?: RouteQueryOptions) => {
@@ -158,7 +158,7 @@ exportMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
 exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -167,7 +167,7 @@ exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
 exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -177,7 +177,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
     const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -187,7 +187,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
         exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -196,7 +196,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:123
+ * @see app/Http/Controllers/AnalyticsController.php:127
  * @route '/admin/export'
  */
         exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

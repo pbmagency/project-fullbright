@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
     const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
         indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\LabsController::index
- * @see app/Http/Controllers/LabsController.php:15
+ * @see app/Http/Controllers/LabsController.php:16
  * @route '/admin/labs'
  */
         indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:85
+ * @see app/Http/Controllers/LabsController.php:90
  * @route '/admin/labs/clear-cache'
  */
 export const clearCache = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -94,7 +94,7 @@ clearCache.definition = {
 
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:85
+ * @see app/Http/Controllers/LabsController.php:90
  * @route '/admin/labs/clear-cache'
  */
 clearCache.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ clearCache.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:85
+ * @see app/Http/Controllers/LabsController.php:90
  * @route '/admin/labs/clear-cache'
  */
 clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -113,7 +113,7 @@ clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:85
+ * @see app/Http/Controllers/LabsController.php:90
  * @route '/admin/labs/clear-cache'
  */
     const clearCacheForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -123,7 +123,7 @@ clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:85
+ * @see app/Http/Controllers/LabsController.php:90
  * @route '/admin/labs/clear-cache'
  */
         clearCacheForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

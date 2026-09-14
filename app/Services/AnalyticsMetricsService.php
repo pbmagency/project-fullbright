@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsMetricsService
 {
+    public const TRIAL_LMS_CTA_LOCATION = 'pricing_self_trial_lms';
+
+    public const TRIAL_LMS_LANDING_SOURCE = '/c10-lp';
+
     public const DWELL_THRESHOLD_MS = 15000;
 
     public const SCROLL_THRESHOLD = 25;
@@ -46,6 +50,8 @@ class AnalyticsMetricsService
         $directCheckouts = $this->checkoutSessions($startDate, $endDate);
         $whatsAppLeads = $this->whatsAppLeadSessions($startDate, $endDate);
         $totalLeads = $directCheckouts + $whatsAppLeads;
+        $trialLmsClicks = $this->trialLmsClicks($startDate, $endDate);
+        $trialLmsLeads = $this->trialLmsLeadSessions($startDate, $endDate);
 
         return [
             'total_visits' => $totalVisits,
@@ -61,6 +67,8 @@ class AnalyticsMetricsService
             'total_leads' => $totalLeads,
             'total_lead_rate' => round($this->safePct($totalLeads, $uniqueVisitors), 2),
             'total_leads_from_intent_rate' => round($this->safePct($totalLeads, $intent), 2),
+            'trial_lms_clicks' => $trialLmsClicks,
+            'trial_lms_leads' => $trialLmsLeads,
         ];
     }
 
@@ -247,6 +255,36 @@ class AnalyticsMetricsService
         $this->applyCheckoutEventConditions($query);
 
         return $query->distinct()->count('session_id');
+    }
+
+    private function trialLmsClicks(Carbon $startDate, Carbon $endDate): int
+    {
+        return DB::table('user_analytics')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('event_type', 'cta_click')
+            ->where('event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCE)
+            ->where('event_data->location', self::TRIAL_LMS_CTA_LOCATION)
+            ->count();
+    }
+
+    private function trialLmsLeadSessions(Carbon $startDate, Carbon $endDate): int
+    {
+        $query = DB::table('user_analytics as leads')
+            ->whereBetween('leads.created_at', [$startDate, $endDate])
+            ->whereExists(function (Builder $trialClicks) use ($startDate, $endDate) {
+                $trialClicks->selectRaw('1')
+                    ->from('user_analytics as trial_clicks')
+                    ->whereColumn('trial_clicks.session_id', 'leads.session_id')
+                    ->where('trial_clicks.event_type', 'cta_click')
+                    ->where('trial_clicks.event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCE)
+                    ->where('trial_clicks.event_data->location', self::TRIAL_LMS_CTA_LOCATION)
+                    ->whereBetween('trial_clicks.created_at', [$startDate, $endDate])
+                    ->whereColumn('trial_clicks.created_at', '<=', 'leads.created_at');
+            });
+
+        $this->applyTotalLeadEventConditions($query);
+
+        return $query->distinct()->count('leads.session_id');
     }
 
     private function eventQuery(string $eventType, Carbon $startDate, Carbon $endDate): Builder

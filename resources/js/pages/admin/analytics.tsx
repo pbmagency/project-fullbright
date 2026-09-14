@@ -3,9 +3,11 @@ import {
     Download,
     Eye,
     MessageCircle,
+    MousePointerClick,
     ShoppingCart,
     Target,
     TrendingUp,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -52,6 +54,8 @@ interface AnalyticsProps {
         total_leads: number;
         total_lead_rate: number;
         total_leads_from_intent_rate: number;
+        trial_lms_clicks: number;
+        trial_lms_leads: number;
     };
     chartData: Record<string, any[]>;
     referralData: Array<{
@@ -186,6 +190,27 @@ export default function Analytics({
                                 value={stats.total_leads.toLocaleString()}
                                 icon={Users}
                                 description={`${stats.total_leads_from_intent_rate}% of Intent · ${stats.total_lead_rate}% of visits`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Trial LMS Metrics */}
+                    <div>
+                        <h2 className="mb-6 text-xl font-semibold text-foreground">
+                            Trial LMS · /c10-lp
+                        </h2>
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <MetricCard
+                                title="Total Click Trial LMS"
+                                value={stats.trial_lms_clicks.toLocaleString()}
+                                icon={MousePointerClick}
+                                description='Klik "Coba gratis 1 modul di LMS"'
+                            />
+                            <MetricCard
+                                title="Total Lead by Trial LMS"
+                                value={stats.trial_lms_leads.toLocaleString()}
+                                icon={UserPlus}
+                                description="Sesi yang menjadi checkout atau lead WhatsApp setelah klik trial"
                             />
                         </div>
                     </div>
