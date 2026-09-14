@@ -12,6 +12,11 @@ class AnalyticsMetricsService
 
     public const TRIAL_LMS_LANDING_SOURCE = '/c10-lp';
 
+    public const TRIAL_LMS_LANDING_SOURCES = [
+        self::TRIAL_LMS_LANDING_SOURCE,
+        self::TRIAL_LMS_LANDING_SOURCE.'/',
+    ];
+
     public const DWELL_THRESHOLD_MS = 15000;
 
     public const SCROLL_THRESHOLD = 25;
@@ -262,7 +267,7 @@ class AnalyticsMetricsService
         return DB::table('user_analytics')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->where('event_type', 'cta_click')
-            ->where('event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCE)
+            ->whereIn('event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCES)
             ->where('event_data->location', self::TRIAL_LMS_CTA_LOCATION)
             ->count();
     }
@@ -276,7 +281,7 @@ class AnalyticsMetricsService
                     ->from('user_analytics as trial_clicks')
                     ->whereColumn('trial_clicks.session_id', 'leads.session_id')
                     ->where('trial_clicks.event_type', 'cta_click')
-                    ->where('trial_clicks.event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCE)
+                    ->whereIn('trial_clicks.event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCES)
                     ->where('trial_clicks.event_data->location', self::TRIAL_LMS_CTA_LOCATION)
                     ->whereBetween('trial_clicks.created_at', [$startDate, $endDate])
                     ->whereColumn('trial_clicks.created_at', '<=', 'leads.created_at');

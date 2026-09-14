@@ -82,6 +82,10 @@ class AnalyticsMetricsTest extends TestCase
             'location' => AnalyticsMetricsService::TRIAL_LMS_CTA_LOCATION,
         ]);
 
+        $this->event('trailing-slash', 'cta_click', '/c10-lp/', $now, [
+            'location' => AnalyticsMetricsService::TRIAL_LMS_CTA_LOCATION,
+        ]);
+
         $this->event('lead-before-click', 'conversion', '/c10-lp', $now->copy()->subMinutes(4), [
             'type' => 'wa_inquiry',
         ]);
@@ -99,7 +103,7 @@ class AnalyticsMetricsTest extends TestCase
             $now->copy()->addHour(),
         );
 
-        $this->assertSame(4, $stats['trial_lms_clicks']);
+        $this->assertSame(5, $stats['trial_lms_clicks']);
         $this->assertSame(1, $stats['trial_lms_leads']);
     }
 

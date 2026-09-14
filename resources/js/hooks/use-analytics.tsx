@@ -92,7 +92,11 @@ export function getLandingSource(): string {
     // A/B analytics must describe the page where the event happened. Keeping
     // the first page in sessionStorage misattributes later visits (for example,
     // opening /c10-lp after another variant) and can also suppress its visit.
-    return window.location.pathname;
+    // Normalize trailing slashes so /c10-lp and /c10-lp/ are reported as the
+    // same landing page when the web server accepts both URLs.
+    const pathname = window.location.pathname;
+
+    return pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 }
 
 export function useAnalytics() {
