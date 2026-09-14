@@ -107,6 +107,44 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(1, $stats['trial_lms_leads']);
     }
 
+    public function test_c10_video_and_survey_interactions_count_unique_sessions(): void
+    {
+        $now = Carbon::now();
+
+        $this->event('video-one', 'engagement', '/c10-lp', $now, [
+            'type' => AnalyticsMetricsService::VIDEO_PLAY_INTERACTION_TYPE,
+            'location' => 'lms_showcase_video',
+        ]);
+        $this->event('video-one', 'engagement', '/c10-lp', $now, [
+            'type' => AnalyticsMetricsService::VIDEO_PLAY_INTERACTION_TYPE,
+            'location' => 'alumni_testimonial_video',
+        ]);
+        $this->event('video-two', 'engagement', '/c10-lp/', $now, [
+            'type' => AnalyticsMetricsService::VIDEO_PLAY_INTERACTION_TYPE,
+            'location' => 'alumni_testimonial_video',
+        ]);
+        $this->event('survey-one', 'engagement', '/c10-lp', $now, [
+            'type' => 'survey_response',
+            'location' => AnalyticsMetricsService::C10_SURVEY_LOCATION,
+        ]);
+        $this->event('survey-one', 'engagement', '/c10-lp', $now, [
+            'type' => 'survey_response',
+            'location' => AnalyticsMetricsService::C10_SURVEY_LOCATION,
+        ]);
+        $this->event('other-page', 'engagement', '/c1-lp', $now, [
+            'type' => AnalyticsMetricsService::VIDEO_PLAY_INTERACTION_TYPE,
+            'location' => 'lms_showcase_video',
+        ]);
+
+        $stats = app(AnalyticsMetricsService::class)->dashboardStats(
+            $now->copy()->subHour(),
+            $now->copy()->addHour(),
+        );
+
+        $this->assertSame(2, $stats['c10_video_clicks']);
+        $this->assertSame(1, $stats['c10_survey_clicks']);
+    }
+
     public function test_engagement_uses_scroll_or_dwell_or_funnel_action(): void
     {
         $now = Carbon::now();

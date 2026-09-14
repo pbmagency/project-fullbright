@@ -17,6 +17,15 @@ class AnalyticsMetricsService
         self::TRIAL_LMS_LANDING_SOURCE.'/',
     ];
 
+    public const VIDEO_PLAY_INTERACTION_TYPE = 'video_play';
+
+    public const C10_VIDEO_LOCATIONS = [
+        'lms_showcase_video',
+        'alumni_testimonial_video',
+    ];
+
+    public const C10_SURVEY_LOCATION = 'difficulty_survey';
+
     public const DWELL_THRESHOLD_MS = 15000;
 
     public const SCROLL_THRESHOLD = 25;
@@ -57,6 +66,8 @@ class AnalyticsMetricsService
         $totalLeads = $directCheckouts + $whatsAppLeads;
         $trialLmsClicks = $this->trialLmsClicks($startDate, $endDate);
         $trialLmsLeads = $this->trialLmsLeadSessions($startDate, $endDate);
+        $c10VideoClicks = $this->c10VideoPlaySessions($startDate, $endDate);
+        $c10SurveyClicks = $this->c10SurveyResponseSessions($startDate, $endDate);
 
         return [
             'total_visits' => $totalVisits,
@@ -74,6 +85,8 @@ class AnalyticsMetricsService
             'total_leads_from_intent_rate' => round($this->safePct($totalLeads, $intent), 2),
             'trial_lms_clicks' => $trialLmsClicks,
             'trial_lms_leads' => $trialLmsLeads,
+            'c10_video_clicks' => $c10VideoClicks,
+            'c10_survey_clicks' => $c10SurveyClicks,
         ];
     }
 
@@ -290,6 +303,30 @@ class AnalyticsMetricsService
         $this->applyTotalLeadEventConditions($query);
 
         return $query->distinct()->count('leads.session_id');
+    }
+
+    private function c10VideoPlaySessions(Carbon $startDate, Carbon $endDate): int
+    {
+        return DB::table('user_analytics')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('event_type', 'engagement')
+            ->whereIn('event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCES)
+            ->where('event_data->type', self::VIDEO_PLAY_INTERACTION_TYPE)
+            ->whereIn('event_data->location', self::C10_VIDEO_LOCATIONS)
+            ->distinct()
+            ->count('session_id');
+    }
+
+    private function c10SurveyResponseSessions(Carbon $startDate, Carbon $endDate): int
+    {
+        return DB::table('user_analytics')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('event_type', 'engagement')
+            ->whereIn('event_data->landing_source', self::TRIAL_LMS_LANDING_SOURCES)
+            ->where('event_data->type', 'survey_response')
+            ->where('event_data->location', self::C10_SURVEY_LOCATION)
+            ->distinct()
+            ->count('session_id');
     }
 
     private function eventQuery(string $eventType, Carbon $startDate, Carbon $endDate): Builder

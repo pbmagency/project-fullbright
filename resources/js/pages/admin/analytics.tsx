@@ -2,8 +2,10 @@ import { Head, router } from '@inertiajs/react';
 import {
     Download,
     Eye,
+    ListChecks,
     MessageCircle,
     MousePointerClick,
+    PlayCircle,
     ShoppingCart,
     Target,
     TrendingUp,
@@ -56,6 +58,8 @@ interface AnalyticsProps {
         total_leads_from_intent_rate: number;
         trial_lms_clicks: number;
         trial_lms_leads: number;
+        c10_video_clicks: number;
+        c10_survey_clicks: number;
     };
     chartData: Record<string, any[]>;
     referralData: Array<{
@@ -194,10 +198,10 @@ export default function Analytics({
                         </div>
                     </div>
 
-                    {/* Trial LMS Metrics */}
+                    {/* C10 Interaction Metrics */}
                     <div>
                         <h2 className="mb-6 text-xl font-semibold text-foreground">
-                            Trial LMS · /c10-lp
+                            Interaksi · /c10-lp
                         </h2>
                         <div className="grid gap-6 md:grid-cols-2">
                             <MetricCard
@@ -211,6 +215,18 @@ export default function Analytics({
                                 value={stats.trial_lms_leads.toLocaleString()}
                                 icon={UserPlus}
                                 description="Sesi yang menjadi checkout atau lead WhatsApp setelah klik trial"
+                            />
+                            <MetricCard
+                                title="Pengunjung Klik Video"
+                                value={stats.c10_video_clicks.toLocaleString()}
+                                icon={PlayCircle}
+                                description="Sesi unik yang memutar video LMS atau testimoni"
+                            />
+                            <MetricCard
+                                title="Pengunjung Isi Survey"
+                                value={stats.c10_survey_clicks.toLocaleString()}
+                                icon={ListChecks}
+                                description='Sesi unik yang memilih jawaban "Apa Tantangan Terbesarmu?"'
                             />
                         </div>
                     </div>

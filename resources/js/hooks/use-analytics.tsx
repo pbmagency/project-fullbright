@@ -291,6 +291,21 @@ export function useAnalytics() {
         [track],
     );
 
+    const trackVideoPlay = useCallback(
+        (location: string) => {
+            void track({
+                event_type: 'engagement',
+                event_data: {
+                    type: 'video_play',
+                    location,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                },
+            });
+        },
+        [track],
+    );
+
     const trackCTA = useCallback(
         (location: string, text: string, destination = 'unknown') => {
             void track({
@@ -382,6 +397,7 @@ export function useAnalytics() {
         trackScroll,
         trackEngagement,
         trackInteraction,
+        trackVideoPlay,
         trackCTA,
         trackInitiateCheckout,
         trackConversion,
