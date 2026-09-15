@@ -86,6 +86,62 @@ class MetaConversionService
         $this->sendEvents([$event]);
     }
 
+    /**
+     * Server-side Purchase event, used by the Scalev payment webhook.
+     *
+     * There is no buyer Request in a webhook, so the click/browser ids are the
+     * values captured when the buyer started the checkout. Reusing the order id
+     * as the event id keeps this de-duplicated against any browser-side pixel.
+     *
+     * @param  array<string, mixed>  $eventData
+     */
+    public function sendPurchase(
+        string $eventId,
+        array $eventData = [],
+        ?string $fbp = null,
+        ?string $fbc = null,
+    ): void {
+        if (! $this->isConfigured() || ! $this->sdkAvailable) {
+            return;
+        }
+
+        $package     = (string) ($eventData['package'] ?? 'starter');
+        $price       = (float) ($eventData['value'] ?? 0);
+        $currency    = (string) ($eventData['currency'] ?? 'IDR');
+        $contentName = (string) ($eventData['package_label'] ?? "TOEFL Full Bright {$package}");
+
+        $userData = (new \FacebookAds\Object\ServerSide\UserData);
+
+        if ($fbp !== null && $fbp !== '') {
+            $userData->setFbp($fbp);
+        }
+
+        if ($fbc !== null && $fbc !== '') {
+            $userData->setFbc($fbc);
+        }
+
+        $content = (new \FacebookAds\Object\ServerSide\Content)
+            ->setProductId('toefl-'.strtolower($package))
+            ->setQuantity(1);
+
+        $customData = (new \FacebookAds\Object\ServerSide\CustomData)
+            ->setContentName($contentName)
+            ->setContentType('product')
+            ->setValue($price)
+            ->setCurrency($currency)
+            ->setContents([$content]);
+
+        $event = (new \FacebookAds\Object\ServerSide\Event)
+            ->setEventName('Purchase')
+            ->setEventTime(time())
+            ->setEventId($eventId)
+            ->setActionSource(\FacebookAds\Object\ServerSide\ActionSource::WEBSITE)
+            ->setUserData($userData)
+            ->setCustomData($customData);
+
+        $this->sendEvents([$event]);
+    }
+
     private function buildUserData(Request $request): \FacebookAds\Object\ServerSide\UserData
     {
         $userData = (new \FacebookAds\Object\ServerSide\UserData)

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\C11ScalevProofController;
 use App\Http\Controllers\LabsController;
+use App\Http\Controllers\ScalevWebhookController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public landing page ───────────────────────────────────────────────────────
@@ -21,11 +23,20 @@ Route::inertia('/toefl-hack', 'cycle8/angle-1')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle7/angle-3')->name('home4');
 Route::inertia('/c10-lp', 'cycle10/LandingPage')->name('cycle10.landing');
 Route::inertia('/c1-lp', 'c1/LandingPage')->name('c1.landing');
+Route::inertia('/c11-problem', 'cycle11/LandingPage')->name('cycle11.problem');
+Route::get('/c11-problem/scalev-proof', C11ScalevProofController::class)
+    ->middleware('throttle:60,1')
+    ->name('cycle11.scalev-proof');
 
 // ── Analytics tracking endpoint (public, validated and rate-limited) ─────────
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])
     ->middleware('throttle:120,1')
     ->name('analytics.track');
+
+// Scalev webhook deliveries. Authenticated by the X-Scalev-Hmac-Sha256
+// signature (not by CSRF), so it is excluded in bootstrap/app.php.
+Route::post('/webhooks/scalev', ScalevWebhookController::class)
+    ->name('scalev.webhook');
 
 // ── Authenticated routes ──────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {

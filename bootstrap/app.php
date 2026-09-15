@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // The endpoint only accepts a tightly validated, rate-limited payload.
         $middleware->validateCsrfTokens(except: [
             'analytics/track',
+            // Scalev signs its webhook deliveries with X-Scalev-Hmac-Sha256;
+            // there is no browser session to issue a CSRF token.
+            'webhooks/scalev',
         ]);
 
         $middleware->web(append: [

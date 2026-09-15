@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\CacheLandingPage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use ReflectionMethod;
 use Tests\TestCase;
 
 class LandingPageCacheTest extends TestCase
@@ -19,9 +19,7 @@ class LandingPageCacheTest extends TestCase
             ->assertOk()
             ->assertSee('content="'.$firstToken.'"', false);
 
-        $manifestVersion = (new ReflectionMethod(CacheLandingPage::class, 'manifestVersion'))
-            ->invoke(null);
-        $cachedHtml = Cache::get('landing_page_html_v2:'.$manifestVersion);
+        $cachedHtml = Cache::get(CacheLandingPage::cacheKey(Request::create('/', 'GET')));
 
         $this->assertIsString($cachedHtml);
         $this->assertStringContainsString('__LANDING_CSRF_TOKEN__', $cachedHtml);
