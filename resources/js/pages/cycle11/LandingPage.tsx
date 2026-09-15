@@ -1,3 +1,4 @@
+import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 
@@ -343,6 +344,7 @@ export default function LandingPage() {
 
   return (
     <>
+      <Head title="Raih TOEFL 500+ Cukup 15 Hari. (LMS + Tutor AI)" />
       <style>{GLOBAL_CSS}</style>
       
       

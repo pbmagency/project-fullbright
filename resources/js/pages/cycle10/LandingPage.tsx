@@ -107,6 +107,12 @@ const RETURN_OPTIONS: string[] = [
   'Belum yakin program ini cocok untuk kebutuhanku',
   'Masih membandingkan dengan program lain',
 ];
+const RETURN_CTA_LOCATIONS = [
+  'return_popup_harga_terlalu_mahal',
+  'return_popup_ragu_target_toefl',
+  'return_popup_ragu_program_cocok',
+  'return_popup_membandingkan_program',
+];
 
 const RETURN_WA_MSGS: string[] = [
   'Halo Admin Full Bright Indonesia. Saya mau konsultasi soal paket dan harga sebelum daftar.',
@@ -433,6 +439,14 @@ export default function LandingPage() {
       'difficulty_survey_lainnya',
     ];
     trackCTA(locations[index], answer, 'difficulty_survey');
+  }, [trackCTA, trackInteraction]);
+  const selectReturnSurvey = useCallback((index: number): void => {
+    const answer = RETURN_OPTIONS[index];
+    const location = RETURN_CTA_LOCATIONS[index];
+    if (!answer || !location) return;
+    setRpSelected(index);
+    trackInteraction('return_popup_survey', answer);
+    trackCTA(location, answer, 'return_popup_survey');
   }, [trackCTA, trackInteraction]);
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
@@ -2446,19 +2460,19 @@ export default function LandingPage() {
               {rpSelected === null ? (<>
                 <div className="[display:flex] [flex-direction:column] [gap:8px]">
                   
-                    <button onClick={() => setRpSelected(0)} style={css(rpOptStyle())}>
+                    <button onClick={() => selectReturnSurvey(0)} style={css(rpOptStyle())}>
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Harganya masih terlalu mahal buatku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(1)} style={css(rpOptStyle())}>
+                    <button onClick={() => selectReturnSurvey(1)} style={css(rpOptStyle())}>
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Belum yakin bisa mencapai target TOEFL-ku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(2)} style={css(rpOptStyle())}>
+                    <button onClick={() => selectReturnSurvey(2)} style={css(rpOptStyle())}>
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Belum yakin program ini cocok untuk kebutuhanku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(3)} style={css(rpOptStyle())}>
+                    <button onClick={() => selectReturnSurvey(3)} style={css(rpOptStyle())}>
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Masih membandingkan dengan program lain</span>
                     </button>
                   
