@@ -1,6 +1,10 @@
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties, MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent, MouseEvent as ReactMouseEvent } from 'react';
+import { generateEventId, useAnalytics } from '@/hooks/use-analytics';
+import { useDwellTime } from '@/hooks/use-dwell-time';
+import { useScrollTracking } from '@/hooks/use-scroll-tracking';
+import { useSectionTracking } from '@/hooks/use-section-tracking';
 
 /* ============================================================
    Full Bright Indonesia — landing page TOEFL ITP
@@ -48,12 +52,30 @@ const WA_SCREENSHOTS: { src: string; score: string }[] = [
 
 const REVIEW_COUNT = 19;
 const reviewSrc = (i: number): string => `/assets/Riview (${i + 1}).webp`;
+const TRACKED_HASH_DESTINATIONS = new Set(['#pricing', '#testimonials']);
+
+function analyticsLocation(anchor: HTMLAnchorElement, destination: string): string {
+  if (anchor.dataset.analyticsLocation) return anchor.dataset.analyticsLocation;
+  if (anchor.id) return anchor.id.replaceAll('-', '_');
+
+  const sectionId = anchor.closest<HTMLElement>('section[id]')?.id;
+  if (sectionId) return `${sectionId}_${destination.startsWith('#') ? destination.slice(1) : 'link'}`;
+  if (anchor.closest('header')) return 'navbar';
+  if (anchor.closest('footer')) return 'footer_whatsapp';
+  return destination.includes('wa.me/') ? 'floating_whatsapp' : 'c11_problem';
+}
 
 const RETURN_OPTIONS: string[] = [
   'Harganya masih terlalu mahal buatku',
   'Belum yakin bisa mencapai target TOEFL-ku',
   'Belum yakin program ini cocok untuk kebutuhanku',
   'Masih membandingkan dengan program lain',
+];
+const RETURN_CTA_LOCATIONS = [
+  'return_popup_harga_terlalu_mahal',
+  'return_popup_ragu_target_toefl',
+  'return_popup_ragu_program_cocok',
+  'return_popup_membandingkan_program',
 ];
 
 const RETURN_WA_MSGS: string[] = [
@@ -196,6 +218,59 @@ export default function LandingPage() {
   const [flashVisible, setFlashVisible] = useState<boolean>(true);
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
+
+  useScrollTracking();
+  useDwellTime();
+  useSectionTracking();
+
+  useEffect(() => { trackVisit(); }, [trackVisit]);
+
+  const handleTrackedClick = useCallback((event: ReactMouseEvent<HTMLDivElement>): void => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const anchor = target.closest<HTMLAnchorElement>('a[href]');
+    if (!anchor || !event.currentTarget.contains(anchor)) return;
+
+    const destination = anchor.getAttribute('href') ?? '';
+    const isWhatsApp = destination.includes('wa.me/');
+    const isCheckout = destination.includes('member.fullbrightindonesia.com/');
+    if (!isWhatsApp && !isCheckout && !TRACKED_HASH_DESTINATIONS.has(destination) && !anchor.dataset.analyticsLocation) return;
+
+    const location = analyticsLocation(anchor, destination);
+    const label = (anchor.getAttribute('aria-label') || anchor.textContent || 'CTA').replace(/\s+/g, ' ').trim().slice(0, 255);
+    const packageName = anchor.dataset.analyticsPackage;
+    const parsedPrice = Number(anchor.dataset.analyticsPrice);
+    const price = Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : undefined;
+
+    trackCTA(location, label, destination);
+    if (isCheckout) {
+      trackInitiateCheckout(location, { level: packageName, package: packageName, price, payment_url: destination }, generateEventId());
+    } else if (isWhatsApp) {
+      trackConversion(anchor.dataset.analyticsConversion || 'wa_inquiry', { location, package: packageName, price, destination });
+    }
+  }, [trackCTA, trackConversion, trackInitiateCheckout]);
+
+  const selectSurvey = useCallback((index: number, answer: string): void => {
+    setSurveySelected(index);
+    trackInteraction('difficulty_survey', answer);
+    trackCTA([
+      'difficulty_survey_bingung_mulai_belajar',
+      'difficulty_survey_skor_masih_stuck',
+      'difficulty_survey_ragu_ikut_kursus',
+      'difficulty_survey_lainnya',
+    ][index], answer, 'difficulty_survey');
+  }, [trackCTA, trackInteraction]);
+
+  const selectReturnSurvey = useCallback((index: number): void => {
+    const answer = RETURN_OPTIONS[index];
+    const location = RETURN_CTA_LOCATIONS[index];
+    if (!answer || !location) return;
+    setRpSelected(index);
+    trackInteraction('return_popup_survey', answer);
+    trackCTA(location, answer, 'return_popup_survey');
+  }, [trackCTA, trackInteraction]);
   /* mode pricing dari ?mode=tutor */
   useEffect(() => { setMode(initialMode()); }, []);
 
@@ -310,6 +385,10 @@ export default function LandingPage() {
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
   const playVideo = useCallback((): void => { if (videoRef.current?.paused) void videoRef.current.play(); }, []);
+  const handleTestimonialVideoPlay = useCallback((): void => {
+    setShowOverlay(false);
+    trackVideoPlay('alumni_testimonial_video');
+  }, [trackVideoPlay]);
   const dismissWaBubble = useCallback((e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -348,7 +427,7 @@ export default function LandingPage() {
       <style>{GLOBAL_CSS}</style>
       
       
-      <div className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
+      <div onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
       
         {/* Urgency Banner */}
         {flashVisible ? (<>
@@ -1401,7 +1480,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Cerita Alumni</p>
                 <h3 className="[margin:0_0_16px] [text-align:center] [font-size:clamp(19px,2.4vw,24px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Dengar Langsung dari <span className="[color:#D70808]">Alumni Kami</span></h3>
                 <div className="[position:relative] [border-radius:18px] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo}>
-                  <video ref={videoRef} src="/assets/testimoni iyha.mp4#t=1.5" controls playsInline preload="metadata" onPlay={() => setShowOverlay(false)} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
+                  <video ref={videoRef} src="/assets/testimoni iyha.mp4#t=1.5" controls playsInline preload="metadata" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
                   {showOverlay ? (<>
                     <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
                       <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
@@ -1516,14 +1595,14 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl?utm_source=c11-problem&utm_content=self-study" target="_blank" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Mulai Belajar Mandiri →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl?utm_source=c11-problem&utm_content=self-study" target="_blank" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="99000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Mulai Belajar Mandiri →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
-                <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#9ca3af]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_whatsapp" data-analytics-package="Self-Study LMS" data-analytics-price="99000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#9ca3af]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_trial_lms" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
               </div>
             </div>
       
@@ -1637,13 +1716,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=starter" target="_blank" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=starter" target="_blank" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="200000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_whatsapp" data-analytics-package="Starter" data-analytics-price="200000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1733,14 +1812,14 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=bundling" target="_blank" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#16a34a] [box-shadow:0_6px_24px_rgba(22,163,74,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=bundling" target="_blank" data-analytics-location="pricing_bundling_checkout" data-analytics-package="Bundling" data-analytics-price="325000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#16a34a] [box-shadow:0_6px_24px_rgba(22,163,74,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <p className="[margin:6px_0_0] [font-size:12px] [text-align:center] [font-weight:600] [color:#D70808]">* Centang opsi Bundle saat checkout</p>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20paket%20HEMAT%20TOEFL%20Level%20Starter%20%2B%20Intermediate." target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20paket%20HEMAT%20TOEFL%20Level%20Starter%20%2B%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_bundling_whatsapp" data-analytics-package="Bundling" data-analytics-price="325000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1805,13 +1884,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=intermediate" target="_blank" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=intermediate" target="_blank" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="280000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-package="Intermediate" data-analytics-price="280000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -2100,28 +2179,28 @@ export default function LandingPage() {
       
             <div className="[display:flex] [flex-direction:column] [gap:6px]">
               
-                <button onClick={() => setSurveySelected(0)} data-idx="0" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
+                <button onClick={() => selectSurvey(0, 'Bingung mulai belajar dari mana')} data-idx="0" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Bingung mulai belajar dari mana</span>
                   {surveySelected === 0 ? (<>
                     <span className="[display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(1)} data-idx="1" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
+                <button onClick={() => selectSurvey(1, 'Sudah belajar tapi skor masih stuck')} data-idx="1" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Sudah belajar tapi skor masih stuck</span>
                   {surveySelected === 1 ? (<>
                     <span className="[display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(2)} data-idx="2" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
+                <button onClick={() => selectSurvey(2, 'Masih ragu apakah perlu ikut kursus')} data-idx="2" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Masih ragu apakah perlu ikut kursus</span>
                   {surveySelected === 2 ? (<>
                     <span className="[display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   </>) : null}
                 </button>
               
-                <button onClick={() => setSurveySelected(3)} data-idx="3" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
+                <button onClick={() => selectSurvey(3, 'Lainnya')} data-idx="3" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:48px] [text-align:left] [padding:10px_12px] [border-radius:9px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit]">
                   <span className="[flex:1] [text-align:left] [font-size:13px] [font-weight:500] [color:#151515]">Lainnya</span>
                   {surveySelected === 3 ? (<>
                     <span className="[display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:16px] [height:16px] [border-radius:9999px] [font-size:9px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
@@ -2231,19 +2310,19 @@ export default function LandingPage() {
               {rpSelected === null ? (<>
                 <div className="[display:flex] [flex-direction:column] [gap:8px]">
                   
-                    <button onClick={() => setRpSelected(0)} data-idx="0" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
+                    <button onClick={() => selectReturnSurvey(0)} data-idx="0" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Harganya masih terlalu mahal buatku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(1)} data-idx="1" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
+                    <button onClick={() => selectReturnSurvey(1)} data-idx="1" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Belum yakin bisa mencapai target TOEFL-ku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(2)} data-idx="2" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
+                    <button onClick={() => selectReturnSurvey(2)} data-idx="2" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Belum yakin program ini cocok untuk kebutuhanku</span>
                     </button>
                   
-                    <button onClick={() => setRpSelected(3)} data-idx="3" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
+                    <button onClick={() => selectReturnSurvey(3)} data-idx="3" className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [text-align:left] [padding:12px_14px] [border-radius:12px] [cursor:pointer] [background:#fff] [border:1px_solid_#e5e5e5] [transition:all_0.15s_ease] [font-family:inherit] [box-sizing:border-box]">
                       <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">Masih membandingkan dengan program lain</span>
                     </button>
                   
