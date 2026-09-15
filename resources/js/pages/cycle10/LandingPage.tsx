@@ -426,7 +426,14 @@ export default function LandingPage() {
   const selectSurvey = useCallback((index: number, answer: string): void => {
     setSurveySelected(index);
     trackInteraction('difficulty_survey', answer);
-  }, [trackInteraction]);
+    const locations = [
+      'difficulty_survey_bingung_mulai_belajar',
+      'difficulty_survey_skor_masih_stuck',
+      'difficulty_survey_ragu_ikut_kursus',
+      'difficulty_survey_lainnya',
+    ];
+    trackCTA(locations[index], answer, 'difficulty_survey');
+  }, [trackCTA, trackInteraction]);
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
   const handleTestimonialVideoPlay = useCallback((): void => {
