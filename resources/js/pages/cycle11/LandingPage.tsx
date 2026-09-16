@@ -415,7 +415,6 @@ export default function LandingPage() {
   const playVideo = useCallback((): void => {
     const video = videoRef.current;
     if (!video) return;
-    if (!video.getAttribute('src')) video.src = '/assets/testimoni iyha.mp4#t=1.5';
     if (video.paused) void video.play();
   }, []);
   const handleTestimonialVideoPlay = useCallback((): void => {
@@ -677,7 +676,7 @@ export default function LandingPage() {
               <div className="[display:flex] [height:36px] [width:36px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#F3F4F6] [color:#374151] [font-size:18px] [margin-top:10px]">↓</div>
             </div>
           </div>
-          </section></div>
+          </section>
         
       
         {/* Value Section: comparison + pillars */}
@@ -1547,7 +1546,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Cerita Alumni</p>
                 <h3 className="[margin:0_0_16px] [text-align:center] [font-size:clamp(19px,2.4vw,24px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Dengar Langsung dari <span className="[color:#D70808]">Alumni Kami</span></h3>
                 <div className="[position:relative] [border-radius:18px] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo}>
-                  <video ref={videoRef} controls playsInline preload="none" aria-label="Video testimoni alumni Full Bright" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
+                  <video ref={videoRef} src="/assets/testimoni iyha.mp4#t=1.5" controls playsInline preload="metadata" aria-label="Video testimoni alumni Full Bright" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
                   {showOverlay ? (<>
                     <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
                       <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
@@ -2441,8 +2440,7 @@ export default function LandingPage() {
             </span>
           </a>
         </div>
-      
-      
+      </div>
 
     </>
   );

@@ -145,6 +145,38 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(1, $stats['c10_survey_clicks']);
     }
 
+    public function test_c11_survey_answers_appear_in_micro_conversion_attribution(): void
+    {
+        $now = Carbon::now();
+
+        $this->event('difficulty', 'cta_click', '/c11-problem', $now, [
+            'location' => 'difficulty_survey_bingung_mulai_belajar',
+            'destination' => 'difficulty_survey',
+        ]);
+        $this->event('difficulty', 'conversion', '/c11-problem', $now, [
+            'type' => 'wa_inquiry',
+        ]);
+        $this->event('return', 'cta_click', '/c11-problem', $now, [
+            'location' => 'return_popup_harga_terlalu_mahal',
+            'destination' => 'return_popup_survey',
+        ]);
+        $this->event('other-page', 'cta_click', '/c10-lp', $now, [
+            'location' => 'difficulty_survey_bingung_mulai_belajar',
+        ]);
+
+        $attribution = collect(app(AbTestingService::class)->getCtaPerformance(
+            $now->copy()->subHour(),
+            $now->copy()->addHour(),
+        ))->firstWhere('landing_source', '/c11-problem');
+
+        $locations = collect($attribution['cta_locations'])->keyBy('location');
+        $this->assertCount(2, $locations);
+        $this->assertSame(1, $locations['difficulty_survey_bingung_mulai_belajar']['click_count']);
+        $this->assertSame(1, $locations['difficulty_survey_bingung_mulai_belajar']['total_leads']);
+        $this->assertSame(1, $locations['return_popup_harga_terlalu_mahal']['click_count']);
+        $this->assertSame(0, $locations['return_popup_harga_terlalu_mahal']['total_leads']);
+    }
+
     public function test_engagement_uses_scroll_or_dwell_or_funnel_action(): void
     {
         $now = Carbon::now();
