@@ -19,9 +19,7 @@ const waUrl = (text: string): string => `https://wa.me/${WA_NUMBER}?text=${encod
 
 const FLASH_WINDOW_MS = 12 * 60 * 60 * 1000;
 function flashDeadline(): number {
-  let start = 0;
-  try { start = Number(localStorage.getItem('fb_flash_start') || 0); }
-  catch { /* storage disabled */ }
+  let start = Number(localStorage.getItem('fb_flash_start') || 0);
   if (!start) {
     start = Date.now();
     try { localStorage.setItem('fb_flash_start', String(start)); } catch { /* storage disabled */ }
@@ -198,10 +196,6 @@ const GLOBAL_CSS = `
   @keyframes fbFadeInUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fbSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   @keyframes heroBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-  [data-c11-defer] { content-visibility: auto; contain-intrinsic-size: auto 900px; }
-  #testimonials[data-c11-defer] { contain-intrinsic-size: auto 2600px; }
-  #pricing[data-c11-defer] { contain-intrinsic-size: auto 1600px; }
-  #faq[data-c11-defer] { contain-intrinsic-size: auto 1100px; }
 `;
 
 export default function LandingPage() {
@@ -218,14 +212,12 @@ export default function LandingPage() {
   const [rpSelected, setRpSelected] = useState<number | null>(null);
   const [waBubbleOpen, setWaBubbleOpen] = useState<boolean>(false);
   const [showOverlay, setShowOverlay] = useState<boolean>(true);
-  const [showLmsOverlay, setShowLmsOverlay] = useState<boolean>(true);
   const [scalevProof, setScalevProof] = useState<{ submitted: number; paid: number } | null>(null);
   const [proofToast, setProofToast] = useState<LatestSubmission | null>(null);
+  const [countdown, setCountdown] = useState<string>('12:00:00');
   const [flashVisible, setFlashVisible] = useState<boolean>(true);
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
-  const countdownRef = useRef<HTMLSpanElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
 
   useScrollTracking();
@@ -286,8 +278,8 @@ export default function LandingPage() {
   useEffect(() => {
     const tick = (): void => {
       const left = flashRemainingMs();
-      if (countdownRef.current) countdownRef.current.textContent = formatCountdown(left);
-      if (left <= 0) setFlashVisible(false);
+      setCountdown(formatCountdown(left));
+      setFlashVisible(left > 0);
     };
     tick();
     const id = window.setInterval(tick, 1000);
@@ -307,25 +299,15 @@ export default function LandingPage() {
     const measure = (): void => setBannerH(bannerRef.current ? Math.round(bannerRef.current.getBoundingClientRect().height) : 0);
     measure();
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    const poll = window.setInterval(measure, 500);
+    return () => { window.removeEventListener('resize', measure); window.clearInterval(poll); };
   }, [flashVisible]);
 
   /* autoplay carousel Google review */
   useEffect(() => {
-    const section = document.getElementById('testimonials');
-    if (!section) return;
-    let timer: number | undefined;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && timer === undefined) {
-        timer = window.setInterval(() => setGIdx((i) => (i + 1) % REVIEW_COUNT), 3000);
-      } else if (!entry.isIntersecting && timer !== undefined) {
-        window.clearInterval(timer);
-        timer = undefined;
-      }
-    });
-    observer.observe(section);
-    return () => { observer.disconnect(); window.clearInterval(timer); };
-  }, []);
+    const id = window.setInterval(() => setGIdx((i) => (i + 1) % REVIEW_COUNT), 3000);
+    return () => window.clearInterval(id);
+  }, [gIdx]);
 
   /* bubble WhatsApp: muncul setelah pengunjung selesai membaca solution section */
   useEffect(() => {
@@ -370,19 +352,9 @@ export default function LandingPage() {
         }
       } catch { /* no verified data available */ }
     };
-    const pricing = document.getElementById('pricing');
-    let timer: number | undefined;
-    const observer = pricing ? new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && timer === undefined) {
-        void load();
-        timer = window.setInterval(() => void load(), 10000);
-      } else if (!entry.isIntersecting && timer !== undefined) {
-        window.clearInterval(timer);
-        timer = undefined;
-      }
-    }, { rootMargin: '600px' }) : null;
-    if (pricing && observer) observer.observe(pricing);
-    return () => { cancelled = true; observer?.disconnect(); window.clearInterval(timer); window.clearTimeout(hideTimer); };
+    void load();
+    const timer = window.setInterval(() => void load(), 10000);
+    return () => { cancelled = true; window.clearInterval(timer); window.clearTimeout(hideTimer); };
   }, []);
 
   /* survey exit-checkout: muncul saat pengunjung kembali ke tab ini */
@@ -412,30 +384,10 @@ export default function LandingPage() {
   const nextGoogle = useCallback((): void => setGIdx((i) => (i + 1) % REVIEW_COUNT), []);
   const closeReturnPopup = useCallback((): void => setRpOpen(false), []);
   const toggleCat = useCallback((i: number): void => setActiveCat((cur) => (cur === FAQ_CATEGORIES[i] ? null : FAQ_CATEGORIES[i])), []);
-  const playVideo = useCallback((): void => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (!video.getAttribute('src')) video.src = '/assets/testimoni iyha.mp4#t=1.5';
-    if (video.paused) void video.play();
-  }, []);
+  const playVideo = useCallback((): void => { if (videoRef.current?.paused) void videoRef.current.play(); }, []);
   const handleTestimonialVideoPlay = useCallback((): void => {
     setShowOverlay(false);
     trackVideoPlay('alumni_testimonial_video');
-  }, [trackVideoPlay]);
-  const showLmsPreviewFrame = useCallback((): void => {
-    const video = lmsVideoRef.current;
-    if (!video || !Number.isFinite(video.duration)) return;
-    video.currentTime = Math.min(4, Math.max(0, video.duration - 0.1));
-  }, []);
-  const playLmsVideo = useCallback((): void => {
-    const video = lmsVideoRef.current;
-    if (!video) return;
-    video.currentTime = 0;
-    void video.play();
-  }, []);
-  const handleLmsVideoPlay = useCallback((): void => {
-    setShowLmsOverlay(false);
-    trackVideoPlay('lms_showcase_video');
   }, [trackVideoPlay]);
   const dismissWaBubble = useCallback((e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
@@ -471,14 +423,11 @@ export default function LandingPage() {
 
   return (
     <>
-      <Head title="Raih TOEFL 500+ Cukup 15 Hari. (LMS + Tutor AI)">
-        <meta name="description" content="Persiapkan TOEFL ITP 500+ dalam 15 hari bersama Full Bright Indonesia. Pilih belajar mandiri lewat LMS atau kelas dengan tutor, mulai Rp99rb." />
-        <link rel="canonical" href="https://toefl.fullbrightindonesia.org/c11-problem" />
-      </Head>
+      <Head title="Raih TOEFL 500+ Cukup 15 Hari. (LMS + Tutor AI)" />
       <style>{GLOBAL_CSS}</style>
       
       
-      <div role="main" onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
+      <div onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
       
         {/* Urgency Banner */}
         {flashVisible ? (<>
@@ -487,7 +436,7 @@ export default function LandingPage() {
             <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 FLASH SALE SEPTEMBER · 60%</span>
             <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
               <span id="banner-timer-label" className="[font-size:11px] [font-weight:800] [letter-spacing:0.04em] [text-transform:uppercase] max-[500px]:[display:none]">⏱ Berakhir</span>
-              <span ref={countdownRef} className="[font-size:13px] [font-weight:900] [font-variant-numeric:tabular-nums] max-[500px]:[font-size:14px] [letter-spacing:0.04em]">12:00:00</span>
+              <span className="[font-size:13px] [font-weight:900] [font-variant-numeric:tabular-nums] max-[500px]:[font-size:14px] [letter-spacing:0.04em]">{countdown}</span>
             </span>
           </a>
         </>) : null}
@@ -497,12 +446,12 @@ export default function LandingPage() {
         <header style={css(navStyle(scrolled, bannerH))}>
           <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px] [overflow:hidden]">
             <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
-              <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="400" height="400" className="[height:150px] [width:auto] [object-fit:contain] [display:block] [margin:-43px_0]" />
+              <img src="https://toefl.fullbrightindonesia.org/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" className="[height:150px] [width:auto] [object-fit:contain] [display:block] [margin:-43px_0]" />
             </a>
             <a href="#pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
               <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
               <span className="[display:flex] [align-items:center] [gap:5px]">
-                <span className="[font-size:11px] [text-decoration:line-through] [color:#fff] [white-space:nowrap]">Rp250rb</span>
+                <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.55)] [white-space:nowrap]">Rp250rb</span>
                 <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp99rb</span>
                 <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-60%</span>
               </span>
@@ -560,7 +509,7 @@ export default function LandingPage() {
       
               <div className="[display:flex] [justify-content:center] [align-items:flex-end] [grid-column:2] max-[899px]:[grid-column:1] max-[899px]:[margin-top:-4px]">
                 <div className="[width:100%] [max-width:560px] [position:relative] [align-self:stretch] [display:flex] [align-items:flex-end] [justify-content:center] max-[899px]:[max-width:250px] max-[899px]:[align-self:initial]">
-                  <img src="/assets/hero-consultant.webp" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" width="820" height="1000" fetchPriority="high" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
+                  <img src="/assets/hero-consultant.png" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
                   <div className="hidden min-[900px]:contents">
                     <div className="[position:absolute] [bottom:18px] [left:0] [display:flex] [max-width:216px] [align-items:center] [gap:10px] [border-radius:16px] [background:#fff] [padding:11px_14px] [box-shadow:0_8px_32px_rgba(0,0,0,0.14)]">
                       <span className="[font-size:22px]">🎓</span>
@@ -591,56 +540,56 @@ export default function LandingPage() {
       
         {/* Social Proof Strip: Alumni Abroad */}
         <div className="[background:#F3F3F3] [padding:32px_0] [overflow:hidden]">
-          <p className="[margin:0_0_18px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Alumni Kami Sekarang Kuliah Di</p>
+          <p className="[margin:0_0_18px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Alumni Kami Sekarang Kuliah Di</p>
           <div className="[overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
             <div className="[display:flex] [width:max-content] [animation:infiniteScroll_30s_linear_infinite]">
               
-                <img src="/assets/c11-logos/ui.webp" alt="Universitas Indonesia" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Indonesia" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ui.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/itb.webp" alt="Institut Teknologi Bandung" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Institut Teknologi Bandung" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/itb.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/ugm.webp" alt="Universitas Gadjah Mada" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Gadjah Mada" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ugm.webp)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/ipb.webp" alt="IPB University" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="IPB University" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ipb.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/unair.webp" alt="Universitas Airlangga" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Airlangga" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/unair.webp)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/unpad.svg" alt="Universitas Padjadjaran" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Padjadjaran" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(https://www.unpad.ac.id/wp-content/uploads/2025/12/logo-unpad-duo.svg)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/its.webp" alt="Institut Teknologi Sepuluh Nopember" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Institut Teknologi Sepuluh Nopember" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/its.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/undip.webp" alt="Universitas Diponegoro" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Diponegoro" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/undip.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/nottingham.webp" alt="University of Nottingham" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="University of Nottingham" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/nottingham.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/stuttgart.webp" alt="Universität Stuttgart" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universität Stuttgart" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/stuttgart.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/ui.webp" alt="Universitas Indonesia" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Indonesia" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ui.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/itb.webp" alt="Institut Teknologi Bandung" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Institut Teknologi Bandung" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/itb.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/ugm.webp" alt="Universitas Gadjah Mada" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Gadjah Mada" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ugm.webp)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/ipb.webp" alt="IPB University" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="IPB University" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/ipb.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/unair.webp" alt="Universitas Airlangga" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Airlangga" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/unair.webp)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/unpad.svg" alt="Universitas Padjadjaran" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Padjadjaran" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(https://www.unpad.ac.id/wp-content/uploads/2025/12/logo-unpad-duo.svg)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/its.webp" alt="Institut Teknologi Sepuluh Nopember" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Institut Teknologi Sepuluh Nopember" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/its.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/undip.webp" alt="Universitas Diponegoro" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universitas Diponegoro" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/undip.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/nottingham.webp" alt="University of Nottingham" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="University of Nottingham" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/nottingham.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
-                <img src="/assets/c11-logos/stuttgart.webp" alt="Universität Stuttgart" width="110" height="64" loading="lazy" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <div role="img" aria-label="Universität Stuttgart" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [background-image:url(/assets/logos/stuttgart.png)] [background-size:contain] [background-repeat:no-repeat] [background-position:center]"></div>
               
             </div>
           </div>
         </div>
       
         {/* Problem / Agitation Section */}
-        <section data-c11-defer id="agitation" className="[background:#F3F3F3] [padding:56px_24px]">
+        <section id="agitation" className="[background:#F3F3F3] [padding:56px_24px]">
           <div className="[max-width:672px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:40px]">
               <div className="[display:inline-block] [border-radius:9999px] [padding:10px_24px] [font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [background:#fff] [color:#D70808] [box-shadow:0_4px_16px_rgba(0,0,0,0.06)] [margin-bottom:20px]">Baru Mau Serius Belajar TOEFL?</div>
@@ -687,7 +636,7 @@ export default function LandingPage() {
           </svg>
         </div>
       
-        <section data-c11-defer id="value" className="[background:#fff] [padding:80px_24px]">
+        <section id="value" className="[background:#fff] [padding:80px_24px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:56px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">💡 Metode Eksklusif Full Bright</div>
@@ -756,7 +705,7 @@ export default function LandingPage() {
       
             <div className="[max-width:560px] [margin:0_auto_18px]">
               <div className="[border-radius:16px] [overflow:hidden] [border:1px_solid_#ececec] [background:#fff] [box-shadow:0_3px_16px_rgba(0,0,0,0.05)] [line-height:0]">
-                <img loading="lazy" src="/assets/pasted-1788585564773-0.webp" alt="Instruktur Full Bright menjelaskan pola soal TOEFL di kelas" className="[display:block] [width:100%] [height:auto]" />
+                <img src="/assets/pasted-1788585564773-0.webp" alt="Instruktur Full Bright menjelaskan pola soal TOEFL di kelas" className="[display:block] [width:100%] [height:auto]" />
               </div>
             </div>
             <p className="[margin:0_auto_28px] [max-width:820px] [text-align:center] [font-size:19px] [line-height:1.6] [font-weight:800] [color:#151515]">3 Metode Belajar yang Membuat Alumni Full Bright Naik Skor dalam 15 Hari:</p>
@@ -798,30 +747,30 @@ export default function LandingPage() {
         </section>
       
         {/* Social Proof: WA screenshots */}
-        <section data-c11-defer id="proof" className="[background:#fff] [padding:72px_24px]">
+        <section id="proof" className="[background:#fff] [padding:72px_24px]">
           <div className="[max-width:672px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:36px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">📱 Bukti Nyata dari Alumni</div>
               <h2 className="[margin:0_0_14px] [font-size:clamp(24px,3vw,36px)] [line-height:1.25] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Metode Kami Berhasil Membuat<br /><span style={{ color: '#d70808' }}>Ribuan Alumni Kami Capai TOEFL 500+&nbsp;</span></h2>
               
-              <p className="[margin:0] [font-size:14px] [color:#555b65]">Klik foto untuk memperbesar</p>
+              <p className="[margin:0] [font-size:14px] [color:#9ca3af]">Klik foto untuk memperbesar</p>
             </div>
       
             <div className="[margin:0_auto_32px] [max-width:420px] [display:flex] [flex-direction:column]">
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(0)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                  <img src="/assets/toefl1.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [object-fit:cover]" />
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl1.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(1)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                  <img src="/assets/toefl2.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [object-fit:cover]" />
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl2.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(2)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                  <img src="/assets/toefl3.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [object-fit:cover]" />
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl3.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
             </div>
@@ -847,253 +796,237 @@ export default function LandingPage() {
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">💻 Tampilan LMS</div>
               <h2 className="[margin:0_0_16px] [font-size:clamp(24px,3vw,36px)] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Nggak Punya Banyak Waktu?<br /><span className="[color:#D70808]">Materi Sudah Urut, Tinggal Ikuti</span></h2>
               <p className="[margin:0] [font-size:16px] [max-width:560px] [margin-left:auto] [margin-right:auto] [line-height:1.6] [color:#3d3d3d]">Semua yang kamu butuhkan untuk mengetahui kelemahan, belajar, berlatih, dan menghadapi ujian.</p>
-            </div>              <div className="[max-width:840px] [margin:0_auto_44px]">
-              <div className="[position:relative] [max-width:1040px] [margin:0_auto] [overflow:hidden] [border-radius:18px] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0]">
-                <video
-                  ref={lmsVideoRef}
-                  controls
-                  preload="metadata"
-                  playsInline
-                  onLoadedMetadata={showLmsPreviewFrame}
-                  onPlay={handleLmsVideoPlay}
-                  className="[display:block] [width:100%] [aspect-ratio:16/9] [object-fit:cover] [background:#151515]"
-                >
-                  <source
-                    src="https://demo-fullbright.b-cdn.net/NEW.mp4#t=4"
-                    type="video/mp4"
-                  />
-                  Browser kamu tidak mendukung pemutaran video.
-                </video>
-                {showLmsOverlay ? (
-                  <button
-                    type="button"
-                    onClick={playLmsVideo}
-                    aria-label="Putar video tampilan LMS"
-                    className="[position:absolute] [inset:0] [display:flex] [align-items:center] [justify-content:center] [border:0] [background:rgba(21,21,21,0.22)] [cursor:pointer] [transition:background_0.2s_ease] hover:[background:rgba(21,21,21,0.32)]"
-                  >
-                    <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M8 5.5v13l11-6.5z"></path></svg>
-                      </span>
-                      <span className="[font-size:13px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#fff] [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">Putar showcase LMS</span>
-                    </div>
-                  </button>
-                ) : null}
+            </div>
+      
+            <div className="[max-width:840px] [margin:0_auto_44px]">
+              <div className="[position:relative] [border-radius:20px] [overflow:hidden] [background:#151515] [border:1px_solid_#e5e5e5] [box-shadow:0_8px_32px_rgba(0,0,0,0.12)] [aspect-ratio:16/9]">
+                <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:repeating-linear-gradient(135deg,#1c1c1c_0,#1c1c1c_14px,#191919_14px,#191919_28px)]">
+                  <span className="[display:flex] [align-items:center] [justify-content:center] [width:66px] [height:66px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_26px_rgba(215,8,8,0.45)]">
+                    <span className="[display:block] [width:0] [height:0] [margin-left:5px] [border-style:solid] [border-width:13px_0_13px_21px] [border-color:transparent_transparent_transparent_#fff]"></span>
+                  </span>
+                  <p className="[margin:0] [font-size:14px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#fff]">Video Tour LMS</p>
+                  
+                </div>
+                <div className="[position:absolute] [left:14px] [top:14px] [display:flex] [align-items:center] [gap:7px] [border-radius:9999px] [background:rgba(0,0,0,0.55)] [padding:7px_13px] [pointer-events:none]">
+                  <span className="[display:block] [width:7px] [height:7px] [border-radius:9999px] [background:#D70808]"></span>
+                  <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#fff]">Showcase</span>
+                </div>
               </div>
+              
             </div>
       
             <div className="[display:flex] [flex-direction:column] [gap:20px] [max-width:1040px] [margin:0_auto_40px]">
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1.35fr_1fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-1.webp" alt="Progresmu Terlihat, Bukan Cuma Terasa Sibuk" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-1.webp" alt="Tidak Lagi Bingung Harus Mulai dari Mana" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
                       <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">01</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Dashboard Progress</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 85.000</span>
-
-                    </div>
-                    <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Progresmu Terlihat, Bukan Cuma Terasa Sibuk</h3>
-                    <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Soal dikerjakan, akurasi, waktu belajar, streak harian, hingga tren skor per section terekam otomatis, jadi progresmu selalu terlihat jelas.</p>
-                    <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
-                        <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
-                          <span className="[color:#D70808] [font-weight:900]">✓</span>Akurasi &amp; streak harian
-                        </span>
-
-                        <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
-                          <span className="[color:#D70808] [font-weight:900]">✓</span>Tren skor per section
-                        </span>
-
-                    </div>
-                  </div>
-                </div>
-
-                <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1.35fr_1fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
-                  <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center]">
-                    <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-2.webp" alt="Tidak Lagi Bingung Harus Mulai dari Mana" className="[width:100%] [height:auto] [display:block]" />
-                    </div>
-                  </div>
-                  <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px]">
-                    <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">02</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Diagnostic Test</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 120.000</span>
-
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Diagnostic Test</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 120.000</span>
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Tidak Lagi Bingung Harus Mulai dari Mana</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Kerjakan Diagnostic Test lebih dulu untuk mengetahui baseline skor TOEFL ITP kamu. Hasilnya menentukan materi mana yang perlu diprioritaskan.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Baseline skor per section
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Materi prioritas otomatis
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1fr_1.35fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center] [order:2] max-[899px]:[order:initial]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-3.webp" alt="Materi Sudah Urut, Kamu Tinggal Mengikuti" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-2.webp" alt="Materi Sudah Urut, Kamu Tinggal Mengikuti" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px] [order:1] max-[899px]:[order:initial]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">03</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Materi &amp; Roadmap</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 300.000</span>
-
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">02</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Materi &amp; Roadmap</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 300.000</span>
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Materi Sudah Urut, Kamu Tinggal Mengikuti</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Materi Structure, Listening, dan Reading tersusun rapi dari Hari 1 sampai Hari 15, jadi kamu tidak perlu menyusun sendiri urutan belajarnya.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>60 video full skills
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Urut Hari 1–15
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1.35fr_1fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-4.webp" alt="Kalau Bingung, Ada yang Langsung Menjawab" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-3.webp" alt="Kalau Bingung, Ada yang Langsung Menjawab" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">04</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">AI Assistant</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 100.000</span>
-
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">03</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">AI Assistant</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 100.000</span>
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Kalau Bingung, Ada yang Langsung Menjawab</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Setiap video dilengkapi rangkuman materi dan AI Assistant yang siap menjelaskan ulang topik yang belum kamu pahami, tanpa perlu menunggu jadwal.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Rangkuman tiap video
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Tanya AI 24/7
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1fr_1.35fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center] [order:2] max-[899px]:[order:initial]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-5.webp" alt="Tahu Persis Bagian yang Belum Kamu Kuasai" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-4.webp" alt="Tahu Persis Bagian yang Belum Kamu Kuasai" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px] [order:1] max-[899px]:[order:initial]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">05</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Latihan Soal</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 150.000</span>
-
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">04</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Latihan Soal</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 150.000</span>
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Tahu Persis Bagian yang Belum Kamu Kuasai</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Setiap topik punya latihan soal dengan navigasi antar nomor dan progress tracker, jadi kamu tahu persis bagian mana yang belum dikuasai.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Latihan per topik
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Progress tracker
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1.35fr_1fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-6.webp" alt="Kesalahan yang Sama Tidak Terulang Lagi" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-5.webp" alt="Kesalahan yang Sama Tidak Terulang Lagi" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">06</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Drill Soal</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 100.000</span>
-
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">05</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Drill Soal</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 100.000</span>
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Kesalahan yang Sama Tidak Terulang Lagi</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Asah kemampuan spesifik lewat drill per skill — Listening, Structure, dan Reading — dengan paket soal yang bisa diulang sampai benar-benar paham.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>84 paket drill
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Bisa diulang tanpa batas
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
                 <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1fr_1.35fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
                   <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center] [order:2] max-[899px]:[order:initial]">
                     <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
-                      <img loading="lazy" src="/lms/lms-7.webp" alt="Supaya Nanti Saat Tes TOEFL Asli Tidak Kaget" className="[width:100%] [height:auto] [display:block]" />
+                      <img src="/lms/lms-6.webp" alt="Supaya Nanti Saat Tes TOEFL Asli Tidak Kaget" className="[width:100%] [height:auto] [display:block]" />
                     </div>
                   </div>
                   <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px] [order:1] max-[899px]:[order:initial]">
                     <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
-                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">07</span>
-                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Simulasi &amp; Ujian</span>
-                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9b1b1b]">Senilai</span>Rp 150.000</span>
-
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">06</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Simulasi &amp; Ujian</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 150.000</span>
+                      
                         <span className="[font-size:10px] [font-weight:800] [padding:4px_9px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">Khusus Dibimbing Tutor</span>
-
+                      
                     </div>
                     <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Supaya Nanti Saat Tes TOEFL Asli Tidak Kaget</h3>
                     <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Mode Simulasi tanpa timer dengan feedback instan untuk latihan, dan Mode Final dengan timer serta kondisi seperti ujian TOEFL ITP sebenarnya.</p>
                     <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Mode latihan + feedback
                         </span>
-
+                      
                         <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
                           <span className="[color:#D70808] [font-weight:900]">✓</span>Mode Final bertimer
                         </span>
-
+                      
                     </div>
                   </div>
                 </div>
-
+              
+                <div className="[border-radius:22px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [overflow:hidden] [display:grid] [grid-template-columns:1.35fr_1fr] [align-items:stretch] max-[899px]:[grid-template-columns:1fr]">
+                  <div className="[padding:22px] [background:#FAFAFA] [display:flex] [flex-direction:column] [justify-content:center]">
+                    <div className="[border-radius:12px] [overflow:hidden] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_18px_rgba(0,0,0,0.09)] [line-height:0]">
+                      <img src="/lms/lms-7.webp" alt="Progresmu Terlihat, Bukan Cuma Terasa Sibuk" className="[width:100%] [height:auto] [display:block]" />
+                    </div>
+                  </div>
+                  <div className="[padding:24px_26px] [display:flex] [flex-direction:column] [justify-content:center] [gap:11px]">
+                    <div className="[display:flex] [align-items:center] [gap:10px] [flex-wrap:wrap]">
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:28px] [height:28px] [flex-shrink:0] [border-radius:9px] [background:#D70808] [color:#fff] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif]">07</span>
+                      <span className="[font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Dashboard Progress</span>
+                      <span className="[display:inline-flex] [align-items:baseline] [gap:5px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [padding:6px_13px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [border:1.5px_solid_#ffb3b3] [white-space:nowrap]"><span className="[font-size:10px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#c96b6b]">Senilai</span>Rp 85.000</span>
+                      
+                    </div>
+                    <h3 className="[margin:0] [font-size:clamp(19px,2.2vw,22px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Progresmu Terlihat, Bukan Cuma Terasa Sibuk</h3>
+                    <p className="[margin:0] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">Soal dikerjakan, akurasi, waktu belajar, streak harian, hingga tren skor per section terekam otomatis, jadi progresmu selalu terlihat jelas.</p>
+                    <div className="[display:flex] [flex-wrap:wrap] [gap:7px] [margin-top:2px]">
+                      
+                        <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
+                          <span className="[color:#D70808] [font-weight:900]">✓</span>Akurasi &amp; streak harian
+                        </span>
+                      
+                        <span className="[display:inline-flex] [flex-shrink:0] [white-space:nowrap] [align-items:center] [gap:6px] [font-size:13px] [font-weight:700] [color:#151515] [background:#F7F7F7] [border:1px_solid_#ececec] [border-radius:9999px] [padding:6px_12px]">
+                          <span className="[color:#D70808] [font-weight:900]">✓</span>Tren skor per section
+                        </span>
+                      
+                    </div>
+                  </div>
+                </div>
+              
             </div>
-
+      
             <div className="[max-width:560px] [margin:0_auto_44px] [border-radius:22px] [background:#fff] [border:1.5px_solid_#ffd6d6] [box-shadow:0_4px_22px_rgba(0,0,0,0.06)] [padding:26px_24px] [text-align:center]">
-              <p className="[margin:0_0_8px] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Total nilai semua fitur di atas</p>
-              <p className="[margin:0_0_12px] [font-size:clamp(30px,5vw,40px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#555b65] [text-decoration:line-through] [text-decoration-color:#D70808] [text-decoration-thickness:3px]">Rp 1.005.000</p>
+              <p className="[margin:0_0_8px] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Total nilai semua fitur di atas</p>
+              <p className="[margin:0_0_12px] [font-size:clamp(30px,5vw,40px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#9ca3af] [text-decoration:line-through] [text-decoration-color:#D70808] [text-decoration-thickness:3px]">Rp 1.005.000</p>
               <p className="[margin:0_0_6px] [font-size:12px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#D70808]">MULAI DARI HANYA</p>
               <p className="[margin:0_0_8px] [font-size:clamp(32px,5.4vw,44px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
               
@@ -1115,7 +1048,7 @@ export default function LandingPage() {
         </section>
       
         {/* Why Full Bright */}
-        <section data-c11-defer className="[background:#F3F3F3] [padding:80px_24px]">
+        <section className="[background:#F3F3F3] [padding:80px_24px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:48px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">🏅 Mengapa Full Bright?</div>
@@ -1158,7 +1091,7 @@ export default function LandingPage() {
             </div>
             <div className="[max-width:440px] [margin:0_auto_36px] [border-radius:18px] [background:#fff] [border:1px_solid_#ececec] [box-shadow:0_3px_16px_rgba(0,0,0,0.05)] [overflow:hidden]">
               <div className="[line-height:0]">
-                <img loading="lazy" src="/assets/Foto Bareng.webp" alt="Tim instruktur Full Bright Indonesia" className="[display:block] [width:100%] [height:auto]" />
+                <img src="/assets/Foto Bareng.webp" alt="Tim instruktur Full Bright Indonesia" className="[display:block] [width:100%] [height:auto]" />
               </div>
               <p className="[margin:0] [padding:14px_18px] [text-align:center] [font-size:13px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Tim instruktur Full Bright, pengalaman 10+ tahun mengajar TOEFL ITP</p>
             </div>
@@ -1173,7 +1106,7 @@ export default function LandingPage() {
         </section>
       
         {/* Social Proof */}
-        <section data-c11-defer id="testimonials">
+        <section id="testimonials">
           <div className="[background:#151515] [padding:40px_24px]">
             <div className="[max-width:1152px] [margin:0_auto] [display:grid] [grid-template-columns:repeat(auto-fit,minmax(140px,1fr))] [gap:32px] [text-align:center] [color:#fff]">
               
@@ -1204,7 +1137,7 @@ export default function LandingPage() {
               <div className="[margin-bottom:48px] [text-align:center]">
                 <div className="[margin-bottom:20px] [display:inline-flex] [align-items:center] [gap:8px] [border-radius:9999px] [padding:6px_16px] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">💬 Testimoni Alumni Kami</div>
                 <h2 className="[margin:0_0_16px] [font-size:clamp(24px,3vw,36px)] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Lihat Bagaimana Strategi Kami Membantu Alumni<br /><span className="[color:rgb(215,_8,_8)]">Meraih Target Skor Untuk Beasiswa &amp; CPNS</span></h2>
-                <p className="[margin:0] [font-size:14px] [color:#555b65]">Klik foto untuk memperbesar</p>
+                <p className="[margin:0] [font-size:14px] [color:#9ca3af]">Klik foto untuk memperbesar</p>
               </div>
       
       
@@ -1213,89 +1146,89 @@ export default function LandingPage() {
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                      <img src="/assets/toefl1.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl1.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                      <img src="/assets/toefl2.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl2.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                      <img src="/assets/toefl3.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl3.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl4.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl4.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">507</span></p>
-                      <img src="/assets/toefl5.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl5.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">513</span></p>
-                      <img src="/assets/toefl6.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl6.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">537</span></p>
-                      <img src="/assets/toefl7.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl7.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl9.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl9.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                      <img src="/assets/toefl1.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl1.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                      <img src="/assets/toefl2.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl2.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                      <img src="/assets/toefl3.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl3.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl4.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl4.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">507</span></p>
-                      <img src="/assets/toefl5.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl5.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">513</span></p>
-                      <img src="/assets/toefl6.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl6.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">537</span></p>
-                      <img src="/assets/toefl7.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl7.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl9.webp" alt="Tangkapan layar skor TOEFL alumni" width="420" height="420" loading="lazy" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [object-fit:cover]" />
+                      <div className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [overflow:hidden] [background-image:url(/assets/toefl9.webp)] [background-size:cover] [background-position:center]"></div>
                     </div>
                   
                 </div>
               </div>
       
               <div className="[margin:0_auto_56px] [width:100%] [max-width:896px]">
-                <p className="[margin:0_0_24px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Testimoni Alumni yang Sukses Masuk Universitas Luar Negeri</p>
+                <p className="[margin:0_0_24px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Testimoni Alumni yang Sukses Masuk Universitas Luar Negeri</p>
                 <div className="[display:grid] [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] [gap:16px]">
                   
                     <div className="[display:flex] [min-width:0] [flex-direction:column] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [padding:20px] [background:#F9F9F9] [box-shadow:0_2px_16px_rgba(0,0,0,0.05)]">
@@ -1303,7 +1236,7 @@ export default function LandingPage() {
                       <p className="[margin:0] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#D70808]">Sangat Terjangkau Untuk Mahasiswa</p>
                       <p className="[margin:0] [flex:1] [font-size:14px] [line-height:1.6] [color:#3d3d3d]">"Full Bright ini tempat yang paling "pas" buat teman-teman Mahasiswa menaklukkan Tes TOEFL &amp; IELTS"</p>
                       <div className="[display:flex] [align-items:center] [gap:12px] [border-top:1px_solid_#f3f4f6] [padding-top:8px]">
-                        <img src="/assets/People%201.webp" alt="Andi Manggala Putra" width="110" height="64" loading="lazy" className="[height:40px] [width:40px] [flex-shrink:0] [border-radius:9999px] [background-size:cover] [object-fit:contain]" />
+                        <div role="img" aria-label="Andi Manggala Putra" className="[height:40px] [width:40px] [flex-shrink:0] [border-radius:9999px] [background-image:url(/assets/People%201.webp)] [background-size:cover] [background-position:center]"></div>
                         <div className="[min-width:0] [flex:1]">
                           <p className="[margin:0] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Andi Manggala Putra</p>
                           <p className="[margin:0] [font-size:12px] [color:#6b7280] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Accounting and Finance</p>
@@ -1317,7 +1250,7 @@ export default function LandingPage() {
                       <p className="[margin:0] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#D70808]">A Good Place to Learn TOEFL &amp; IELTS</p>
                       <p className="[margin:0] [flex:1] [font-size:14px] [line-height:1.6] [color:#3d3d3d]">"Fullbright growing together with their students. This place is good place to learn TOEFL &amp; IELTS. Thank you for the teacher and friendly staff. Now I can see the world"</p>
                       <div className="[display:flex] [align-items:center] [gap:12px] [border-top:1px_solid_#f3f4f6] [padding-top:8px]">
-                        <img src="/assets/People%202.webp" alt="Hajrah" width="110" height="64" loading="lazy" className="[height:40px] [width:40px] [flex-shrink:0] [border-radius:9999px] [background-size:cover] [object-fit:contain]" />
+                        <div role="img" aria-label="Hajrah" className="[height:40px] [width:40px] [flex-shrink:0] [border-radius:9999px] [background-image:url(/assets/People%202.webp)] [background-size:cover] [background-position:center]"></div>
                         <div className="[min-width:0] [flex:1]">
                           <p className="[margin:0] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Hajrah</p>
                           <p className="[margin:0] [font-size:12px] [color:#6b7280] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Student Water Resources Engineering and Management</p>
@@ -1333,7 +1266,7 @@ export default function LandingPage() {
                 <div className="[display:flex] [width:max-content] [animation:infiniteScroll_40s_linear_infinite]">
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Rani</p>
                       </div>
@@ -1341,7 +1274,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Ayu</p>
                       </div>
@@ -1349,7 +1282,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Mbak Widya</p>
                       </div>
@@ -1357,7 +1290,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Pak Yohanes</p>
                       </div>
@@ -1365,7 +1298,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Uly Sinaga</p>
                       </div>
@@ -1373,7 +1306,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Nadia Ayu</p>
                       </div>
@@ -1381,7 +1314,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Rani</p>
                       </div>
@@ -1389,7 +1322,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Ayu</p>
                       </div>
@@ -1397,7 +1330,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Mbak Widya</p>
                       </div>
@@ -1405,7 +1338,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Pak Yohanes</p>
                       </div>
@@ -1413,7 +1346,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Uly Sinaga</p>
                       </div>
@@ -1421,7 +1354,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Nadia Ayu</p>
                       </div>
@@ -1429,7 +1362,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Rani</p>
                       </div>
@@ -1437,7 +1370,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Ayu</p>
                       </div>
@@ -1445,7 +1378,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Mbak Widya</p>
                       </div>
@@ -1453,7 +1386,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Pak Yohanes</p>
                       </div>
@@ -1461,7 +1394,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Uly Sinaga</p>
                       </div>
@@ -1469,7 +1402,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Nadia Ayu</p>
                       </div>
@@ -1477,7 +1410,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/rani.webp" alt="Kak Rani" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Rani</p>
                       </div>
@@ -1485,7 +1418,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/ayu.webp" alt="Kak Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Ayu</p>
                       </div>
@@ -1493,7 +1426,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/widya.webp" alt="Mbak Widya" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Mbak Widya</p>
                       </div>
@@ -1501,7 +1434,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/yohanes.webp" alt="Pak Yohanes" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Pak Yohanes</p>
                       </div>
@@ -1509,7 +1442,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/uly.webp" alt="Kak Uly Sinaga" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Uly Sinaga</p>
                       </div>
@@ -1517,7 +1450,7 @@ export default function LandingPage() {
                     </div>
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
-                      <img loading="lazy" src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
+                      <img src="/assets/reviews/nadia.webp" alt="Kak Nadia Ayu" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />
                       <div className="[min-width:0] [flex:1]">
                         <p className="[margin:0] [font-size:12px] [font-weight:900] [color:#151515] [white-space:nowrap] [overflow:hidden] [text-overflow:ellipsis]">Kak Nadia Ayu</p>
                       </div>
@@ -1537,17 +1470,17 @@ export default function LandingPage() {
                 <div className="[position:relative] [display:flex] [align-items:center] [justify-content:center] [height:220px] [overflow:hidden]">
                   <button onClick={prevGoogle} aria-label="Sebelumnya" className="[position:absolute] [left:0] [z-index:3] [display:flex] [height:36px] [width:36px] [align-items:center] [justify-content:center] [border-radius:9999px] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_12px_rgba(0,0,0,0.12)] [color:#151515] [font-size:16px] [cursor:pointer]">‹</button>
                   <div style={css(gSideStyle('prev', gIdx))} onClick={() => setReviewIdx((gIdx - 1 + REVIEW_COUNT) % REVIEW_COUNT)}></div>
-                  <img src={reviewSrc(gIdx)} alt={`Ulasan Google alumni ${gIdx + 1}`} loading="lazy" onClick={() => setReviewIdx(gIdx)} className="[position:absolute] [left:50%] [transform:translateX(-50%)] [transition:all_0.3s_ease] [cursor:pointer] [height:210px] [width:auto] [max-width:340px] [border-radius:16px] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [z-index:2] [object-fit:contain]" />
+                  <img src={reviewSrc(gIdx)} onClick={() => setReviewIdx(gIdx)} className="[position:absolute] [left:50%] [transform:translateX(-50%)] [transition:all_0.3s_ease] [cursor:pointer] [height:210px] [width:auto] [max-width:340px] [border-radius:16px] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [z-index:2] [object-fit:contain]" />
                   <div style={css(gSideStyle('next', gIdx))} onClick={() => setReviewIdx((gIdx + 1) % REVIEW_COUNT)}></div>
                   <button onClick={nextGoogle} aria-label="Selanjutnya" className="[position:absolute] [right:0] [z-index:3] [display:flex] [height:36px] [width:36px] [align-items:center] [justify-content:center] [border-radius:9999px] [border:1px_solid_#e5e7eb] [background:#fff] [box-shadow:0_4px_12px_rgba(0,0,0,0.12)] [color:#151515] [font-size:16px] [cursor:pointer]">›</button>
                 </div>
               </div>
       
               <div className="[margin-top:48px] [max-width:520px] [margin-left:auto] [margin-right:auto]">
-                <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Cerita Alumni</p>
+                <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#9ca3af]">Cerita Alumni</p>
                 <h3 className="[margin:0_0_16px] [text-align:center] [font-size:clamp(19px,2.4vw,24px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Dengar Langsung dari <span className="[color:#D70808]">Alumni Kami</span></h3>
                 <div className="[position:relative] [border-radius:18px] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo}>
-                  <video ref={videoRef} controls playsInline preload="none" aria-label="Video testimoni alumni Full Bright" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
+                  <video ref={videoRef} src="/assets/testimoni iyha.mp4#t=1.5" controls playsInline preload="metadata" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
                   {showOverlay ? (<>
                     <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
                       <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
@@ -1596,7 +1529,7 @@ export default function LandingPage() {
       
         {/* Pricing: Belajar Sendiri (self-study mode) */}
         {mode === 'self' ? (<>
-        <section data-c11-defer id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
+        <section id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
               {scalevProof !== null && scalevProof.submitted > 0 ? (
                 <p className="[margin:16px_0_0] [text-align:center] [font-size:13px] [font-weight:800] [color:#16a34a]" aria-live="polite">
@@ -1616,16 +1549,16 @@ export default function LandingPage() {
               
               <div className="[display:inline-flex] [gap:4px] [padding:5px] [border-radius:9999px] [background:#fff] [border:1px_solid_#ffb3b3] [box-shadow:0_2px_12px_rgba(215,8,8,0.08)]">
                 <button onClick={() => setMode('self')} style={css(toggleBtnStyle(true))}>Belajar Sendiri</button>
-                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [right:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#a83b00] [color:#fff] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-80%</span></button>
+                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [right:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#F97316] [color:#fff] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-80%</span></button>
               </div>
             </div>
       
             <div className="[max-width:520px] [margin:0_auto_40px]">
               <div className="[border-radius:24px] [padding:28px] [display:flex] [flex-direction:column] [position:relative] [overflow:hidden] [border:2px_solid_#F5B700] [box-shadow:0_8px_32px_rgba(245,183,0,0.15)] [background:linear-gradient(165deg,#ffffff_0%,#fffbf0_100%)]">
-                <div className="[position:absolute] [top:0] [right:0] [font-size:12px] [font-weight:900] [padding:8px_16px] [border-bottom-left-radius:16px] [color:#151515] [background:#F5B700] [font-family:Nunito,sans-serif]">🔥 POPULAR</div>
+                <div className="[position:absolute] [top:0] [right:0] [font-size:12px] [font-weight:900] [padding:8px_16px] [border-bottom-left-radius:16px] [color:#FFFFFF] [background:#F5B700] [font-family:Nunito,sans-serif]">🔥 POPULAR</div>
                 <div className="[display:flex] [align-items:flex-start] [justify-content:space-between] [margin-bottom:4px] [margin-top:20px]">
                   <div>
-                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#555b65]">E-Course</p>
+                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#9ca3af]">E-Course</p>
                     <h3 className="[margin:0] [font-size:24px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Self-Study LMS</h3>
                   </div>
                   <span className="[display:flex] [align-items:center] [gap:4px] [font-size:12px] [font-weight:600] [padding:4px_10px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808]">📚 Mandiri</span>
@@ -1633,7 +1566,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_16px] [font-size:15px] [font-weight:700] [color:#4b5563]">Target Skor: <span className="[font-size:20px] [font-weight:900] [color:#16a34a]">500+</span> · <span className="[font-weight:900] [color:#151515]">Belajar Kapan Saja</span></p>
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
-                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 250.000</span>
+                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#9ca3af]">Rp 250.000</span>
                     <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 60%</span>
                   </div>
                   <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
@@ -1653,37 +1586,37 @@ export default function LandingPage() {
                     <li className="[display:flex] [align-items:flex-start] [gap:8px] [font-size:14px] [color:#3d3d3d] [font-weight:500]"><span className="[flex-shrink:0] [margin-top:1px] [color:#16a34a]">✓</span>Simulasi dan Post Test (Full Skills)</li>
                   
                 </ul>
-                <p className="[margin:12px_0_8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.06em] [color:#555b65]">Belum termasuk:</p>
+                <p className="[margin:12px_0_8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.06em] [color:#9ca3af]">Belum termasuk:</p>
                 <ul className="[list-style:none] [margin:0_0_20px] [padding:0] [display:flex] [flex-direction:column] [gap:8px]">
                   
-                    <li className="[display:flex] [align-items:flex-start] [gap:8px] [font-size:14px] [color:#555b65]"><span className="[flex-shrink:0] [margin-top:1px] [color:#d1d5db]">✕</span>LIVE ZOOM 15 Hari</li>
+                    <li className="[display:flex] [align-items:flex-start] [gap:8px] [font-size:14px] [color:#9ca3af]"><span className="[flex-shrink:0] [margin-top:1px] [color:#d1d5db]">✕</span>LIVE ZOOM 15 Hari</li>
                   
-                    <li className="[display:flex] [align-items:flex-start] [gap:8px] [font-size:14px] [color:#555b65]"><span className="[flex-shrink:0] [margin-top:1px] [color:#d1d5db]">✕</span>Sertifikat TOEFL</li>
+                    <li className="[display:flex] [align-items:flex-start] [gap:8px] [font-size:14px] [color:#9ca3af]"><span className="[flex-shrink:0] [margin-top:1px] [color:#d1d5db]">✕</span>Sertifikat TOEFL</li>
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
                   <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl?utm_source=c11-problem&utm_content=self-study" target="_blank" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="99000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Mulai Belajar Mandiri →</a>
-                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
+                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
-                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
+                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_whatsapp" data-analytics-package="Self-Study LMS" data-analytics-price="99000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
-                <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#555b65]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_trial_lms" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_whatsapp" data-analytics-package="Self-Study LMS" data-analytics-price="99000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#9ca3af]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_trial_lms" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
               </div>
             </div>
       
             
       
             <div className="[max-width:520px] [margin:0_auto_32px]">
-              <p className="[margin:0_0_16px] [text-align:center] [font-size:13px] [font-weight:800] [letter-spacing:0.06em] [text-transform:uppercase] [color:#555b65]">Kata Mereka yang Belajar Mandiri</p>
+              <p className="[margin:0_0_16px] [text-align:center] [font-size:13px] [font-weight:800] [letter-spacing:0.06em] [text-transform:uppercase] [color:#9a9a9a]">Kata Mereka yang Belajar Mandiri</p>
               <div className="[display:grid] [grid-template-columns:1fr] [gap:12px]">
                 
                   <div className="[border-radius:16px] [background:#F9F9F9] [border:1px_solid_#ececec] [padding:22px]">
                     <p className="[margin:0_0_8px] [font-size:16px] [color:#FBBF24] [letter-spacing:0.08em]">★★★★★</p>
                     <p className="[margin:0_0_18px] [font-size:15px] [line-height:1.7] [color:#3d3d3d]">"Trm kasih Full Bright Indonesia yg sudah memberikan kesempatan belajar Bhs Inggris, belajar di sini bisa menjadi alternatif bagi individu yg ingin belajar sambil bekerja, LMS bisa diakses kapan pun"</p>
                     <div className="[display:flex] [align-items:center] [gap:14px]">
-                      <img loading="lazy" src="/assets/nina.png" alt="Nina Hernawati" className="[width:60px] [height:60px] [border-radius:9999px] [object-fit:cover] [flex-shrink:0] [border:2px_solid_#fff] [box-shadow:0_3px_12px_rgba(0,0,0,0.12)]" />
+                      <img src="/assets/nina.png" alt="Nina Hernawati" className="[width:60px] [height:60px] [border-radius:9999px] [object-fit:cover] [flex-shrink:0] [border:2px_solid_#fff] [box-shadow:0_3px_12px_rgba(0,0,0,0.12)]" />
                       <div>
                         <p className="[margin:0_0_2px] [font-size:17px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Nina Hernawati</p>
                         
@@ -1699,7 +1632,7 @@ export default function LandingPage() {
       
         {/* Pricing: Dibimbing Tutor (default mode) */}
         {mode === 'tutor' ? (<>
-        <section data-c11-defer id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
+        <section id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
               {scalevProof !== null && scalevProof.submitted > 0 ? (
                 <p className="[margin:16px_0_0] [text-align:center] [font-size:13px] [font-weight:800] [color:#16a34a]" aria-live="polite">
@@ -1728,7 +1661,7 @@ export default function LandingPage() {
               <div className="[border-radius:24px] [padding:28px] [border:2px_solid_#e5e7eb] [display:flex] [flex-direction:column] [box-shadow:0_4px_24px_rgba(0,0,0,0.06)]">
                 <div className="[display:flex] [align-items:flex-start] [justify-content:space-between] [margin-bottom:4px]">
                   <div>
-                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#555b65]">Paket</p>
+                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#9ca3af]">Paket</p>
                     <h3 className="[margin:0] [font-size:24px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Starter</h3>
                   </div>
                   <span className="[display:flex] [align-items:center] [gap:4px] [font-size:12px] [font-weight:600] [padding:4px_10px] [border-radius:9999px] [background:#F0FDF4] [color:#16a34a]">★★★★★<span className="[margin-left:4px]">5.0</span></span>
@@ -1736,7 +1669,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_16px] [font-size:15px] [font-weight:700] [color:#4b5563]">Target Skor: <span className="[font-size:20px] [font-weight:900] [color:#16a34a]">450+</span> · <span className="[font-weight:900] [color:#151515]">10 Hari (2 Minggu)</span></p>
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
-                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 1.000.000</span>
+                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#9ca3af]">Rp 1.000.000</span>
                     <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 80%</span>
                   </div>
                   <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 200.000</p>
@@ -1784,12 +1717,12 @@ export default function LandingPage() {
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
                   <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=starter" target="_blank" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="200000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
-                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
+                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
-                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
+                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_whatsapp" data-analytics-package="Starter" data-analytics-price="200000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_whatsapp" data-analytics-package="Starter" data-analytics-price="200000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1811,7 +1744,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_16px] [font-size:15px] [font-weight:700] [color:#4b5563]">Target Skor: <span className="[font-size:20px] [font-weight:900] [color:#D70808]">500+</span> · <span className="[font-weight:900] [color:#151515]">25 Hari Total</span></p>
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
-                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 1.875.000</span>
+                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#9ca3af]">Rp 1.875.000</span>
                     <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 80% + Rp50rb</span>
                   </div>
                   <p className="[margin:0_0_4px] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 325.000</p>
@@ -1880,13 +1813,13 @@ export default function LandingPage() {
                 </div>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
                   <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=bundling" target="_blank" data-analytics-location="pricing_bundling_checkout" data-analytics-package="Bundling" data-analytics-price="325000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#16a34a] [box-shadow:0_6px_24px_rgba(22,163,74,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
-                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
+                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <p className="[margin:6px_0_0] [font-size:12px] [text-align:center] [font-weight:600] [color:#D70808]">* Centang opsi Bundle saat checkout</p>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
-                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
+                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20paket%20HEMAT%20TOEFL%20Level%20Starter%20%2B%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_bundling_whatsapp" data-analytics-package="Bundling" data-analytics-price="325000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20paket%20HEMAT%20TOEFL%20Level%20Starter%20%2B%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_bundling_whatsapp" data-analytics-package="Bundling" data-analytics-price="325000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1898,7 +1831,7 @@ export default function LandingPage() {
               <div className="[border-radius:24px] [padding:28px] [border:2px_solid_#e5e7eb] [display:flex] [flex-direction:column] [box-shadow:0_4px_24px_rgba(0,0,0,0.06)]">
                 <div className="[display:flex] [align-items:flex-start] [justify-content:space-between] [margin-bottom:4px]">
                   <div>
-                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#555b65]">Paket</p>
+                    <p className="[margin:0_0_4px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [color:#9ca3af]">Paket</p>
                     <h3 className="[margin:0] [font-size:24px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Intermediate</h3>
                   </div>
                   <span className="[display:flex] [align-items:center] [gap:4px] [font-size:12px] [font-weight:600] [padding:4px_10px] [border-radius:9999px] [background:#F0FDF4] [color:#16a34a]">★★★★★<span className="[margin-left:4px]">5.0</span></span>
@@ -1906,7 +1839,7 @@ export default function LandingPage() {
                 <p className="[margin:0_0_16px] [font-size:15px] [font-weight:700] [color:#4b5563]">Target Skor: <span className="[font-size:20px] [font-weight:900] [color:#16a34a]">500+</span> · <span className="[font-weight:900] [color:#151515]">15 Hari</span> · Min. 430</p>
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
-                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 1.400.000</span>
+                    <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#9ca3af]">Rp 1.400.000</span>
                     <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 80%</span>
                   </div>
                   <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 280.000</p>
@@ -1952,12 +1885,12 @@ export default function LandingPage() {
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
                   <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=intermediate" target="_blank" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="280000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
-                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
+                  <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
-                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
+                  <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-package="Intermediate" data-analytics-price="280000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-package="Intermediate" data-analytics-price="280000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1967,7 +1900,7 @@ export default function LandingPage() {
             </div>
       
             <div className="[max-width:672px] [margin:0_auto_32px] [border-radius:16px] [padding:24px] [background:#F3F3F3] [border:1px_solid_#e5e7eb]">
-              <p className="[margin:0_0_12px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#555b65]">Legalitas Resmi</p>
+              <p className="[margin:0_0_12px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#9ca3af]">Legalitas Resmi</p>
               <div className="[display:flex] [flex-direction:column] [gap:6px]">
                 <span className="[font-size:12px] [font-weight:600] [color:#151515]">✓ SK Kemenkumham RI Nomor AHU-0055720-AH.0114 Tahun 2020</span>
                 <span className="[font-size:12px] [font-weight:600] [color:#151515]">✓ SK Izin Operasional LKP 503/20177/LKP/DPM-PTSP/8/2024</span>
@@ -1983,7 +1916,7 @@ export default function LandingPage() {
         </>) : null}
       
         {/* FAQ */}
-        <section data-c11-defer id="faq" className="[background:#F3F3F3] [padding:80px_24px_48px]">
+        <section id="faq" className="[background:#F3F3F3] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:56px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">❓ Masih Ragu?</div>
@@ -2226,7 +2159,7 @@ export default function LandingPage() {
             <div className="[max-width:512px] [margin:0_auto] [text-align:center]">
               <p className="[margin:0_0_24px] [font-size:14px] [font-weight:600] [color:#3d3d3d]">Masih ada pertanyaan lain? Hubungi kami sekarang.</p>
               <div className="[display:flex] [flex-wrap:wrap] [gap:12px] [justify-content:center]">
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL.%20Saya%20mau%20tanya-tanya%20dulu." target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#151515] [background:#25D366] [box-shadow:0_4px_20px_rgba(37,211,102,0.35)] [text-decoration:none]">Chat Via WA →</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL.%20Saya%20mau%20tanya-tanya%20dulu." target="_blank" rel="noopener noreferrer" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#fff] [background:#25D366] [box-shadow:0_4px_20px_rgba(37,211,102,0.35)] [text-decoration:none]">Chat Via WA →</a>
                 <a href="#testimonials" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#151515] [border:2px_solid_#D70808] [text-decoration:none]">Lihat Bukti Alumni →</a>
               </div>
             </div>
@@ -2237,7 +2170,7 @@ export default function LandingPage() {
         
       
         {/* Survey */}
-        <section data-c11-defer id="survey" className="[background:#fff] [padding:28px_24px]">
+        <section id="survey" className="[background:#fff] [padding:28px_24px]">
           <div className="[max-width:460px] [margin:0_auto] [background:#FAFAFA] [border:1px_solid_#ececec] [border-radius:16px] [padding:20px_20px_16px]">
             <div className="[margin-bottom:16px]">
               <p className="[margin:0_0_6px] [font-size:11px] [font-weight:700] [letter-spacing:0.06em] [text-transform:uppercase] [color:#6b6b6b]">BOLEH TAHU KESULITANMU?</p>
@@ -2286,7 +2219,7 @@ export default function LandingPage() {
             <div className="[display:grid] [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))] [gap:40px] [margin-bottom:40px]">
               <div>
                 <div className="[margin-bottom:16px]">
-                  <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="400" height="400" loading="lazy" className="[width:160px] [height:auto] [object-fit:contain] [filter:brightness(0)_invert(1)]" />
+                  <img src="https://toefl.fullbrightindonesia.org/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" className="[width:160px] [height:auto] [object-fit:contain] [filter:brightness(0)_invert(1)]" />
                 </div>
                 <p className="[margin:0_0_16px] [font-size:12px] [line-height:1.6] [color:#9ca3af]">SK Kemenkumham RI No. AHU-0055720-AH.0114 Tahun 2020<br />SK LKP No. 503/20177/LKP/DPM-PTSP/8/2024<br />NPSN K9998700 · Kerjasama dengan IIEF Jakarta</p>
                 <div className="[display:flex] [gap:12px]">
@@ -2297,7 +2230,7 @@ export default function LandingPage() {
               </div>
       
               <div>
-                <p className="[margin:0_0_20px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#aeb4be]">Navigasi</p>
+                <p className="[margin:0_0_20px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#6b7280]">Navigasi</p>
                 <ul className="[list-style:none] [margin:0] [padding:0] [display:flex] [flex-direction:column] [gap:12px]">
                   <li><a href="#value" className="[font-size:14px] [color:#9ca3af] [text-decoration:none]">Keunggulan</a></li>
                   <li><a href="#testimonials" className="[font-size:14px] [color:#9ca3af] [text-decoration:none]">Testimoni</a></li>
@@ -2307,7 +2240,7 @@ export default function LandingPage() {
               </div>
       
               <div>
-                <p className="[margin:0_0_20px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#aeb4be]">Hubungi Kami</p>
+                <p className="[margin:0_0_20px] [font-size:12px] [font-weight:900] [text-transform:uppercase] [letter-spacing:0.08em] [color:#6b7280]">Hubungi Kami</p>
                 <ul className="[list-style:none] [margin:0] [padding:0] [display:flex] [flex-direction:column] [gap:16px]">
                   
                     <li className="[display:flex] [align-items:flex-start] [gap:12px]">
@@ -2352,7 +2285,7 @@ export default function LandingPage() {
               </div>
             </div>
       
-            <div className="[border-top:1px_solid_rgba(255,255,255,0.08)] [padding-top:24px] [display:flex] [justify-content:center] [font-size:12px] [color:#aeb4be]">
+            <div className="[border-top:1px_solid_rgba(255,255,255,0.08)] [padding-top:24px] [display:flex] [justify-content:center] [font-size:12px] [color:#6b7280]">
               <p className="[margin:0]">© 2026 Full Bright Indonesia. Lembaga Resmi TOEFL ITP bekerjasama dengan IIEF Jakarta.</p>
             </div>
           </div>
@@ -2362,13 +2295,13 @@ export default function LandingPage() {
         {rpOpen ? (<>
           <div className="[position:fixed] [inset:0] [z-index:100] [display:flex] [align-items:flex-end] [justify-content:center] [background:rgba(21,21,21,0.45)] [animation:fbFadeInUp_0.2s_ease]" onClick={closeReturnPopup}>
             <div className="[position:relative] [width:100%] [max-width:480px] [max-height:60vh] [overflow-y:auto] [background:#fff] [border-radius:24px_24px_0_0] [padding:22px_22px_28px] [box-shadow:0_-12px_40px_rgba(0,0,0,0.18)] [animation:fbSheetUp_0.25s_ease]" onClick={(e) => e.stopPropagation()}>
-              <button onClick={closeReturnPopup} aria-label="Tutup" className="[position:absolute] [top:16px] [right:16px] [display:flex] [height:30px] [width:30px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#F3F4F6] [border:none] [color:#aeb4be] [font-size:16px] [cursor:pointer]">✕</button>
+              <button onClick={closeReturnPopup} aria-label="Tutup" className="[position:absolute] [top:16px] [right:16px] [display:flex] [height:30px] [width:30px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#F3F4F6] [border:none] [color:#6b7280] [font-size:16px] [cursor:pointer]">✕</button>
               <p className="[margin:0_0_6px] [font-size:11px] [font-weight:700] [letter-spacing:0.06em] [text-transform:uppercase] [color:#6b6b6b]">Sebelum Kamu Pergi</p>
               <h3 className="[margin:0_0_18px] [padding-right:30px] [font-size:clamp(22px,5vw,26px)] [line-height:1.25] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Apa yang <span className="[color:#D70808]">Masih Bikin Kamu Ragu Daftar?</span></h3>
               {rpSelected !== null ? (<>
                 <a href={waUrl(RETURN_WA_MSGS[rpSelected ?? 0])} target="_blank" rel="noopener noreferrer" className="[display:flex] [align-items:center] [justify-content:center] [gap:8px] [width:100%] [font-size:14px] [font-weight:700] [color:#fff] [background:#16a34a] [border-radius:12px] [padding:13px_16px] [text-decoration:none] [box-sizing:border-box] [margin-bottom:14px]">💬 Konsultasi via WhatsApp →</a>
                 <p className="[margin:0_0_2px] [font-size:13px] [font-weight:700] [color:#151515]">{RETURN_SUBTEXTS[rpSelected ?? 0]}</p>
-                <p className="[margin:0_0_12px] [font-size:12px] [font-weight:500] [color:#aeb4be]">Tim kami siap bantu jawab langsung lewat WhatsApp.</p>
+                <p className="[margin:0_0_12px] [font-size:12px] [font-weight:500] [color:#6b7280]">Tim kami siap bantu jawab langsung lewat WhatsApp.</p>
                 <div className="[display:flex] [align-items:center] [gap:10px] [width:100%] [min-height:54px] [padding:12px_14px] [border-radius:12px] [background:rgba(215,8,8,0.05)] [border:1px_solid_#D70808] [box-sizing:border-box]">
                   <span className="[display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:18px] [height:18px] [border-radius:9999px] [font-size:10px] [font-weight:800] [background:#D70808] [color:#fff]">✓</span>
                   <span className="[flex:1] [text-align:left] [font-size:14px] [font-weight:500] [color:#151515]">{RETURN_OPTIONS[rpSelected ?? 0]}</span>
@@ -2426,7 +2359,7 @@ export default function LandingPage() {
             <div className="max-[559px]:[width:244px] max-[559px]:[right:6px] max-[559px]:[bottom:28px] max-[559px]:[padding:12px_14px_12px_12px] max-[559px]:[border-radius:16px_16px_6px_16px] [position:absolute] [right:6px] [bottom:30px] [width:270px] [border-radius:18px_18px_6px_18px] [background:#fff] [border:1px_solid_#e5e7eb] [box-shadow:0_10px_34px_rgba(0,0,0,0.18)] [padding:14px_16px_14px_14px]">
               <button onClick={dismissWaBubble} aria-label="Tutup" className="[position:absolute] [top:-9px] [right:-9px] [display:flex] [align-items:center] [justify-content:center] [width:24px] [height:24px] [border-radius:9999px] [background:#151515] [color:#fff] [border:2px_solid_#fff] [font-size:12px] [font-weight:900] [cursor:pointer] [line-height:1] [padding:0]">✕</button>
               <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20lihat%20iklan.%20Submission%20beasiswa%20luar%20negeri%20saya%20butuh%20skor%20TOEFL%2C%20saya%20minat%20daftar%20kelas." target="_blank" rel="noopener noreferrer" className="[display:flex] [align-items:flex-start] [gap:11px] [text-decoration:none]">
-                <img loading="lazy" src="/assets/admin-avatar.webp" alt="Ms. Fini - Admin Full Bright" className="max-[559px]:[width:34px] max-[559px]:[height:34px] [width:38px] [height:38px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366]" />
+                <img src="/assets/admin-avatar.webp" alt="Ms. Fini - Admin Full Bright" className="max-[559px]:[width:34px] max-[559px]:[height:34px] [width:38px] [height:38px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366]" />
                 <span className="[display:block]">
                   <span className="max-[559px]:[font-size:12px] max-[559px]:[margin-bottom:2px] [display:block] [font-size:12px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515] [margin-bottom:3px]">Ms. Fini - Admin Full Bright</span>
                   <span className="[display:block] [font-size:13px] [line-height:1.5] [font-weight:600] [color:#3d3d3d]">Masih bingung atau ragu? Tanya langsung ke saya di WA ☕</span>

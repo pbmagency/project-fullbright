@@ -22,6 +22,7 @@ createServer((page) =>
                 case name.startsWith('payment/'):
                 case name.startsWith('admin/'):
                 case name.startsWith('cycle10/'):
+                case name.startsWith('cycle11/'):
                     return null;
                 case name.startsWith('auth/'):
                     return AuthLayout;
@@ -38,7 +39,7 @@ createServer((page) =>
         },
         setup({ App, props }) {
             return (
-                <AppProviders lean={page.component.startsWith('cycle10/')}>
+                <AppProviders lean={page.component.startsWith('cycle10/') || page.component.startsWith('cycle11/')}>
                     <App {...props} />
                 </AppProviders>
             );

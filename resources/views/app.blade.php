@@ -35,6 +35,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="preload" href="/logo/Logo-Fullbright.webp" as="image" type="image/webp" fetchpriority="high">
+    @if($page['component'] === 'cycle11/LandingPage')
+        <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high">
+    @endif
 
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])

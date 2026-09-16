@@ -11,7 +11,8 @@ const AuthLayout = lazy(() => import('@/layouts/auth-layout'));
 const SettingsLayout = lazy(() => import('@/layouts/settings/layout'));
 
 function isLeanInitialPage(): boolean {
-    const pageData = document.getElementById('app')?.dataset.page;
+    const pageData = document.getElementById('app')?.dataset.page
+        ?? document.querySelector<HTMLScriptElement>('script[data-page="app"]')?.textContent;
 
     if (!pageData) {
         return false;
@@ -20,7 +21,7 @@ function isLeanInitialPage(): boolean {
     try {
         const component = (JSON.parse(pageData) as { component?: string }).component;
 
-        return component?.startsWith('cycle10/') ?? false;
+        return component?.startsWith('cycle10/') || component?.startsWith('cycle11/') || false;
     } catch {
         return false;
     }
