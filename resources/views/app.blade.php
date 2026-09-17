@@ -35,8 +35,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="preload" href="/logo/Logo-Fullbright.webp" as="image" type="image/webp" fetchpriority="high">
-    @if($page['component'] === 'cycle11/LandingPage')
-        <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high">
+    @if(in_array($page['component'], ['cycle10/LandingPage', 'cycle11/LandingPage'], true))
+        {{-- Preload harus memakai kandidat srcset yang sama dengan <img>, kalau
+             tidak browser mengunduh dua kali (satu dari preload, satu dari img). --}}
+        <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
+              imagesrcset="/assets/hero-consultant-460.webp 460w, /assets/hero-consultant-660.webp 660w, /assets/hero-consultant.webp 820w"
+              imagesizes="(max-width: 899px) 250px, 560px">
     @endif
 
     @viteReactRefresh
