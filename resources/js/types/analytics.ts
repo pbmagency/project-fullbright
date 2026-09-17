@@ -70,6 +70,8 @@ export interface DeviceData {
 export interface CtaLocation {
     location: string;
     click_count: number;
+    direct_checkouts: number;
+    whatsapp_leads: number;
     total_leads: number;
     total_lead_rate: number;
 }

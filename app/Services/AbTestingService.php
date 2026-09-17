@@ -143,37 +143,87 @@ class AbTestingService
 
     public function getCtaPerformance(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
     {
-        $query = DB::table('user_analytics')
+        $ctaClicks = DB::table('user_analytics')
             ->select([
                 DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
                 DB::raw("COALESCE(json_extract(event_data, '$.location'), 'unknown') as cta_location"),
+                'id',
                 'session_id',
+                'created_at',
             ])
             ->where('event_type', 'cta_click')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
-            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')");
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('referral_source', $sourceFilter))
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get();
 
-        if ($sourceFilter && $sourceFilter !== 'all') {
-            $query->where('referral_source', $sourceFilter);
+        $leadQuery = DB::table('user_analytics')
+            ->select([
+                DB::raw("json_extract(event_data, '$.landing_source') as landing_source"),
+                DB::raw("json_extract(event_data, '$.location') as lead_location"),
+                DB::raw("json_extract(event_data, '$.type') as conversion_type"),
+                'event_type',
+                'session_id',
+                'created_at',
+            ])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereRaw("json_extract(event_data, '$.landing_source') IS NOT NULL")
+            ->whereRaw("json_extract(event_data, '$.landing_source') NOT IN ('', 'unknown')")
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('referral_source', $sourceFilter));
+        $this->metrics->applyTotalLeadEventConditions($leadQuery);
+
+        $clicksBySession = [];
+        foreach ($ctaClicks as $click) {
+            $source = $this->normalizeLandingSource($click->landing_source);
+            $clicksBySession[$source][$click->session_id][] = $click;
         }
 
-        $ctaClicks = $query->get();
+        $attributed = [];
+        foreach ($leadQuery->get() as $lead) {
+            $source = $this->normalizeLandingSource($lead->landing_source);
+            $sessionClicks = $clicksBySession[$source][$lead->session_id] ?? [];
+            $location = $lead->lead_location;
 
-        $checkoutSessions = $this->batchCheckoutSessionIds($startDate, $endDate, $sourceFilter);
-        $whatsAppLeadSessions = $this->batchWhatsAppLeadSessionIds($startDate, $endDate, $sourceFilter);
+            if ($location !== null && $location !== '') {
+                // Both events fire from one click, but their async requests may
+                // reach the server in either order.
+                $matched = collect($sessionClicks)->contains(fn ($click) => $click->cta_location === $location);
+                if (! $matched) {
+                    continue;
+                }
+            } else {
+                // Older lead events may have no location. Attribute only to the
+                // latest CTA before the lead, never every CTA in the session.
+                $preceding = collect($sessionClicks)
+                    ->filter(fn ($click) => $click->created_at <= $lead->created_at)
+                    ->sortBy('created_at');
+                $location = $preceding->last()?->cta_location;
+                if ($location === null) {
+                    continue;
+                }
+            }
 
-        return $ctaClicks->groupBy(fn ($row) => $this->normalizeLandingSource($row->landing_source))->map(function ($sourceClicks, $landingSource) use ($checkoutSessions, $whatsAppLeadSessions) {
-            $checkoutLeads = $checkoutSessions[$landingSource] ?? collect();
-            $whatsAppLeads = $whatsAppLeadSessions[$landingSource] ?? collect();
-            $locations = $sourceClicks->groupBy('cta_location')->map(function ($locationClicks, $location) use ($checkoutLeads, $whatsAppLeads) {
+            $branch = $lead->event_type === 'initiate_checkout'
+                || in_array($lead->conversion_type, AnalyticsMetricsService::LEGACY_CHECKOUT_CONVERSION_TYPES, true)
+                    ? 'direct_checkouts' : 'whatsapp_leads';
+            $attributed[$source][$location][$branch][$lead->session_id] = true;
+        }
+
+        return $ctaClicks->groupBy(fn ($row) => $this->normalizeLandingSource($row->landing_source))->map(function ($sourceClicks, $landingSource) use ($attributed) {
+            $locations = $sourceClicks->groupBy('cta_location')->map(function ($locationClicks, $location) use ($attributed, $landingSource) {
                 $uniqueSessions = $locationClicks->pluck('session_id')->unique();
-                $totalLeads = $uniqueSessions->intersect($checkoutLeads)->count()
-                    + $uniqueSessions->intersect($whatsAppLeads)->count();
+                $directCheckouts = count($attributed[$landingSource][$location]['direct_checkouts'] ?? []);
+                $whatsAppLeads = count($attributed[$landingSource][$location]['whatsapp_leads'] ?? []);
+                $totalLeads = $directCheckouts + $whatsAppLeads;
 
                 return [
                     'location' => $location,
                     'click_count' => $uniqueSessions->count(),
+                    'direct_checkouts' => $directCheckouts,
+                    'whatsapp_leads' => $whatsAppLeads,
                     'total_leads' => $totalLeads,
                     'total_lead_rate' => round($this->safeDiv($totalLeads, $uniqueSessions->count()) * 100, 2),
                 ];

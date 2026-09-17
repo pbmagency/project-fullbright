@@ -177,6 +177,44 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(0, $locations['return_popup_harga_terlalu_mahal']['total_leads']);
     }
 
+    public function test_cta_attribution_credits_the_button_that_started_each_lead_branch(): void
+    {
+        $now = Carbon::now();
+
+        $this->event('buyer', 'cta_click', '/c11-problem', $now->copy()->subMinutes(3), [
+            'location' => 'navbar', 'destination' => '#pricing',
+        ]);
+        $this->event('buyer', 'cta_click', '/c11-problem', $now->copy()->subMinutes(2), [
+            'location' => 'pricing_self_checkout', 'destination' => 'https://member.fullbrightindonesia.com/checkout',
+        ]);
+        $this->event('buyer', 'initiate_checkout', '/c11-problem', $now->copy()->subMinute(), [
+            'location' => 'pricing_self_checkout',
+        ]);
+        $this->event('buyer', 'payment', '/c11-problem', $now, ['status' => 'paid']);
+
+        $this->event('inquirer', 'cta_click', '/c11-problem', $now->copy()->subMinutes(3), [
+            'location' => 'pricing_self_trial_lms',
+        ]);
+        $this->event('inquirer', 'cta_click', '/c11-problem', $now->copy()->subMinutes(2), [
+            'location' => 'pricing_self_whatsapp',
+        ]);
+        $this->event('inquirer', 'conversion', '/c11-problem', $now->copy()->subMinute(), [
+            'type' => 'wa_registration', 'location' => 'pricing_self_whatsapp',
+        ]);
+
+        $attribution = collect(app(AbTestingService::class)->getCtaPerformance(
+            $now->copy()->subHour(), $now->copy()->addHour(),
+        ))->firstWhere('landing_source', '/c11-problem');
+        $locations = collect($attribution['cta_locations'])->keyBy('location');
+
+        $this->assertSame(0, $locations['navbar']['total_leads']);
+        $this->assertSame(0, $locations['pricing_self_trial_lms']['total_leads']);
+        $this->assertSame(1, $locations['pricing_self_checkout']['direct_checkouts']);
+        $this->assertSame(0, $locations['pricing_self_checkout']['whatsapp_leads']);
+        $this->assertSame(0, $locations['pricing_self_whatsapp']['direct_checkouts']);
+        $this->assertSame(1, $locations['pricing_self_whatsapp']['whatsapp_leads']);
+    }
+
     public function test_engagement_uses_scroll_or_dwell_or_funnel_action(): void
     {
         $now = Carbon::now();

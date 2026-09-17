@@ -78,7 +78,7 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                         Micro-Conversion Attribution
                     </CardTitle>
                     <CardDescription>
-                        Which button placements generate the most Total Leads?
+                        Leads attributed to each button: direct checkout starts plus WhatsApp leads. Payments are tracked separately.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -95,6 +95,12 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                     </th>
                                     <th className="p-4 text-right font-medium text-muted-foreground">
                                         Clicks
+                                    </th>
+                                    <th className="p-4 text-right font-medium text-muted-foreground">
+                                        Direct Checkout
+                                    </th>
+                                    <th className="p-4 text-right font-medium text-muted-foreground">
+                                        WhatsApp Leads
                                     </th>
                                     <th className="p-4 text-right font-medium text-muted-foreground">
                                         Total Leads
@@ -170,6 +176,16 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                                 <td className="p-4 text-right text-foreground">
                                                     {(
                                                         cta.click_count ?? 0
+                                                    ).toLocaleString()}
+                                                </td>
+                                                <td className="p-4 text-right text-foreground">
+                                                    {(
+                                                        cta.direct_checkouts ?? 0
+                                                    ).toLocaleString()}
+                                                </td>
+                                                <td className="p-4 text-right text-foreground">
+                                                    {(
+                                                        cta.whatsapp_leads ?? 0
                                                     ).toLocaleString()}
                                                 </td>
                                                 <td className="p-4 text-right">
@@ -255,6 +271,12 @@ export function CtaAnalysis({ data }: CtaAnalysisProps) {
                                                     <span className="text-muted-foreground">
                                                         {cta.click_count ?? 0}{' '}
                                                         clicks
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {cta.direct_checkouts ?? 0} checkout
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {cta.whatsapp_leads ?? 0} WA
                                                     </span>
                                                     <span
                                                         className={
