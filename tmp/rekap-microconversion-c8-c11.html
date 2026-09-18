@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Rekap Microconversion Landing Page C8 hingga C11</title>
+<style>
+@page { size: A4 landscape; margin: 1.5cm 1.6cm; }
+body { font-family: Aptos, Arial, sans-serif; color: #171717; font-size: 10pt; line-height: 1.25; }
+h1 { font-size: 20pt; font-weight: 700; color: #000; margin: 0 0 10pt; }
+h2 { font-size: 12pt; font-weight: 700; color: #000; margin: 15pt 0 6pt; }
+p { margin: 0 0 8pt; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 10pt; table-layout: fixed; }
+th, td { border: 1px solid #d9d9d9; padding: 6pt 7pt; vertical-align: middle; overflow-wrap: break-word; }
+th { background: #243b59; color: white; font-weight: 700; text-align: left; }
+tr:nth-child(even) td { background: #f3f6fa; }
+th:nth-child(1) { width: 16%; } th:nth-child(2) { width: 30%; } th:nth-child(3) { width: 25%; } th:nth-child(4) { width: 29%; }
+.small { font-size: 9pt; color: #454545; }
+.mono { font-family: Consolas, monospace; font-size: 8.5pt; }
+</style>
+</head>
+<body>
+<h1>Rekap Microconversion Landing Page C8 hingga C11</h1>
+<p>Dokumen ini merangkum tindakan pengunjung yang dicatat oleh implementasi analytics pada landing page mulai dari C8. Rekap menunjukkan <b>jenis event yang tersedia</b>, bukan jumlah kejadian atau hasil penjualan.</p>
+
+<h2>Cakupan halaman</h2>
+<table>
+<tr><th>Versi</th><th>Alamat halaman</th><th>Implementasi</th><th>Catatan</th></tr>
+<tr><td>C8</td><td class="mono">/c8-angle-1<br>/</td><td>cycle8/angle-1</td><td>Route utama situs memakai komponen C8 yang sama.</td></tr>
+<tr><td>C10</td><td class="mono">/c10-lp<br>/bio-ig-toefl-hack<br>/toefl-hack<br>/e-course-toefl-hack</td><td>cycle10/LandingPage</td><td>Keempat alamat memakai komponen yang sama.</td></tr>
+<tr><td>C11</td><td class="mono">/c11-problem</td><td>cycle11/LandingPage</td><td>Memiliki webhook Scalev untuk pembayaran terverifikasi.</td></tr>
+</table>
+
+<h2>Matriks microconversion</h2>
+<table>
+<tr><th>Halaman</th><th>Tindakan pengunjung</th><th>Event analytics</th><th>Makna pengukuran</th></tr>
+<tr><td>C8, C10, C11</td><td>Klik CTA menuju bagian harga atau testimoni dari hero, navigasi, banner, dan bagian konten.</td><td class="mono">cta_click<br>location sesuai posisi tombol</td><td>Minat untuk melihat penawaran atau bukti alumni; belum menjadi lead.</td></tr>
+<tr><td>C8</td><td>Klik “Coba Gratis Sekarang” ke pendaftaran LMS.</td><td class="mono">cta_click<br>location=free_trial</td><td>Minat mencoba materi gratis.</td></tr>
+<tr><td>C10, C11</td><td>Klik “Coba gratis 1 modul di LMS”.</td><td class="mono">cta_click<br>location=pricing_self_trial_lms</td><td>Minat mencoba LMS. Klik ini tidak memastikan pendaftaran selesai.</td></tr>
+<tr><td>C8</td><td>Memilih jawaban survei kesulitan TOEFL.</td><td class="mono">cta_click<br>conversion.type=intent<br>action=survey_answered</td><td>Menunjukkan masalah yang dirasakan pengunjung.</td></tr>
+<tr><td>C10, C11</td><td>Memilih jawaban survei kesulitan TOEFL.</td><td class="mono">engagement.type=survey_response<br>location=difficulty_survey<br>cta_click</td><td>Menunjukkan masalah pengunjung; jawaban juga tercatat sebagai klik CTA.</td></tr>
+<tr><td>C8</td><td>Memilih alasan pada popup setelah kembali dari checkout.</td><td class="mono">cta_click<br>conversion.type=intent<br>action=return_modal_answered</td><td>Menunjukkan hambatan sebelum membeli.</td></tr>
+<tr><td>C10, C11</td><td>Memilih alasan pada popup setelah kembali dari checkout.</td><td class="mono">engagement.type=survey_response<br>location=return_popup_survey<br>cta_click</td><td>Menunjukkan hambatan sebelum membeli.</td></tr>
+<tr><td>C10, C11</td><td>Memutar video testimoni alumni atau demo LMS.</td><td class="mono">engagement.type=video_play<br>location=alumni_testimonial_video atau lms_showcase_video</td><td>Minat pada bukti hasil atau isi kelas.</td></tr>
+<tr><td>C8, C10, C11</td><td>Klik tombol bayar paket Self, Starter, Intermediate, atau Bundling.</td><td class="mono">cta_click<br>initiate_checkout</td><td>Pengunjung diarahkan ke checkout eksternal; belum berarti pembayaran berhasil.</td></tr>
+<tr><td>C8, C10, C11</td><td>Klik WhatsApp dari kartu harga.</td><td class="mono">cta_click<br>conversion.type=wa_registration</td><td>Lead berdasarkan klik menuju WhatsApp; belum membuktikan pesan dikirim.</td></tr>
+<tr><td>C8, C10, C11</td><td>Klik WhatsApp dari popup setelah kembali dari checkout.</td><td class="mono">cta_click<br>conversion.type=wa_registration pada C8; wa_inquiry pada C10 dan C11</td><td>Minat konsultasi setelah melihat checkout.</td></tr>
+<tr><td>C8, C11</td><td>Klik WhatsApp dari FAQ.</td><td class="mono">cta_click<br>conversion.type=wa_inquiry</td><td>Minat bertanya sebelum mendaftar.</td></tr>
+<tr><td>C10, C11</td><td>Klik tombol WhatsApp melayang atau bubble.</td><td class="mono">cta_click<br>conversion.type=wa_inquiry</td><td>Lead berdasarkan klik menuju WhatsApp.</td></tr>
+<tr><td>C11</td><td>Klik nomor WhatsApp pada footer.</td><td class="mono">cta_click<br>conversion.type=wa_inquiry</td><td>Minat menghubungi salah satu admin.</td></tr>
+</table>
+
+<h2>Sinyal keterlibatan yang juga dicatat</h2>
+<table>
+<tr><th>Sinyal</th><th>Pemicu</th><th>Event analytics</th><th>Cara membaca</th></tr>
+<tr><td>Kunjungan</td><td>Halaman dibuka, sekali per sesi browser dan path.</td><td class="mono">visit</td><td>Dasar funnel, bukan microconversion.</td></tr>
+<tr><td>Scroll</td><td>Mencapai 25%, 50%, 75%, atau 90% halaman.</td><td class="mono">scroll</td><td>Menunjukkan kedalaman jelajah.</td></tr>
+<tr><td>Waktu aktif</td><td>15 detik awal, lalu ping setiap 30 detik saat tab terlihat.</td><td class="mono">engagement.type=dwell_ping</td><td>Menunjukkan waktu aktif membaca.</td></tr>
+<tr><td>Section terlihat</td><td>Sedikitnya 20% section ber-ID terlihat selama 500 ms.</td><td class="mono">section_view</td><td>Menunjukkan bagian konten yang sempat dilihat.</td></tr>
+</table>
+
+<h2>Catatan pembacaan dashboard</h2>
+<table>
+<tr><th>Topik</th><th>Temuan</th><th>Dampak</th><th>Rujukan kode</th></tr>
+<tr><td>Intent</td><td>Dashboard menghitung sesi dengan event <span class="mono">cta_click</span> sebagai Intent.</td><td>Satu sesi yang menekan beberapa tombol tetap dihitung sebagai satu sesi intent pada metrik utama.</td><td class="mono">app/Services/AnalyticsMetricsService.php</td></tr>
+<tr><td>WhatsApp Leads</td><td>Dashboard menerima <span class="mono">conversion.type=wa_inquiry</span> dan <span class="mono">wa_registration</span>.</td><td>Angka lead adalah klik menuju WhatsApp, bukan percakapan yang sudah terkirim.</td><td class="mono">app/Services/AnalyticsMetricsService.php</td></tr>
+<tr><td>WhatsApp melayang C8</td><td>Tombol ini hanya mengirim Meta Pixel Search, tanpa event conversion internal.</td><td>Kliknya tidak masuk WhatsApp Leads internal.</td><td class="mono">resources/js/pages/cycle8/angle-1.tsx</td></tr>
+<tr><td>Metrik khusus C10</td><td>Metrik trial LMS, survei, dan video difilter ke <span class="mono">/c10-lp</span>.</td><td>Aktivitas melalui tiga alias C10 tidak masuk metrik khusus tersebut.</td><td class="mono">app/Services/AnalyticsMetricsService.php</td></tr>
+<tr><td>Pembayaran C11</td><td>Webhook Scalev mencatat <span class="mono">payment</span> untuk pembayaran yang terverifikasi dan teratribusi ke C11.</td><td>Ini konversi akhir, terpisah dari klik checkout.</td><td class="mono">app/Http/Controllers/ScalevWebhookController.php</td></tr>
+<tr><td>C9</td><td>Tidak ditemukan route C9 pada daftar halaman yang aktif.</td><td>Urutan yang tersedia setelah C8 langsung berlanjut ke C10.</td><td class="mono">routes/web.php</td></tr>
+</table>
+<p class="small">Disusun dari implementasi aplikasi per 17 September 2026. Dokumen ini tidak memuat hitungan event atau data produksi.</p>
+</body>
+</html>
