@@ -954,24 +954,19 @@ export default function LandingPage() {
       <video
         ref={lmsVideoRef}
         controls
-         preload="none"
-         playsInline
-         {...LAZY_POSTER}
-         poster="/assets/lms-showcase-poster.webp"
+        preload="metadata"
+        playsInline
+        src="https://demo-fullbright.b-cdn.net/NEW.mp4#t=0.001"
         onPlay={handleLmsVideoPlay}
         className="[display:block] [width:100%] [aspect-ratio:16/9] [object-fit:cover] [background:#151515]"
       >
-        <source
-           src="https://demo-fullbright.b-cdn.net/NEW.mp4"
-          type="video/mp4"
-        />
         Browser kamu tidak mendukung pemutaran video.
       </video>
       {showLmsOverlay ? (
         <button
           type="button"
           onClick={playLmsVideo}
-          aria-label="Putar video tampilan LMS"
+          aria-label="Putar showcase LMS"
           className="[position:absolute] [inset:0] [display:flex] [align-items:center] [justify-content:center] [border:0] [background:rgba(21,21,21,0.22)] [cursor:pointer] [transition:background_0.2s_ease] hover:[background:rgba(21,21,21,0.32)]"
         >
           <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
@@ -2497,7 +2492,7 @@ export default function LandingPage() {
           </a>
         </div>
       
-      </div>
+      </main>
     </>
   );
 }
