@@ -39,7 +39,7 @@
         {{-- Preload harus memakai kandidat srcset yang sama dengan <img>, kalau
              tidak browser mengunduh dua kali (satu dari preload, satu dari img). --}}
         <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
-              imagesrcset="/assets/hero-consultant-460.webp 460w, /assets/hero-consultant-660.webp 660w, /assets/hero-consultant.webp 820w"
+              imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
               imagesizes="(max-width: 899px) 250px, 560px">
     @endif
 
