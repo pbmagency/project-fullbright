@@ -218,6 +218,7 @@ export default function LandingPage() {
   const [rpSelected, setRpSelected] = useState<number | null>(null);
   const [waBubbleOpen, setWaBubbleOpen] = useState<boolean>(false);
   const [showOverlay, setShowOverlay] = useState<boolean>(true);
+  const [showOverlay2, setShowOverlay2] = useState<boolean>(true);
   const [showLmsOverlay, setShowLmsOverlay] = useState<boolean>(true);
   const [scalevProof, setScalevProof] = useState<{ submitted: number; paid: number } | null>(null);
   const [proofToast, setProofToast] = useState<LatestSubmission | null>(null);
@@ -225,6 +226,7 @@ export default function LandingPage() {
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
   const countdownRef = useRef<HTMLSpanElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef2 = useRef<HTMLVideoElement | null>(null);
   const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
 
@@ -407,11 +409,11 @@ export default function LandingPage() {
   const playVideo = useCallback((): void => {
     const video = videoRef.current;
     if (!video) return;
-    /* Video testimoni berukuran ~19 MB. Sumbernya baru diambil saat pengunjung
-     * benar-benar menekan play, karena `preload="metadata"` ikut menarik
-     * beberapa MB di jalur kritis LCP. Poster statis menjaga tampilan awal
-     * (frame 1,5 detik) tetap sama. */
-    if (!video.getAttribute('src')) video.src = '/assets/testimoni iyha.mp4#t=1.5';
+    if (video.paused) void video.play();
+  }, []);
+  const playVideo2 = useCallback((): void => {
+    const video = videoRef2.current;
+    if (!video) return;
     if (video.paused) void video.play();
   }, []);
   const handleTestimonialVideoPlay = useCallback((): void => {
@@ -493,7 +495,7 @@ export default function LandingPage() {
             <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
               <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="400" height="400" className="[height:150px] [width:auto] [object-fit:contain] [display:block] [margin:-43px_0]" />
             </a>
-            <a href="#pricing" aria-label="Amankan Seat" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
+            <a href="#pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
               <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
               <span className="[display:flex] [align-items:center] [gap:5px]">
                 <span className="[font-size:11px] [text-decoration:line-through] [color:#fff] [white-space:nowrap]">Rp250rb</span>
@@ -554,7 +556,7 @@ export default function LandingPage() {
       
               <div className="[display:flex] [justify-content:center] [align-items:flex-end] [grid-column:2] max-[899px]:[grid-column:1] max-[899px]:[margin-top:-4px]">
                 <div className="[width:100%] [max-width:560px] [position:relative] [align-self:stretch] [display:flex] [align-items:flex-end] [justify-content:center] max-[899px]:[max-width:250px] max-[899px]:[align-self:initial]">
-                            <img src="/assets/hero-consultant.webp" srcSet="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w" sizes="(max-width: 899px) 250px, 560px" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" width="820" height="1000" fetchPriority="high" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
+                            <img src="/assets/hero-consultant.webp" srcSet="/assets/hero-consultant-460.webp 460w, /assets/hero-consultant-660.webp 660w, /assets/hero-consultant.webp 820w" sizes="(max-width: 899px) 250px, 560px" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" width="820" height="1000" fetchPriority="high" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
                   <div className="hidden min-[900px]:contents">
                     <div className="[position:absolute] [bottom:18px] [left:0] [display:flex] [max-width:216px] [align-items:center] [gap:10px] [border-radius:16px] [background:#fff] [padding:11px_14px] [box-shadow:0_8px_32px_rgba(0,0,0,0.14)]">
                       <span className="[font-size:22px]">🎓</span>
@@ -635,39 +637,64 @@ export default function LandingPage() {
       
         {/* Problem / Agitation Section */}
         <section data-c11-defer id="agitation" className="[background:#F3F3F3] [padding:56px_24px]">
-          <div className="[max-width:672px] [margin:0_auto]">
-            <div className="[text-align:center] [margin-bottom:40px]">
+          <div className="[max-width:600px] [margin:0_auto]">
+            <div className="[text-align:center] [margin-bottom:26px]">
               <div className="[display:inline-block] [border-radius:9999px] [padding:10px_24px] [font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [background:#fff] [color:#D70808] [box-shadow:0_4px_16px_rgba(0,0,0,0.06)] [margin-bottom:20px]">Baru Mau Serius Belajar TOEFL?</div>
-              <h2 className="[margin:0_0_16px] [font-size:clamp(24px,_6.4vw,_36px)] [line-height:1.2] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Wajar Kalau Kamu Masih Bingung<br /><span className="[color:#D70808]">Harus Mulai dari Mana.</span></h2>
-              <p className="[margin:0] [font-size:16px] [max-width:520px] [margin-left:auto] [margin-right:auto] [line-height:1.6] [color:#6b6b6b]">Apalagi jika sebelumnya kamu <b className="[color:#151515]">belum pernah belajar TOEFL dengan alur yang terstruktur.</b></p>
+              <h2 className="[margin:0_0_14px] [font-size:clamp(22px,5.4vw,30px)] [line-height:1.2] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Wajar Kalau Kamu Masih Bingung<br /><span className="[color:#D70808]">Harus Mulai dari Mana.</span></h2>
+              <p className="[margin:0] [font-size:17px] [max-width:470px] [margin-left:auto] [margin-right:auto] [line-height:1.6] [color:#6b6b6b] [font-weight:700]">Materi gratis di internet melimpah, tapi tidak ada yang menjawab:</p>
             </div>
       
-            <div className="[margin-bottom:36px]">
-              <p className="[margin:0_0_16px] [text-align:center] [font-size:12px] [font-weight:900] [letter-spacing:0.1em] [text-transform:uppercase] [color:#D70808]">BANYAK MATERI GRATIS DI INTERNET, TAPI BELUM MENJAWAB:</p>
-              <div className="[display:flex] [flex-direction:column] [gap:12px]">
-                <div className="[display:flex] [align-items:center] [gap:14px] [border-radius:16px] [background:#fff] [border-left:4px_solid_#D70808] [box-shadow:0_3px_18px_rgba(0,0,0,0.06)] [padding:16px_20px]">
-                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif]">01</span>
-                  <p className="[margin:0] [font-size:17px] [line-height:1.45] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Mulai dari materi apa?</p>
+            <div className="[border-radius:18px] [background:#FFF9F9] [border:1px_solid_#f4dede] [overflow:hidden]">
+                <div className="[display:flex] [align-items:center] [gap:12px] [padding:14px_22px] [border-bottom:1px_solid_#f6e4e4]">
+                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:26px] [height:26px] [border-radius:9999px] [background:#D70808] [color:#fff] [font-size:13px] [font-weight:900] [font-family:Nunito,sans-serif]">?</span>
+                  <p className="[margin:0] [font-size:16px] [line-height:1.4] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Mulai dari materi apa?</p>
                 </div>
-                <div className="[display:flex] [align-items:center] [gap:14px] [border-radius:16px] [background:#fff] [border-left:4px_solid_#D70808] [box-shadow:0_3px_18px_rgba(0,0,0,0.06)] [padding:16px_20px]">
-                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif]">02</span>
-                  <p className="[margin:0] [font-size:17px] [line-height:1.45] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Mana yang perlu dipelajari lebih dulu?</p>
+                <div className="[display:flex] [align-items:center] [gap:12px] [padding:14px_22px] [border-bottom:1px_solid_#f6e4e4]">
+                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:26px] [height:26px] [border-radius:9999px] [background:#D70808] [color:#fff] [font-size:13px] [font-weight:900] [font-family:Nunito,sans-serif]">?</span>
+                  <p className="[margin:0] [font-size:16px] [line-height:1.4] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Mana yang perlu dipelajari lebih dulu?</p>
                 </div>
-                <div className="[display:flex] [align-items:center] [gap:14px] [border-radius:16px] [background:#fff] [border-left:4px_solid_#D70808] [box-shadow:0_3px_18px_rgba(0,0,0,0.06)] [padding:16px_20px]">
-                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [background:#FFF0F0] [color:#D70808] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif]">03</span>
-                  <p className="[margin:0] [font-size:17px] [line-height:1.45] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Bagaimana urutan belajar yang tepat untuk pemula?</p>
+                <div className="[display:flex] [align-items:center] [gap:12px] [padding:14px_22px]">
+                  <span className="[flex-shrink:0] [display:flex] [align-items:center] [justify-content:center] [width:26px] [height:26px] [border-radius:9999px] [background:#D70808] [color:#fff] [font-size:13px] [font-weight:900] [font-family:Nunito,sans-serif]">?</span>
+                  <p className="[margin:0] [font-size:16px] [line-height:1.4] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Bagaimana urutan belajar yang tepat untuk pemula?</p>
                 </div>
-              </div>
             </div>
       
-            <div className="[border-radius:20px] [background:#fff] [box-shadow:0_4px_24px_rgba(0,0,0,0.07)] [padding:28px_24px] [margin-bottom:36px] [text-align:center]">
-              <p className="[margin:0_0_10px] [font-size:12px] [font-weight:900] [letter-spacing:0.1em] [text-transform:uppercase] [color:#D70808]">Tanpa titik awal yang jelas</p>
-              <p className="[margin:0] [font-size:clamp(20px,2.8vw,26px)] [line-height:1.35] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Belajar TOEFL terasa membingungkan <span className="[color:#D70808]">bahkan sebelum benar-benar dimulai.</span></p>
+            <div className="[display:flex] [flex-direction:column] [align-items:center] [gap:10px] [padding:18px_0_16px]">
+              <span className="[display:flex] [height:28px] [width:28px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#fff] [border:1px_solid_#e5e5e5] [color:#D70808] [font-size:14px] [font-weight:900] [line-height:1]">↓</span>
+              <p className="[margin:0] [max-width:480px] [text-align:center] [font-size:17px] [line-height:1.55] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Karena tidak terjawab, hampir semua orang berhenti di titik yang sama:</p>
             </div>
       
-            <div className="[display:flex] [flex-direction:column] [align-items:center] [gap:6px]">
-              <p className="[margin:0] [text-align:center] [font-size:16px] [line-height:1.5] [font-weight:600] [color:#6b6b6b]">Kamu bukan membutuhkan lebih banyak materi.</p>
-              <p className="[margin:0] [text-align:center] [font-size:20px] [line-height:1.45] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Kamu membutuhkan <span className="[color:#D70808]">arah belajar yang jelas.</span></p>
+            <div className="[border-radius:20px] [background:#fff] [box-shadow:0_6px_26px_rgba(0,0,0,0.08)] [overflow:hidden]">
+                <div className="[display:grid] [grid-template-columns:44px_1fr] [gap:16px] [align-items:start] [padding:20px_24px] [border-bottom:1px_solid_#f1f1f1]">
+                  <span className="[font-size:28px] [line-height:0.95] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">01</span>
+                  <div className="[min-width:0]">
+                    <p className="[margin:0_0_5px] [font-size:18px] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Bingung mulai dari mana</p>
+                    <p className="[margin:0] [font-size:15px] [line-height:1.6] [color:#6b6b6b]">Materi ada di mana-mana, tapi ga ada yang memberi tahu urutannya</p>
+                  </div>
+                </div>
+                <div className="[display:grid] [grid-template-columns:44px_1fr] [gap:16px] [align-items:start] [padding:20px_24px] [border-bottom:1px_solid_#f1f1f1]">
+                  <span className="[font-size:28px] [line-height:0.95] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">02</span>
+                  <div className="[min-width:0]">
+                    <p className="[margin:0_0_5px] [font-size:18px] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Materinya susah dipahami</p>
+                    <p className="[margin:0] [font-size:15px] [line-height:1.6] [color:#6b6b6b]">Materinya ribet bikin males belajar apalagi ga ada tempat bertanya.</p>
+                  </div>
+                </div>
+                <div className="[display:grid] [grid-template-columns:44px_1fr] [gap:16px] [align-items:start] [padding:20px_24px]">
+                  <span className="[font-size:28px] [line-height:0.95] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">03</span>
+                  <div className="[min-width:0]">
+                    <p className="[margin:0_0_5px] [font-size:18px] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Susah konsisten</p>
+                    <p className="[margin:0] [font-size:15px] [line-height:1.6] [color:#6b6b6b]">Semangat di hari pertama tapi lama-lama males jadi ga ada progress</p>
+                  </div>
+                </div>
+            </div>
+      
+            <p className="[margin:20px_0_0] [text-align:center] [font-size:18px] [line-height:1.6] [color:#6b6b6b]">Akhirnya belajar terus ditunda, <b className="[color:#151515]">dan skormu tidak pernah naik.</b></p>
+      
+            <div className="[height:1px] [background:#e4e4e4] [max-width:120px] [margin:26px_auto]"></div>
+      
+            <div className="[display:flex] [flex-direction:column] [align-items:center] [gap:8px]">
+              <p className="[margin:0] [text-align:center] [font-size:17px] [line-height:1.5] [font-weight:600] [color:#6b6b6b]">Masalahnya bukan kamu tidak mampu.</p>
+              <p className="[margin:0] [max-width:500px] [text-align:center] [font-size:20px] [line-height:1.45] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Kamu cuma butuh <span className="[color:#D70808]">materi yang urut dan mudah diikuti.</span></p>
               <div className="[display:flex] [height:36px] [width:36px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#F3F4F6] [color:#374151] [font-size:18px] [margin-top:10px]">↓</div>
             </div>
           </div>
@@ -859,7 +886,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={playLmsVideo}
-                    aria-label="Putar video tampilan LMS"
+                    aria-label="Putar showcase LMS"
                     className="[position:absolute] [inset:0] [display:flex] [align-items:center] [justify-content:center] [border:0] [background:rgba(21,21,21,0.22)] [cursor:pointer] [transition:background_0.2s_ease] hover:[background:rgba(21,21,21,0.32)]"
                   >
                     <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
@@ -1534,11 +1561,13 @@ export default function LandingPage() {
                 </div>
               </div>
       
-              <div className="[margin-top:48px] [max-width:520px] [margin-left:auto] [margin-right:auto]">
-                <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Cerita Alumni</p>
-                <h3 className="[margin:0_0_16px] [text-align:center] [font-size:clamp(19px,2.4vw,24px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Dengar Langsung dari <span className="[color:#D70808]">Alumni Kami</span></h3>
-                <div className="[position:relative] [border-radius:18px] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo}>
-                  <video ref={videoRef} controls playsInline preload="none" {...LAZY_POSTER} poster="/assets/testimoni-iyha-poster.webp" aria-label="Video testimoni alumni Full Bright" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
+              <div className="[margin-top:48px] [max-width:1080px] [margin-left:auto] [margin-right:auto]">
+                <p className="[margin:0_0_6px] [text-align:center] [font-size:11px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#6b7280]">Cerita Alumni</p>
+                <h3 className="[margin:0_0_20px] [text-align:center] [font-size:clamp(19px,2.4vw,24px)] [line-height:1.3] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Dengar Langsung dari <span className="[color:#D70808]">Alumni Kami</span></h3>
+                <div className="[display:grid] [grid-template-columns:repeat(auto-fit,minmax(260px,340px))] [gap:20px] [justify-content:center] [max-width:1080px] [margin:0_auto] [align-items:start]">
+                <div className="[display:flex] [flex-direction:column]">
+                 <div className="[position:relative] [border-radius:18px_18px_0_0] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo}>
+                   <video ref={videoRef} src="https://demo-fullbright.b-cdn.net/testimoni%20iyha.mp4#t=0.001" controls playsInline preload="metadata" aria-label="Video testimoni alumni Full Bright" onPlay={handleTestimonialVideoPlay} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
                   {showOverlay ? (<>
                     <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
                       <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
@@ -1548,15 +1577,40 @@ export default function LandingPage() {
                     </div>
                   </>) : null}
                 </div>
+                  <div className="[padding:16px_18px] [background:#fff] [border:1px_solid_#ececec] [border-top:0] [border-radius:0_0_18px_18px]">
+                    <p className="[margin:0_0_2px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Nurul Masyiah Rani</p>
+                    <p className="[margin:0_0_8px] [font-size:12.5px] [font-weight:700] [color:#9ca3af]">Alumni Full Bright · Universitas Hasanuddin</p>
+                    <p className="[margin:0] [font-size:14px] [line-height:1.55] [color:#3d3d3d]">"Pengajarnya profesional dan handal, dan banyak latihan soalnya."</p>
+                  </div>
+                </div>
+
+                <div className="[display:flex] [flex-direction:column]">
+                <div className="[position:relative] [border-radius:18px_18px_0_0] [overflow:hidden] [background:#151515] [box-shadow:0_8px_28px_rgba(0,0,0,0.18)] [line-height:0] [cursor:pointer]" onClick={playVideo2}>
+                   <video ref={videoRef2} src="https://demo-fullbright.b-cdn.net/Testimoni%20Siswa%20TOEFLIni%20kata%20mereka%20yang%20mengambil%20kelas%20TOEFL%20di%20Full%20Bright.Saatnya%20Anda%20yang.mp4#t=0.001" controls playsInline preload="metadata" aria-label="Video testimoni alumni Full Bright 2" onPlay={() => setShowOverlay2(false)} className="[display:block] [width:100%] [aspect-ratio:9/16] [max-height:560px] [object-fit:cover] [background:#151515]"></video>
+                  {showOverlay2 ? (<>
+                    <div className="[position:absolute] [inset:0] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:14px] [background:rgba(21,21,21,0.35)]">
+                      <span className="[display:flex] [align-items:center] [justify-content:center] [width:76px] [height:76px] [border-radius:9999px] [background:#D70808] [box-shadow:0_8px_28px_rgba(215,8,8,0.5)]">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M8 5.5v13l11-6.5z"></path></svg>
+                      </span>
+                      <span className="[font-size:13px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#fff] [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">Putar video testimoni</span>
+                    </div>
+                  </>) : null}
+                </div>
+                  <div className="[padding:16px_18px] [background:#fff] [border:1px_solid_#ececec] [border-top:0] [border-radius:0_0_18px_18px]">
+                    <p className="[margin:0_0_2px] [font-size:15px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515]">Celinetia &amp; Aqila Afifah</p>
+                    <p className="[margin:0_0_8px] [font-size:12.5px] [font-weight:700] [color:#9ca3af]">Alumni Full Bright · Mahasiswi UMY &amp; UNSRI</p>
+                    <p className="[margin:0] [font-size:14px] [line-height:1.55] [color:#3d3d3d]">"Metode belajarnya mudah dipahami dan pengajarnya lulusan luar negeri"</p>
+                  </div>
+                </div>
               </div>
-      
+
               <div className="[margin-top:40px] [text-align:center]">
                 <p className="[margin:0_0_20px] [max-width:520px] [margin-left:auto] [margin-right:auto] [font-size:18px] [line-height:1.5] [font-weight:700] [font-family:Nunito,sans-serif] [color:#151515]">Keberhasilan alumni selama ini bukan karena mereka pintar, tapi karena mereka <span className="[color:#D70808]">gunakan metode yang tepat</span>.</p>
                 <a href="#pricing" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_4px_20px_rgba(215,8,8,0.35)] [text-decoration:none]">Mulai Persiapan TOEFL →</a>
               </div>
             </div>
           </div>
-        </section>
+        </div></section>
       
         {/* Photo Lightbox */}
         {lightboxIdx !== null ? (<>
