@@ -1,0 +1,24 @@
+@import 'tailwindcss' source(none);
+
+/* Keep the public Cycle 10 landing page on a small, route-specific stylesheet.
+   The main application stylesheet scans every dashboard and experiment page,
+   which needlessly blocked this landing page's first render. */
+@source '../js/pages/cycle10/LandingPage.tsx';
+
+html {
+    scroll-behavior: smooth;
+    background: #fff;
+}
+
+body {
+    margin: 0;
+    background: #fff;
+    color: #151515;
+}
+
+/* Most of this sales page starts below the first viewport. Let the browser
+   defer its layout and paint work until each section approaches the viewport. */
+.c10-deferred-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+}

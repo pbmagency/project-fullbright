@@ -44,7 +44,11 @@
     @endif
 
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+    @if($page['component'] === 'cycle10/LandingPage')
+        @vite(['resources/css/cycle10.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+    @else
+        @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+    @endif
     <x-inertia::head>
         <title>{{ config('app.name') }}</title>
     </x-inertia::head>

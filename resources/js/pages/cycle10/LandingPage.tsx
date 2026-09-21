@@ -248,14 +248,44 @@ function CountdownText() {
 /* Self-contained Google-review carousel so its 3s autoplay only re-renders this strip. */
 function GoogleReviewCarousel({ onOpen }: { onOpen: (i: number) => void }) {
   const [gIdx, setGIdx] = useState<number>(0);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const prevGoogle = useCallback((): void => setGIdx((i) => (i - 1 + REVIEW_COUNT) % REVIEW_COUNT), []);
   const nextGoogle = useCallback((): void => setGIdx((i) => (i + 1) % REVIEW_COUNT), []);
+
   useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root || !('IntersectionObserver' in window)) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '400px 0px' });
+
+    observer.observe(root);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
     const id = window.setInterval(() => setGIdx((i) => (i + 1) % REVIEW_COUNT), 3000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [isVisible]);
+
+  if (!isVisible) {
+    return <div ref={rootRef} aria-hidden="true" className="[height:280px] [margin-top:48px]" />;
+  }
+
   return (
-    <div className="[margin-top:48px]">
+    <div ref={rootRef} className="[margin-top:48px]">
       <div className="[display:flex] [align-items:center] [justify-content:center] [gap:8px] [margin-bottom:24px]">
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20.4H24v7.2h11.3C33.7 32 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.9 6.1 29.2 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"></path><path fill="#FF3D00" d="M6.3 14.7l5.8 4.3C13.9 15.4 18.6 12 24 12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.9 6.1 29.2 4 24 4 16.4 4 9.8 8.5 6.3 14.7z"></path><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.2 35.2 26.7 36 24 36c-5.3 0-9.6-3.4-11.3-8l-6 4.6C9.6 39.5 16.2 44 24 44z"></path><path fill="#1976D2" d="M43.6 20.5H42V20.4H24v7.2h11.3c-1 3-3.1 5.5-5.9 7.1l6.2 5.2C39.4 37 44 31 44 24c0-1.3-.1-2.7-.4-3.5z"></path></svg>
         <span className="[font-size:14px] [font-weight:800] [color:#151515]">4.9</span>
@@ -288,6 +318,7 @@ export default function LandingPage() {
   const [showOverlay, setShowOverlay] = useState<boolean>(true);
   const [showLmsOverlay, setShowLmsOverlay] = useState<boolean>(true);
   const [flashVisible, setFlashVisible] = useState<boolean>(true);
+  const [renderDeferredContent, setRenderDeferredContent] = useState<boolean>(false);
 
   const bannerRef = useRef<HTMLAnchorElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -301,6 +332,20 @@ export default function LandingPage() {
   useEffect(() => {
     trackVisit();
   }, [trackVisit]);
+
+  useEffect(() => {
+    const reveal = (): void => setRenderDeferredContent(true);
+
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(reveal, { timeout: 1200 });
+
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = globalThis.setTimeout(reveal, 0);
+
+    return () => globalThis.clearTimeout(timeoutId);
+  }, []);
 
   const handleTrackedClick = useCallback((event: ReactMouseEvent<HTMLDivElement>): void => {
     const target = event.target;
@@ -623,6 +668,7 @@ export default function LandingPage() {
           </div>
         </section>
       
+        {renderDeferredContent ? (<>
         {/* Social Proof Strip: Alumni Abroad */}
         <div className="[background:#F3F3F3] [padding:32px_0] [overflow:hidden]">
           <p className="[margin:0_0_18px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#4b5563]">Alumni Kami Sekarang Kuliah Di</p>
@@ -633,7 +679,7 @@ export default function LandingPage() {
               
                 <img src="/assets/c11-logos/itb.webp" alt="Institut Teknologi Bandung" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
-                <img src="/assets/logos/ugm.webp" alt="Universitas Gadjah Mada" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <img src="/assets/logos/ugm-220.webp" alt="Universitas Gadjah Mada" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
                 <img src="/assets/c11-logos/ipb.webp" alt="IPB University" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
@@ -653,7 +699,7 @@ export default function LandingPage() {
               
                 <img src="/assets/c11-logos/itb.webp" alt="Institut Teknologi Bandung" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
-                <img src="/assets/logos/ugm.webp" alt="Universitas Gadjah Mada" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
+                <img src="/assets/logos/ugm-220.webp" alt="Universitas Gadjah Mada" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
                 <img src="/assets/c11-logos/ipb.webp" alt="IPB University" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
@@ -674,7 +720,7 @@ export default function LandingPage() {
         </div>
       
         {/* Problem / Agitation Section */}
-        <section id="agitation" className="[background:#F3F3F3] [padding:56px_24px]">
+        <section id="agitation" className="c10-deferred-section [background:#F3F3F3] [padding:56px_24px]">
           <div className="[max-width:672px] [margin:0_auto]">
             <div className="[margin-bottom:24px] [text-align:center]">
               <div className="[display:inline-block] [border-radius:9999px] [padding:10px_24px] [font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [background:#fff] [color:#D70808] [box-shadow:0_4px_16px_rgba(0,0,0,0.06)]">Kamu Sudah Mencoba</div>
@@ -772,7 +818,7 @@ export default function LandingPage() {
               <p className="[margin:0] [text-align:center] [font-size:20px] [line-height:1.5] [font-weight:700] [color:#151515]">Kamu butuh cara belajar yang terstruktur dan fokus ke pola soal TOEFL</p>
               <div className="[display:flex] [height:36px] [width:36px] [align-items:center] [justify-content:center] [border-radius:9999px] [background:#F3F4F6] [color:#374151] [font-size:18px] [margin-top:8px]">↓</div>
             </div>
-          </section></div>
+          </section>
         
       
         {/* Value Section: comparison + pillars */}
@@ -782,7 +828,7 @@ export default function LandingPage() {
           </svg>
         </div>
       
-        <section id="value" className="[background:#fff] [padding:80px_24px]">
+        <section id="value" className="c10-deferred-section [background:#fff] [padding:80px_24px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:56px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">💡 Metode Eksklusif Full Bright</div>
@@ -893,7 +939,7 @@ export default function LandingPage() {
         </section>
       
         {/* Social Proof: WA screenshots */}
-        <section id="proof" className="[background:#fff] [padding:72px_24px]">
+        <section id="proof" className="c10-deferred-section [background:#fff] [padding:72px_24px]">
           <div className="[max-width:672px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:36px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">📱 Bukti Nyata dari Alumni</div>
@@ -906,17 +952,17 @@ export default function LandingPage() {
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(0)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl1.webp)] [background-size:cover] [background-position:center]"></div>
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl1-thumb.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(1)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl2.webp)] [background-size:cover] [background-position:center]"></div>
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl2-thumb.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
                 <div className="[display:flex] [cursor:pointer] [flex-direction:column] [align-items:center] [gap:10px] [padding:20px_0] [border-bottom:1px_solid_#e5e7eb]" onClick={() => setLightboxIdx(2)}>
                   <p className="[margin:0] [font-size:18px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl3.webp)] [background-size:cover] [background-position:center]"></div>
+                  <div className="[border-radius:14px] [box-shadow:0_6px_24px_rgba(0,0,0,0.18)] [aspect-ratio:1/1] [width:100%] [overflow:hidden] [background-image:url(/assets/toefl3-thumb.webp)] [background-size:cover] [background-position:center]"></div>
                 </div>
               
             </div>
@@ -936,7 +982,7 @@ export default function LandingPage() {
         </section>
       
      {/* LMS Preview */}
-<section id="lms" className="[background:#fff] [padding:80px_24px]">
+<section id="lms" className="c10-deferred-section [background:#fff] [padding:80px_24px]">
   <div className="[max-width:1152px] [margin:0_auto]">
     <div className="[text-align:center] [margin-bottom:48px]">
       <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">
@@ -1201,6 +1247,7 @@ export default function LandingPage() {
       <div className="[display:flex] [flex-wrap:wrap] [gap:12px] [justify-content:center]">
         <a href="#pricing" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_4px_20px_rgba(215,8,8,0.35)] [text-decoration:none]">Gabung Sekarang →</a>
         <a href="#testimonials" className="[display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:14px_28px] [font-size:16px] [color:#151515] [border:2px_solid_#D70808] [text-decoration:none]">Lihat Bukti Alumni →</a>
+        </div>
       </div>
       <div className="[margin-top:12px] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:8px_12px]">
         <span className="[display:flex] [align-items:center] [gap:4px] [font-size:12px] [font-weight:600] [color:#6b7280]">★★★★★<span className="[margin-left:4px]">4.9/5 Google Review</span></span>
@@ -1208,11 +1255,10 @@ export default function LandingPage() {
         <span className="[font-size:12px] [color:#6b7280]">•</span><span className="[font-size:12px] [font-weight:600] [color:#6b7280]">🛡️ Garansi 100%</span>
       </div>
     </div>
-  </div>
 </section>
       
         {/* Why Full Bright */}
-        <section id="why-fullbright" className="[background:#F3F3F3] [padding:80px_24px]">
+        <section id="why-fullbright" className="c10-deferred-section [background:#F3F3F3] [padding:80px_24px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:48px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">🏅 Mengapa Full Bright?</div>
@@ -1270,7 +1316,7 @@ export default function LandingPage() {
         </section>
       
         {/* Social Proof */}
-        <section id="testimonials">
+        <section id="testimonials" className="c10-deferred-section">
           <div className="[background:#151515] [padding:40px_24px]">
             <div className="[max-width:1152px] [margin:0_auto] [display:grid] [grid-template-columns:repeat(auto-fit,minmax(140px,1fr))] [gap:32px] [text-align:center] [color:#fff]">
               
@@ -1310,82 +1356,82 @@ export default function LandingPage() {
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                      <img src="/assets/toefl1.webp" alt="Bukti skor TOEFL 547" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl1-thumb.webp" alt="Bukti skor TOEFL 547" loading="lazy" width="260" height="343" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                      <img src="/assets/toefl2.webp" alt="Bukti skor TOEFL 543" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl2-thumb.webp" alt="Bukti skor TOEFL 543" loading="lazy" width="260" height="296" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                      <img src="/assets/toefl3.webp" alt="Bukti skor TOEFL 563" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl3-thumb.webp" alt="Bukti skor TOEFL 563" loading="lazy" width="260" height="273" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl4.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl4-thumb.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="260" height="273" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">507</span></p>
-                      <img src="/assets/toefl5.webp" alt="Bukti skor TOEFL 507" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl5-thumb.webp" alt="Bukti skor TOEFL 507" loading="lazy" width="260" height="424" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">513</span></p>
-                      <img src="/assets/toefl6.webp" alt="Bukti skor TOEFL 513" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl6-thumb.webp" alt="Bukti skor TOEFL 513" loading="lazy" width="260" height="386" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">537</span></p>
-                      <img src="/assets/toefl7.webp" alt="Bukti skor TOEFL 537" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl7-thumb.webp" alt="Bukti skor TOEFL 537" loading="lazy" width="260" height="303" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl9.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl9-thumb.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="260" height="578" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
-                      <img src="/assets/toefl1.webp" alt="Bukti skor TOEFL 547" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl1-thumb.webp" alt="Bukti skor TOEFL 547" loading="lazy" width="260" height="343" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">543</span></p>
-                      <img src="/assets/toefl2.webp" alt="Bukti skor TOEFL 543" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl2-thumb.webp" alt="Bukti skor TOEFL 543" loading="lazy" width="260" height="296" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">563</span></p>
-                      <img src="/assets/toefl3.webp" alt="Bukti skor TOEFL 563" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl3-thumb.webp" alt="Bukti skor TOEFL 563" loading="lazy" width="260" height="273" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl4.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl4-thumb.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="260" height="273" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">507</span></p>
-                      <img src="/assets/toefl5.webp" alt="Bukti skor TOEFL 507" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl5-thumb.webp" alt="Bukti skor TOEFL 507" loading="lazy" width="260" height="424" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">513</span></p>
-                      <img src="/assets/toefl6.webp" alt="Bukti skor TOEFL 513" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl6-thumb.webp" alt="Bukti skor TOEFL 513" loading="lazy" width="260" height="386" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">537</span></p>
-                      <img src="/assets/toefl7.webp" alt="Bukti skor TOEFL 537" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl7-thumb.webp" alt="Bukti skor TOEFL 537" loading="lazy" width="260" height="303" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">560</span></p>
-                      <img src="/assets/toefl9.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="415" height="547" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
+                      <img src="/assets/toefl9-thumb.webp" alt="Bukti skor TOEFL 560" loading="lazy" width="260" height="578" className="[width:130px] [border-radius:12px] [box-shadow:0_4px_16px_rgba(0,0,0,0.15)] [aspect-ratio:9/16] [object-fit:cover] [display:block]" />
                     </div>
                   
                 </div>
@@ -1679,7 +1725,7 @@ export default function LandingPage() {
       
         {/* Pricing: Belajar Sendiri (self-study mode) */}
         {mode === 'self' ? (<>
-        <section id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
+        <section id="pricing" className="c10-deferred-section [background:#fff] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:32px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">⏳ Mulai dari Sekarang, Bukan Nanti</div>
@@ -1776,7 +1822,7 @@ export default function LandingPage() {
       
         {/* Pricing: Dibimbing Tutor (default mode) */}
         {mode === 'tutor' ? (<>
-        <section id="pricing" className="[background:#fff] [padding:80px_24px_48px]">
+        <section id="pricing" className="c10-deferred-section [background:#fff] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:32px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">⏳ Mulai dari Sekarang, Bukan Nanti</div>
@@ -2054,7 +2100,7 @@ export default function LandingPage() {
         </>) : null}
       
         {/* FAQ */}
-        <section id="faq" className="[background:#F3F3F3] [padding:80px_24px_48px]">
+        <section id="faq" className="c10-deferred-section [background:#F3F3F3] [padding:80px_24px_48px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[text-align:center] [margin-bottom:56px]">
               <div className="[display:inline-flex] [align-items:center] [gap:8px] [font-size:12px] [font-weight:700] [text-transform:uppercase] [letter-spacing:0.08em] [padding:6px_16px] [border-radius:9999px] [margin-bottom:20px] [background:#FFF0F0] [color:#D70808] [border:1px_solid_#ffb3b3]">❓ Masih Ragu?</div>
@@ -2308,7 +2354,7 @@ export default function LandingPage() {
         
       
         {/* Survey */}
-        <section id="survey" className="[background:#fff] [padding:28px_24px]">
+        <section id="survey" className="c10-deferred-section [background:#fff] [padding:28px_24px]">
           <div className="[max-width:460px] [margin:0_auto] [background:#FAFAFA] [border:1px_solid_#ececec] [border-radius:16px] [padding:20px_20px_16px]">
             <div className="[margin-bottom:16px]">
               <p className="[margin:0_0_6px] [font-size:11px] [font-weight:700] [letter-spacing:0.06em] [text-transform:uppercase] [color:#6b6b6b]">BOLEH TAHU KESULITANMU?</p>
@@ -2352,7 +2398,7 @@ export default function LandingPage() {
         </section>
       
         {/* Footer */}
-        <footer className="[background:#151515] [padding:56px_16px_32px]">
+        <footer className="c10-deferred-section [background:#151515] [padding:56px_16px_32px]">
           <div className="[max-width:1152px] [margin:0_auto]">
             <div className="[display:grid] [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))] [gap:40px] [margin-bottom:40px]">
               <div>
@@ -2428,6 +2474,7 @@ export default function LandingPage() {
             </div>
           </div>
         </footer>
+        </>) : <div aria-hidden="true" className="[min-height:100vh] [background:#F3F3F3]" />}
       
         {/* Return-to-checkout survey bottom sheet */}
         {rpOpen ? (<>
@@ -2492,7 +2539,8 @@ export default function LandingPage() {
           </a>
         </div>
       
-      </main>
+        </div>
+      </div>
     </>
   );
 }

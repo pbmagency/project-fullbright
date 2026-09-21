@@ -23,7 +23,7 @@ Route::inertia('/toefl-hack', 'cycle10/LandingPage')->name('home3');
 Route::inertia('/e-course-toefl-hack', 'cycle10/LandingPage')->name('home4');
 Route::inertia('/c10-lp', 'cycle10/LandingPage')->name('cycle10.landing');
 Route::inertia('/c1-lp', 'c1/LandingPage')->name('c1.landing');
-Route::inertia('/c11-problem', 'cycle11/LandingPage')->name('cycle11.problem');
+Route::inertia('/c11-problem', 'cycle11/LandingPage')->name('cocycle11.problem');
 Route::get('/c11-problem/scalev-proof', C11ScalevProofController::class)
     ->middleware('throttle:60,1')
     ->name('cycle11.scalev-proof');
