@@ -1,4 +1,4 @@
-name: Deploy Split Structure (Laravel & Public)
+name: Deploy Laravel to CyberPanel
 
 on:
   push:
@@ -7,60 +7,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  inspect-c10-redirect:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Inspect LiteSpeed redirect sources
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: '72.61.210.213'
-          username: 'root'
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            echo '=== public target ==='
-            readlink -f /home/fullbrightindonesia.org/toefl || true
-            ls -la /home/fullbrightindonesia.org/toefl || true
-            echo '=== target htaccess ==='
-            sed -n '1,180p' /home/fullbrightindonesia.org/toefl/.htaccess || true
-            echo '=== c10 filesystem entries ==='
-            find /home -maxdepth 8 -name 'c10-lp' -print -exec ls -lad {} \; 2>/dev/null || true
-            echo '=== c10 rules in home and LiteSpeed config ==='
-            grep -Rns --include='.htaccess' 'c10-lp' /home 2>/dev/null | head -100 || true
-            grep -Rns 'c10-lp' /usr/local/lsws/conf /etc/apache2 /etc/httpd 2>/dev/null | head -100 || true
-
   deploy:
     runs-on: ubuntu-latest
+
     env:
-      SERVER_IP: '72.61.210.213'
+      SERVER_IP: '72.61.142.238'
       SERVER_USER: 'root'
-      DOMAIN_USERNAME: 'fullb5357'
-      TARGET_DIR_LARAVEL: '/home/fullbrightindonesia.org/laravel-toefl'
-      TARGET_DIR_PUBLIC: '/home/fullbrightindonesia.org/toefl'
+
+      DOMAIN_USERNAME: 'toefl6071'
+      DOMAIN_GROUP: 'nobody'
+
+      TARGET_DIR_LARAVEL: '/home/toefl.fullbrightindonesia.org/laravel-toefl'
+      TARGET_DIR_PUBLIC: '/home/toefl.fullbrightindonesia.org/public_html'
 
     steps:
+      # ---------------------------------------------------------
+      # CHECKOUT
+      # ---------------------------------------------------------
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # ---------------------------------------------------------
+      # PHP & COMPOSER DI GITHUB RUNNER
+      # ---------------------------------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: '8.4'
+          extensions: mbstring, bcmath, intl, pdo_mysql
+          coverage: none
 
-      # We keep this step here just in case your Vite/NPM build requires Laravel's packages to exist
-      - name: Install Composer Dependencies (Runner)
+      - name: Install Composer Dependencies on Runner
         run: |
-          composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+          composer install \
+            --no-dev \
+            --optimize-autoloader \
+            --no-interaction \
+            --no-scripts
 
+      # ---------------------------------------------------------
+      # NODE & VITE BUILD
+      # ---------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
+          cache: npm
 
-      - name: Install NPM & Build Inertia React
+      - name: Install NPM and Build Inertia React
         run: |
           npm install
           npm run build
 
+      # ---------------------------------------------------------
+      # SSH
+      # ---------------------------------------------------------
       - name: Setup SSH Key
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -70,148 +71,198 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
+
           for attempt in 1 2 3; do
             keyscan_error_file="$(mktemp)"
-            if ssh-keyscan -T 30 -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts 2>"$keyscan_error_file"; then
+
+            if ssh-keyscan -T 30 -H "${{ env.SERVER_IP }}" \
+              >> ~/.ssh/known_hosts \
+              2>"$keyscan_error_file"; then
+
               rm -f "$keyscan_error_file"
               break
             fi
+
             echo "ssh-keyscan attempt $attempt failed:"
             cat "$keyscan_error_file"
             rm -f "$keyscan_error_file"
+
             if [ "$attempt" -eq 3 ]; then
-              echo "Failed to fetch SSH host key for ${{ env.SERVER_IP }} after 3 attempts."
+              echo "Failed to fetch SSH host key after 3 attempts."
               exit 1
-            else
-              sleep 5
             fi
+
+            sleep 5
           done
+
           chmod 600 ~/.ssh/known_hosts
 
       # ---------------------------------------------------------
-      # SYNC 1: Pindahkan Core Laravel
+      # PERSIAPAN DIREKTORI SERVER
       # ---------------------------------------------------------
-      - name: Sync Core Laravel to Server
+      - name: Prepare Server Directories
         run: |
-          rsync -avz --delete \
-          --exclude='.env' \
-          --exclude='/storage/' \
-          --exclude='/bootstrap/cache/' \
-          --exclude='/.git/' \
-          --exclude='/node_modules/' \
-          --exclude='/public/' \
-          --exclude='/vendor/' \
-          ./ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}
+          ssh "${{ env.SERVER_USER }}@${{ env.SERVER_IP }}" "
+            set -e
+
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}'
+            mkdir -p '${{ env.TARGET_DIR_PUBLIC }}'
+
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/storage/app/public'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/storage/framework/cache/data'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/storage/framework/sessions'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/storage/framework/views'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/storage/logs'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/bootstrap/cache'
+            mkdir -p '${{ env.TARGET_DIR_LARAVEL }}/public/build'
+          "
 
       # ---------------------------------------------------------
-      # SYNC 2: Pindahkan Aset Public
+      # SYNC 1: CORE LARAVEL
       # ---------------------------------------------------------
-      - name: Sync Public Assets to public_html
+      - name: Sync Laravel Core
         run: |
           rsync -avz --delete \
-          --exclude='/index.php' \
-          --exclude='.htaccess' \
-          ./public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}
+            --exclude='.env' \
+            --exclude='/storage/' \
+            --exclude='/bootstrap/cache/' \
+            --exclude='/.git/' \
+            --exclude='/node_modules/' \
+            --exclude='/public/' \
+            --exclude='/vendor/' \
+            ./ \
+            "${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}/"
 
       # ---------------------------------------------------------
-      # SYNC 3: Upload storage/app/public (images, misc assets)
+      # SYNC 2: PUBLIC ASSETS
+      # ---------------------------------------------------------
+      - name: Sync Public Assets
+        run: |
+          rsync -avz --delete \
+            --exclude='/index.php' \
+            --exclude='/.well-known/' \
+            ./public/ \
+            "${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_PUBLIC }}/"
+
+      # ---------------------------------------------------------
+      # SYNC 3: STORAGE PUBLIC
       # ---------------------------------------------------------
       - name: Sync Storage Public Assets
         run: |
           rsync -avz \
-          ./storage/app/public/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}/storage/app/public
+            ./storage/app/public/ \
+            "${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.TARGET_DIR_LARAVEL }}/storage/app/public/"
 
       # ---------------------------------------------------------
-      # POST-DEPLOYMENT
+      # POST DEPLOYMENT
       # ---------------------------------------------------------
-      - name: Run Artisan & Move Manifest
+      - name: Complete Laravel Deployment
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.SERVER_IP }}
           username: ${{ env.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Route the TSX landing page through Laravel before any legacy
-            # trailing-slash rule can bounce /c10-lp and /c10-lp/ forever.
-            htaccess="${{ env.TARGET_DIR_PUBLIC }}/.htaccess"
-            if ! grep -q 'C10 Laravel route override' "$htaccess"; then
-              cp -p "$htaccess" "$htaccess.before-c10-fix"
-              awk '
-                { print }
-                /RewriteEngine On/ {
-                  print ""
-                  print "    # C10 Laravel route override: bypass legacy slash redirects"
-                  print "    RewriteRule ^c10-lp/?$ index.php [L]"
-                }
-              ' "$htaccess" > "$htaccess.c10-fix"
-              chown --reference="$htaccess" "$htaccess.c10-fix"
-              chmod --reference="$htaccess" "$htaccess.c10-fix"
-              mv "$htaccess.c10-fix" "$htaccess"
-            fi
+            set -e
 
-            # public/.htaccess is deliberately excluded from rsync because the
-            # host owns additional rules. Install only our idempotent performance
-            # block so browser caching/security headers actually reach production.
-            if ! grep -q 'Full Bright performance headers' "$htaccess"; then
-              printf '%s\n' \
-                '' \
-                '# Full Bright performance headers' \
-                '<IfModule mod_expires.c>' \
-                '  ExpiresActive On' \
-                '  ExpiresByType text/css "access plus 1 year"' \
-                '  ExpiresByType application/javascript "access plus 1 year"' \
-                '  ExpiresByType text/javascript "access plus 1 year"' \
-                '  ExpiresByType font/woff2 "access plus 1 year"' \
-                '  ExpiresByType image/webp "access plus 30 days"' \
-                '  ExpiresByType image/jpeg "access plus 30 days"' \
-                '  ExpiresByType image/png "access plus 30 days"' \
-                '  ExpiresByType image/gif "access plus 30 days"' \
-                '  ExpiresByType image/svg+xml "access plus 30 days"' \
-                '  ExpiresByType video/mp4 "access plus 30 days"' \
-                '</IfModule>' \
-                '<IfModule mod_headers.c>' \
-                '  <FilesMatch "\.(js|css|woff2)$">' \
-                '    Header set Cache-Control "public, max-age=31536000, immutable"' \
-                '  </FilesMatch>' \
-                '  <FilesMatch "\.(webp|png|jpg|jpeg|gif|svg|mp4)$">' \
-                '    Header set Cache-Control "public, max-age=2592000"' \
-                '  </FilesMatch>' \
-                '  Header always set X-Content-Type-Options "nosniff"' \
-                '  Header always set X-Frame-Options "SAMEORIGIN"' \
-                '  Header always set Referrer-Policy "strict-origin-when-cross-origin"' \
-                '  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"' \
-                '</IfModule>' \
-                '<IfModule mod_deflate.c>' \
-                '  AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript text/javascript application/json image/svg+xml' \
-                '</IfModule>' >> "$htaccess"
-            fi
+            LARAVEL_DIR="${{ env.TARGET_DIR_LARAVEL }}"
+            PUBLIC_DIR="${{ env.TARGET_DIR_PUBLIC }}"
+            SITE_USER="${{ env.DOMAIN_USERNAME }}"
+            SITE_GROUP="${{ env.DOMAIN_GROUP }}"
 
-            # The old static landing page left this physical directory behind.
-            # LiteSpeed adds a trailing slash for the directory while Laravel
-            # removes it for the /c10-lp route, causing an infinite redirect.
-            legacy_c10_dir="${{ env.TARGET_DIR_PUBLIC }}/c10-lp"
-            expected_legacy_c10_dir="/home/fullbrightindonesia.org/toefl/c10-lp"
-            if [ "$legacy_c10_dir" != "$expected_legacy_c10_dir" ]; then
-              echo "Refusing to remove unexpected path: $legacy_c10_dir"
+            echo "Starting deployment..."
+
+            # Pastikan .env sudah dibuat manual di server
+            if [ ! -f "$LARAVEL_DIR/.env" ]; then
+              echo "ERROR: File .env belum ada di $LARAVEL_DIR/.env"
+              echo "Buat file .env terlebih dahulu sebelum deployment."
               exit 1
             fi
-            rm -rf -- "$legacy_c10_dir"
 
-            mkdir -p ${{ env.TARGET_DIR_LARAVEL }}/public/build
-            cp ${{ env.TARGET_DIR_PUBLIC }}/build/manifest.json ${{ env.TARGET_DIR_LARAVEL }}/public/build/manifest.json
+            # Install PHP dependencies langsung di server
+            cd "$LARAVEL_DIR"
 
-            cd ${{ env.TARGET_DIR_PUBLIC }}
-            ln -sfn ${{ env.TARGET_DIR_LARAVEL }}/storage/app/public storage
+            composer install \
+              --no-dev \
+              --optimize-autoloader \
+              --no-interaction
 
-            cd ${{ env.TARGET_DIR_LARAVEL }}
+            # Buat index.php khusus split structure.
+            # public_html dan laravel-toefl berada dalam folder domain yang sama.
+            printf '%s\n' \
+              '<?php' \
+              '' \
+              'use Illuminate\Foundation\Application;' \
+              'use Illuminate\Http\Request;' \
+              '' \
+              'define("LARAVEL_START", microtime(true));' \
+              '' \
+              'if (file_exists($maintenance = __DIR__."/../laravel-toefl/storage/framework/maintenance.php")) {' \
+              '    require $maintenance;' \
+              '}' \
+              '' \
+              'require __DIR__."/../laravel-toefl/vendor/autoload.php";' \
+              '' \
+              '/** @var Application $app */' \
+              '$app = require_once __DIR__."/../laravel-toefl/bootstrap/app.php";' \
+              '' \
+              '$app->handleRequest(Request::capture());' \
+              > "$PUBLIC_DIR/index.php"
 
-            # --- CHANGED: Run composer install directly on the server ---
-            composer install --no-dev --optimize-autoloader --no-interaction
+            # Laravel tetap mencari manifest dari core/public/build.
+            mkdir -p "$LARAVEL_DIR/public/build"
 
+            if [ ! -f "$PUBLIC_DIR/build/manifest.json" ]; then
+              echo "ERROR: Vite manifest tidak ditemukan."
+              echo "Expected: $PUBLIC_DIR/build/manifest.json"
+              exit 1
+            fi
+
+            cp \
+              "$PUBLIC_DIR/build/manifest.json" \
+              "$LARAVEL_DIR/public/build/manifest.json"
+
+            # Buat symlink public/storage secara aman
+            if [ -L "$PUBLIC_DIR/storage" ]; then
+              rm "$PUBLIC_DIR/storage"
+            elif [ -e "$PUBLIC_DIR/storage" ]; then
+              echo "ERROR: $PUBLIC_DIR/storage sudah ada dan bukan symlink."
+              echo "Periksa folder tersebut secara manual."
+              exit 1
+            fi
+
+            ln -s \
+              "$LARAVEL_DIR/storage/app/public" \
+              "$PUBLIC_DIR/storage"
+
+            # Bersihkan cache lama
             php artisan optimize:clear
+
+            # Jalankan migration
             php artisan migrate --force
 
-            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}
-            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_PUBLIC }}
-            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}/storage
-            chown -R ${{ env.DOMAIN_USERNAME }}:${{ env.DOMAIN_USERNAME }} ${{ env.TARGET_DIR_LARAVEL }}/bootstrap/cache
+            # Buat cache production
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Ownership CyberPanel
+            chown -R "$SITE_USER:$SITE_GROUP" "$LARAVEL_DIR"
+            chown -R "$SITE_USER:$SITE_GROUP" "$PUBLIC_DIR"
+
+            # Permission folder Laravel yang perlu writable
+            find "$LARAVEL_DIR/storage" \
+              -type d -exec chmod 775 {} \;
+
+            find "$LARAVEL_DIR/storage" \
+              -type f -exec chmod 664 {} \;
+
+            find "$LARAVEL_DIR/bootstrap/cache" \
+              -type d -exec chmod 775 {} \;
+
+            find "$LARAVEL_DIR/bootstrap/cache" \
+              -type f -exec chmod 664 {} \;
+
+            chmod 644 "$PUBLIC_DIR/index.php"
+
+            echo "Deployment completed successfully."
