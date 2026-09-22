@@ -232,7 +232,11 @@ const GLOBAL_CSS = `
   @keyframes heroBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 `;
 
-export default function LandingPage() {
+type LandingPageProps = {
+  renderCriticalSections?: boolean;
+};
+
+export default function LandingPage({ renderCriticalSections = true }: LandingPageProps) {
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [bannerH, setBannerH] = useState<number>(38);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -565,6 +569,7 @@ nextReview();
       
       <div role="main" onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
       
+        {renderCriticalSections ? (<>
         {/* Urgency Banner */}
         {flashVisible ? (<>
           <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[position:fixed] [top:0] [left:0] [right:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
@@ -673,6 +678,7 @@ nextReview();
             </svg>
           </div>
         </section>
+        </>) : null}
       
         {/* Social Proof Strip: Alumni Abroad */}
         <div className="[background:#F3F3F3] [padding:32px_0] [overflow:hidden]">
