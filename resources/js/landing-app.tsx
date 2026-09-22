@@ -17,10 +17,24 @@ const idleWindow = window as Window & {
     requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
 };
 
-if (idleWindow.requestIdleCallback) {
-    idleWindow.requestIdleCallback(() => void mountInteractivePage(), { timeout: 1200 });
-} else {
-    window.setTimeout(() => void mountInteractivePage(), 250);
+window.setTimeout(() => {
+    if (idleWindow.requestIdleCallback) {
+        idleWindow.requestIdleCallback(() => void mountInteractivePage(), { timeout: 1200 });
+    } else {
+        void mountInteractivePage();
+    }
+}, 8000);
+
+const interactiveRoot = document.getElementById('app');
+
+if (interactiveRoot && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            void mountInteractivePage();
+        }
+    });
+    observer.observe(interactiveRoot);
 }
 
 window.addEventListener('pointerdown', () => void mountInteractivePage(), { once: true, passive: true });
@@ -29,6 +43,7 @@ window.addEventListener('keydown', () => void mountInteractivePage(), { once: tr
 document.querySelectorAll<HTMLAnchorElement>('#c12-critical a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (event) => {
         const destination = anchor.getAttribute('href');
+
         if (!destination || destination === '#') {
             return;
         }

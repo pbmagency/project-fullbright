@@ -42,7 +42,9 @@
               imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
               imagesizes="(max-width: 899px) 250px, 560px">
     @elseif($page['component'] === 'cycle12/LandingPage')
-        <link rel="preload" href="/assets-c12/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high">
+        <link rel="preload" href="/assets-c12/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
+              imagesrcset="/assets-c12/hero-consultant-360.webp 360w, /assets-c12/hero-consultant.webp 660w"
+              imagesizes="(max-width: 899px) 180px, 560px">
         <style>
             #c12-critical { min-height: 100vh; background: #fff; color: #151515; font-family: Nunito, Arial, sans-serif; }
             #c12-critical * { box-sizing: border-box; }
@@ -127,7 +129,7 @@
                         </div>
                         <div class="c12-trust"><span>★★★★★ 4.9/5 Google Review</span><span>• 45.000+ Alumni Sukses</span><span>• 🛡 Garansi 100%</span></div>
                     </div>
-                    <div class="c12-hero-media"><img class="c12-hero-image" src="/assets-c12/hero-consultant.webp" width="660" height="805" fetchpriority="high" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu"></div>
+                    <div class="c12-hero-media"><img class="c12-hero-image" src="/assets-c12/hero-consultant.webp" srcset="/assets-c12/hero-consultant-360.webp 360w, /assets-c12/hero-consultant.webp 660w" sizes="(max-width: 899px) 180px, 560px" width="660" height="805" fetchpriority="high" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu"></div>
                 </div>
                 <div class="c12-wave"></div>
             </section>
