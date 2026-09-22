@@ -16,7 +16,7 @@ export type AnalyticsEventType =
     | 'payment'
     | 'section_view';
 
-interface AnalyticsEvent {
+export interface AnalyticsEvent {
     event_type: AnalyticsEventType;
     event_data?: Record<string, unknown>;
     referral_source?: string;
@@ -78,7 +78,7 @@ export function getAnalyticsSessionId(): string {
     return inMemoryAnalyticsSessionId;
 }
 
-function getCookieValue(name: string): string | null {
+export function getCookieValue(name: string): string | null {
     const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
 
     return match ? decodeURIComponent(match[2]) : null;
@@ -99,110 +99,116 @@ export function getLandingSource(): string {
     return pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 }
 
+export function initializeAnalyticsReferral(): void {
+    if (typeof window === 'undefined' || readSessionStorage(REFERRAL_SOURCE_KEY)) {
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let externalReferrer = '';
+
+    if (document.referrer) {
+        try {
+            externalReferrer =
+                new URL(document.referrer).hostname === window.location.hostname
+                    ? ''
+                    : document.referrer;
+        } catch {
+            externalReferrer = '';
+        }
+    }
+
+    writeSessionStorage(
+        REFERRAL_SOURCE_KEY,
+        urlParams.get('ref') || externalReferrer || 'direct',
+    );
+}
+
+export async function trackAnalyticsEvent(
+    event: AnalyticsEvent,
+): Promise<boolean> {
+    try {
+        initializeAnalyticsReferral();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const suppliedEventId = event.event_data?.event_id;
+        const eventId =
+            typeof suppliedEventId === 'string'
+                ? suppliedEventId
+                : generateEventId();
+        const payload = {
+            ...event,
+            event_data: {
+                ...event.event_data,
+                event_id: eventId,
+                analytics_session_id: getAnalyticsSessionId(),
+                landing_source: getLandingSource(),
+            },
+            referral_source:
+                event.referral_source ||
+                readSessionStorage(REFERRAL_SOURCE_KEY) ||
+                'direct',
+            utm_source: event.utm_source || urlParams.get('utm_source'),
+            utm_medium: event.utm_medium || urlParams.get('utm_medium'),
+            utm_campaign: event.utm_campaign || urlParams.get('utm_campaign'),
+            utm_content: event.utm_content || urlParams.get('utm_content'),
+            utm_term: event.utm_term || urlParams.get('utm_term'),
+        };
+
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+            try {
+                const response = await fetch('/analytics/track', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    keepalive: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name=csrf-token]')
+                                ?.getAttribute('content') || '',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    return true;
+                }
+
+                if (response.status < 500 && response.status !== 429) {
+                    console.debug(
+                        `Analytics tracking rejected (${response.status})`,
+                    );
+
+                    return false;
+                }
+            } catch (error) {
+                if (attempt === 1) {
+                    throw error;
+                }
+            }
+        }
+
+        console.debug('Analytics tracking failed after retry');
+
+        return false;
+    } catch (error) {
+        console.debug('Analytics tracking failed:', error);
+
+        return false;
+    }
+}
+
 export function useAnalytics() {
     const coursePrice = import.meta.env.VITE_COURSE_PRICE;
 
     useEffect(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        if (!readSessionStorage(REFERRAL_SOURCE_KEY)) {
-            const urlParams = new URLSearchParams(window.location.search);
-            let externalReferrer = '';
-
-            if (document.referrer) {
-                try {
-                    externalReferrer =
-                        new URL(document.referrer).hostname ===
-                        window.location.hostname
-                            ? ''
-                            : document.referrer;
-                } catch {
-                    externalReferrer = '';
-                }
-            }
-
-            writeSessionStorage(
-                REFERRAL_SOURCE_KEY,
-                urlParams.get('ref') || externalReferrer || 'direct',
-            );
-        }
+        initializeAnalyticsReferral();
     }, []);
 
     const track = useCallback(
-        async (event: AnalyticsEvent): Promise<boolean> => {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const suppliedEventId = event.event_data?.event_id;
-                const eventId =
-                    typeof suppliedEventId === 'string'
-                        ? suppliedEventId
-                        : generateEventId();
-                const payload = {
-                    ...event,
-                    event_data: {
-                        ...event.event_data,
-                        event_id: eventId,
-                        analytics_session_id: getAnalyticsSessionId(),
-                        landing_source: getLandingSource(),
-                    },
-                    referral_source:
-                        event.referral_source ||
-                        readSessionStorage(REFERRAL_SOURCE_KEY) ||
-                        'direct',
-                    utm_source: event.utm_source || urlParams.get('utm_source'),
-                    utm_medium: event.utm_medium || urlParams.get('utm_medium'),
-                    utm_campaign:
-                        event.utm_campaign || urlParams.get('utm_campaign'),
-                    utm_content:
-                        event.utm_content || urlParams.get('utm_content'),
-                    utm_term: event.utm_term || urlParams.get('utm_term'),
-                };
-
-                for (let attempt = 0; attempt < 2; attempt += 1) {
-                    try {
-                        const response = await fetch('/analytics/track', {
-                            method: 'POST',
-                            credentials: 'same-origin',
-                            keepalive: true,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN':
-                                    document
-                                        .querySelector('meta[name=csrf-token]')
-                                        ?.getAttribute('content') || '',
-                            },
-                            body: JSON.stringify(payload),
-                        });
-
-                        if (response.ok) {
-                            return true;
-                        }
-
-                        if (response.status < 500 && response.status !== 429) {
-                            console.debug(
-                                `Analytics tracking rejected (${response.status})`,
-                            );
-
-                            return false;
-                        }
-                    } catch (error) {
-                        if (attempt === 1) {
-                            throw error;
-                        }
-                    }
-                }
-
-                console.debug('Analytics tracking failed after retry');
-
-                return false;
-            } catch (error) {
-                console.debug('Analytics tracking failed:', error);
-
-                return false;
-            }
-        },
+        (event: AnalyticsEvent): Promise<boolean> =>
+            trackAnalyticsEvent(event),
         [],
     );
 
