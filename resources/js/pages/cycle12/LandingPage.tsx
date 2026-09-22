@@ -518,11 +518,15 @@ nextReview();
   }, [lightboxIdx, reviewIdx, rpOpen, closeLightbox, prevPhoto, nextPhoto, closeReview, prevReview, nextReview, closeReturnPopup]);
 
   return (
-    <>
+    <div
+      role="main"
+      onClickCapture={handleTrackedClick}
+      className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]"
+    >
       <style>{GLOBAL_CSS}</style>
       
       
-      <div role="main" onClickCapture={handleTrackedClick} className="[min-height:100vh] [background:#fff] [font-family:Nunito,system-ui,sans-serif]">
+      <div>
       
         {renderCriticalSections ? (<>
         {/* Urgency Banner */}
@@ -2585,6 +2589,6 @@ nextReview();
         </div>
       
       
-    </>
+    </div>
   );
 }
