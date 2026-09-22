@@ -27,6 +27,10 @@ export interface AnalyticsEvent {
     utm_term?: string;
 }
 
+export interface AnalyticsTrackOptions {
+    transport?: 'fetch' | 'beacon';
+}
+
 export function generateEventId(): string {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
         return crypto.randomUUID();
@@ -126,6 +130,7 @@ export function initializeAnalyticsReferral(): void {
 
 export async function trackAnalyticsEvent(
     event: AnalyticsEvent,
+    options: AnalyticsTrackOptions = {},
 ): Promise<boolean> {
     try {
         initializeAnalyticsReferral();
@@ -154,6 +159,25 @@ export async function trackAnalyticsEvent(
             utm_content: event.utm_content || urlParams.get('utm_content'),
             utm_term: event.utm_term || urlParams.get('utm_term'),
         };
+
+        // Outbound CTAs can hand control to another app immediately (most
+        // notably WhatsApp on mobile). Beacon queues the event before that
+        // transition, so the conversion is not lost when the page is frozen.
+        if (
+            options.transport === 'beacon' &&
+            typeof navigator.sendBeacon === 'function'
+        ) {
+            const queued = navigator.sendBeacon(
+                '/analytics/track',
+                new Blob([JSON.stringify(payload)], {
+                    type: 'application/json',
+                }),
+            );
+
+            if (queued) {
+                return true;
+            }
+        }
 
         for (let attempt = 0; attempt < 2; attempt += 1) {
             try {
@@ -207,8 +231,10 @@ export function useAnalytics() {
     }, []);
 
     const track = useCallback(
-        (event: AnalyticsEvent): Promise<boolean> =>
-            trackAnalyticsEvent(event),
+        (
+            event: AnalyticsEvent,
+            options?: AnalyticsTrackOptions,
+        ): Promise<boolean> => trackAnalyticsEvent(event, options),
         [],
     );
 
@@ -313,7 +339,12 @@ export function useAnalytics() {
     );
 
     const trackCTA = useCallback(
-        (location: string, text: string, destination = 'unknown') => {
+        (
+            location: string,
+            text: string,
+            destination = 'unknown',
+            options?: AnalyticsTrackOptions,
+        ) => {
             void track({
                 event_type: 'cta_click',
                 event_data: {
@@ -323,7 +354,7 @@ export function useAnalytics() {
                     page: window.location.pathname,
                     timestamp: new Date().toISOString(),
                 },
-            });
+            }, options);
         },
         [track],
     );
@@ -333,6 +364,7 @@ export function useAnalytics() {
             location: string,
             data?: Record<string, unknown>,
             eventId = generateEventId(),
+            options?: AnalyticsTrackOptions,
         ) => {
             void track({
                 event_type: 'initiate_checkout',
@@ -346,13 +378,17 @@ export function useAnalytics() {
                     timestamp: new Date().toISOString(),
                     ...data,
                 },
-            });
+            }, options);
         },
         [track],
     );
 
     const trackConversion = useCallback(
-        (type: string, data?: Record<string, unknown>) => {
+        (
+            type: string,
+            data?: Record<string, unknown>,
+            options?: AnalyticsTrackOptions,
+        ) => {
             void track({
                 event_type: 'conversion',
                 event_data: {
@@ -361,7 +397,7 @@ export function useAnalytics() {
                     timestamp: new Date().toISOString(),
                     ...data,
                 },
-            });
+            }, options);
         },
         [track],
     );

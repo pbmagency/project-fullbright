@@ -430,6 +430,39 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(4, (int) $chartData->get('total_lead')->first()->total);
     }
 
+    public function test_c12_price_checkout_and_whatsapp_clicks_are_counted_as_leads(): void
+    {
+        $now = Carbon::now();
+
+        foreach (['checkout-session', 'whatsapp-session'] as $sessionId) {
+            $this->event($sessionId, 'visit', '/c12-price', $now);
+        }
+
+        $this->event('checkout-session', 'initiate_checkout', '/c12-price', $now, [
+            'type' => 'external_payment_redirect',
+            'location' => 'pricing_self_checkout',
+            'package' => 'Self-Study LMS',
+            'price' => 99000,
+        ]);
+        $this->event('whatsapp-session', 'conversion', '/c12-price', $now, [
+            'type' => 'wa_registration',
+            'location' => 'pricing_self_whatsapp',
+            'package' => 'Self-Study LMS',
+            'price' => 99000,
+        ]);
+
+        $matrix = collect(app(AbTestingService::class)->getPerformanceMatrix(
+            $now->copy()->subMinute(),
+            $now->copy()->addMinute(),
+        ))->firstWhere('landing_source', '/c12-price');
+
+        $this->assertNotNull($matrix);
+        $this->assertSame(1, $matrix['direct_checkouts']);
+        $this->assertSame(50.0, $matrix['direct_checkout_rate']);
+        $this->assertSame(1, $matrix['whatsapp_leads']);
+        $this->assertSame(50.0, $matrix['whatsapp_lead_rate']);
+    }
+
     public function test_deleting_a_user_keeps_their_anonymous_analytics_history(): void
     {
         $user = User::factory()->create();

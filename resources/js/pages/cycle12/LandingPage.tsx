@@ -286,13 +286,18 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
     const parsedPrice = Number(anchor.dataset.analyticsPrice);
     const price = Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : undefined;
 
-    trackCTA(location, label, destination);
+    const outboundTransport = isWhatsApp || isCheckout
+      ? { transport: 'beacon' as const }
+      : undefined;
+
+    trackCTA(location, label, destination, outboundTransport);
 
     if (isCheckout) {
       trackInitiateCheckout(
         location,
         { level: packageName, package: packageName, price, payment_url: destination },
         generateEventId(),
+        outboundTransport,
       );
     } else if (isWhatsApp) {
       trackConversion(anchor.dataset.analyticsConversion || 'wa_inquiry', {
@@ -300,7 +305,7 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
         package: packageName,
         price,
         destination,
-      });
+      }, outboundTransport);
     }
   }, [trackCTA, trackConversion, trackInitiateCheckout]);
 
