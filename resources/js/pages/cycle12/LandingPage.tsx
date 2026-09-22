@@ -352,7 +352,14 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
 
   /* offset sticky diukur dari tinggi banner (jadi 0 saat banner hilang) */
   useEffect(() => {
-    const measure = (): void => setBannerH(bannerRef.current ? Math.round(bannerRef.current.getBoundingClientRect().height) : 0);
+    const measure = (): void => {
+      const b = document.querySelector('.c12-banner');
+      if (b) {
+        setBannerH(Math.round(b.getBoundingClientRect().height));
+      } else {
+        setBannerH(bannerRef.current ? Math.round(bannerRef.current.getBoundingClientRect().height) : 0);
+      }
+    };
     measure();
     window.addEventListener('resize', measure);
     const poll = window.setInterval(measure, 500);
