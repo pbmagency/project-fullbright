@@ -1709,7 +1709,7 @@ nextReview();
         </>) : null}
       
         {/* Pricing — VARIAN B (single primary offer + secondary tutor panel) */}
-        <section id="pricing" className="max-[559px]:[padding:48px_16px_40px] [background:#fff] [padding:72px_24px_56px]">
+        <section id="pricing" className="max-[559px]:[padding:48px_16px_40px] [background:#fff] [padding:72px_24px_56px] [scroll-margin-top:102px]">
           <div className="[max-width:1080px] [margin:0_auto]">
       
             <div className="[text-align:center] [margin-bottom:32px]">

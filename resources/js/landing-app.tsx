@@ -48,9 +48,51 @@ document.querySelectorAll<HTMLAnchorElement>('#c12-critical a[href^="#"]').forEa
             return;
         }
 
+        const location = anchor.dataset.analyticsLocation;
+
+        if (location) {
+            const label = (anchor.getAttribute('aria-label') || anchor.textContent || 'CTA')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 255);
+            const clickedAt = new Date().toISOString();
+
+            // The critical hero deliberately exists outside React. Load the
+            // shared tracker on demand so its very first CTA click is recorded
+            // without pulling React into the critical page bundle.
+            void import('./hooks/use-analytics').then(
+                ({ generateEventId, trackAnalyticsEvent }) =>
+                    trackAnalyticsEvent({
+                        event_type: 'cta_click',
+                        event_data: {
+                            event_id: generateEventId(),
+                            location,
+                            text: label,
+                            destination,
+                            page: window.location.pathname,
+                            timestamp: clickedAt,
+                        },
+                    }),
+            );
+        }
+
         event.preventDefault();
         void mountInteractivePage().then(() => {
-            document.querySelector(destination)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Try scrolling multiple times to catch delayed React mounts and layout shifts
+            let attempts = 0;
+            const tryScroll = () => {
+                const el = document.querySelector(destination);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                attempts++;
+                if (attempts < 5) {
+                    setTimeout(tryScroll, 150);
+                }
+            };
+            tryScroll();
+
             history.replaceState(null, '', destination);
         });
     });
