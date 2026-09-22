@@ -11,9 +11,6 @@ import { useSectionTracking } from '@/hooks/use-section-tracking';
    Semua asset ada di public/assets-c12/ dan dirujuk sebagai /assets-c12/*
    ============================================================ */
 
-interface ProofPart { text: string; bold?: boolean }
-interface ProofToast { parts: ProofPart[]; time: string }
-
 /* Chrome 121+ menunda unduhan poster <video> yang masih jauh dari viewport
  * lewat `loading=lazy`, tetapi tipe React belum punya properti itu untuk
  * elemen video. */
@@ -144,20 +141,6 @@ const FAQ_ITEM_CATEGORIES: string[] = [
   "Jaminan & Garansi"
 ];
 
-const PROOF_CITIES: string[] = ['Jakarta', 'Surabaya', 'Bandung', 'Yogyakarta', 'Medan', 'Makassar', 'Semarang', 'Malang', 'Palembang', 'Denpasar', 'Bogor', 'Balikpapan'];
-const PROOF_GOALS: string[] = ['syarat Beasiswa LPDP', 'syarat skripsi & kelulusan S1', 'syarat pendaftaran S2 dalam negeri', 'syarat rekrutmen BUMN', 'syarat CPNS', 'syarat kenaikan jabatan kantor', 'kejar target skor 500+'];
-const PROOF_TIMES: string[] = ['Baru saja', '1 menit lalu', '2 menit lalu', '4 menit lalu'];
-
-function makeProof(): ProofToast {
-  const pick = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
-  const city = pick(PROOF_CITIES);
-  const time = pick(PROOF_TIMES);
-
-  return Math.random() > 0.5
-    ? { parts: [{ text: 'Seseorang di ' }, { text: city, bold: true }, { text: ' daftar kelas TOEFL.' }], time }
-    : { parts: [{ text: 'Peserta dari ' }, { text: city, bold: true }, { text: ' daftar untuk ' }, { text: pick(PROOF_GOALS), bold: true }, { text: '.' }], time };
-}
-
 /** Mengubah string deklarasi CSS menjadi objek style React (khusus nilai yang berubah saat runtime). */
 function css(decl: string): CSSProperties {
   const out: Record<string, string> = {};
@@ -253,8 +236,6 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
   const [showLmsOverlay, setShowLmsOverlay] = useState<boolean>(true);
   const [countdown, setCountdown] = useState<string>('12:00:00');
   const [flashVisible, setFlashVisible] = useState<boolean>(true);
-  const [proofToasts, setProofToasts] = useState<ProofToast[]>([]);
-  const [proofDismissed, setProofDismissed] = useState<boolean>(false);
   const [lmsDetailOpen, setLmsDetailOpen] = useState<boolean>(false);
   const [bundlingDetailOpen, setBundlingDetailOpen] = useState<boolean>(false);
   const [tutorPanelOpen, setTutorPanelOpen] = useState<boolean>(false);
@@ -265,10 +246,6 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const videoRef2 = useRef<HTMLVideoElement | null>(null);
   const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
-  const proofShown = useRef<number>(0);
-  const proofMax = useRef<number>(3);
-  const proofNext = useRef<number | undefined>(undefined);
-  const proofHide = useRef<number | undefined>(undefined);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
 
   useScrollTracking();
@@ -409,34 +386,6 @@ return;
     return () => window.clearTimeout(timer);
   }, []);
 
-  /* notifikasi social proof: jeda acak 10–20 detik, maksimal 3–4 kali per sesi */
-  useEffect(() => {
-    const queue = (delay: number): void => {
-      proofNext.current = window.setTimeout(() => {
-        if (proofShown.current >= proofMax.current) {
-return;
-}
-
-        const burst = proofShown.current > 0 && proofShown.current + 2 <= proofMax.current && Math.random() < 0.3;
-        const batch = burst ? [makeProof(), makeProof()] : [makeProof()];
-        proofShown.current += batch.length;
-        setProofToasts(batch);
-        proofHide.current = window.setTimeout(() => {
-          setProofToasts([]);
-
-          if (proofShown.current < proofMax.current) {
-queue(10000 + Math.random() * 10000);
-}
-        }, 5500);
-      }, delay);
-    };
-    queue(6000);
-
-    return () => {
- window.clearTimeout(proofNext.current); window.clearTimeout(proofHide.current); 
-};
-  }, []);
-
   /* survey exit-checkout: muncul saat pengunjung kembali ke tab ini */
   useEffect(() => {
     const onVisible = (): void => {
@@ -521,12 +470,6 @@ void videoRef2.current.play();
  sessionStorage.setItem('fb_wa_bubble_v3', '1'); 
 } catch { /* storage disabled */ }
   }, []);
-  const dismissProofToast = useCallback((): void => {
-    window.clearTimeout(proofNext.current);
-    window.clearTimeout(proofHide.current);
-    setProofToasts([]);
-    setProofDismissed(true);
-  }, []);
   const markCheckoutClicked = useCallback((): void => {
     try {
       localStorage.setItem('fb_checkout_clicked_at', String(Date.now()));
@@ -585,14 +528,14 @@ nextReview();
         {/* Navbar */}
         <div style={css(`height:${bannerH + 64}px;`)}></div>
         <header style={css(navStyle(scrolled, bannerH))}>
-          <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px] [overflow:hidden]">
+          <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px]">
             <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
-              <img loading="eager" decoding="async" fetchPriority="high" src="/logo/Logo-Fullbright.webp" width="400" height="400" alt="Full Bright Indonesia" className="[height:150px] [width:auto] [object-fit:contain] [display:block] [margin:-43px_0]" />
+              <img loading="eager" decoding="async" fetchPriority="high" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia" className="[height:auto] [width:160px] [object-fit:contain] [display:block]" />
             </a>
               <a href="#pricing" data-analytics-location="navbar_pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
               <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
               <span className="[display:flex] [align-items:center] [gap:5px]">
-                <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.55)] [white-space:nowrap]">Rp250rb</span>
+                <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.92)] [white-space:nowrap]">Rp250rb</span>
                 <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp99rb</span>
                 <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-60%</span>
               </span>
@@ -601,7 +544,7 @@ nextReview();
         </header>
       
         {/* Hero */}
-        <section className="[position:relative] [overflow:hidden] [background:linear-gradient(160deg,#fff_55%,#FFF5F5_100%)]">
+        <section id="hero" className="[position:relative] [overflow:hidden] [background:linear-gradient(160deg,#fff_55%,#FFF5F5_100%)]">
           <div className="[pointer-events:none] [position:absolute] [top:-96px] [right:-96px] [height:384px] [width:384px] [border-radius:9999px] [background:#D70808] [filter:blur(120px)] [opacity:0.07]"></div>
           <div className="[pointer-events:none] [position:absolute] [bottom:-96px] [left:-96px] [height:288px] [width:288px] [border-radius:9999px] [background:#151515] [filter:blur(100px)] [opacity:0.05]"></div>
       
@@ -650,7 +593,7 @@ nextReview();
       
               <div className="[display:flex] [justify-content:center] [align-items:flex-end] [grid-column:2] max-[899px]:[grid-column:1] max-[899px]:[margin-top:-4px]">
                 <div className="[width:100%] [max-width:560px] [position:relative] [align-self:stretch] [display:flex] [align-items:flex-end] [justify-content:center] max-[899px]:[max-width:250px] max-[899px]:[align-self:initial]">
-                  <img loading="eager" decoding="async" fetchPriority="high" src="/assets-c12/hero-consultant.webp" width="660" height="805" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
+                  <img loading="eager" decoding="async" fetchPriority="high" src="/assets-c12/hero-consultant.webp" srcSet="/assets-c12/hero-consultant-360.webp 360w, /assets-c12/hero-consultant.webp 660w" sizes="(max-width: 899px) 250px, 560px" width="660" height="805" alt="Konsultan Full Bright Indonesia siap membantu persiapan TOEFL kamu" className="[display:block] [width:100%] [height:auto] [max-height:min(72vh,660px)] [object-fit:contain] [object-position:bottom_center] [filter:drop-shadow(0_18px_40px_rgba(0,0,0,0.16))] [mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_78%,rgba(0,0,0,0.5)_92%,transparent_100%)] max-[899px]:[max-height:min(28vh,215px)] max-[899px]:[filter:drop-shadow(0_12px_28px_rgba(0,0,0,0.14))]" />
                   <div className="hidden min-[900px]:contents">
                     <div className="[position:absolute] [bottom:18px] [left:0] [display:flex] [max-width:216px] [align-items:center] [gap:10px] [border-radius:16px] [background:#fff] [padding:11px_14px] [box-shadow:0_8px_32px_rgba(0,0,0,0.14)]">
                       <span className="[font-size:22px]">🎓</span>
@@ -2607,54 +2550,24 @@ nextReview();
           </div>
         </>) : null}
       
-        {/* Social proof toast */}
-        {proofToasts.length > 0 && !proofDismissed && !waBubbleOpen ? (
-          <div className="[position:fixed] [left:20px] [bottom:20px] [z-index:51] [display:flex] [flex-direction:column] [gap:8px] max-[899px]:[left:12px] max-[899px]:[bottom:12px]">
-            {proofToasts.map((toast: ProofToast, ti: number) => (
-              <div key={ti} className="[position:relative] [width:250px] [max-width:calc(100vw_-_104px)] [border-radius:14px] [background:#fff] [border:1px_solid_#e5e5e5] [box-shadow:0_14px_40px_rgba(0,0,0,0.16)] [overflow:hidden] [animation:fbFadeInUp_0.4s_ease_both] max-[559px]:[width:214px] max-[559px]:[max-width:calc(100vw_-_92px)]">
-                <div className="[display:flex] [align-items:center] [gap:6px] [background:#FFE666] [border-bottom:1px_solid_#F2D34D] [padding:5px_11px] max-[559px]:[padding:4px_9px]">
-                  <span className="[display:block] [width:6px] [height:6px] [border-radius:9999px] [background:#151515]"></span>
-                  <span className="[font-size:10px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#151515] max-[559px]:[font-size:9px]">Pendaftaran Terbaru</span>
-                </div>
-                <div className="[display:flex] [align-items:center] [gap:10px] [padding:10px_12px] max-[559px]:[padding:8px_10px] max-[559px]:[gap:8px]">
-                  <span className="[position:relative] [display:flex] [flex-shrink:0] [align-items:center] [justify-content:center] [width:36px] [height:36px] [border-radius:9999px] [background:#FFF0F0] [border:2px_solid_#FFD9D9] [font-size:17px] max-[559px]:[width:30px] max-[559px]:[height:30px] max-[559px]:[font-size:14px]">🎓
-                    <span className="[position:absolute] [right:-2px] [bottom:-2px] [display:flex] [align-items:center] [justify-content:center] [width:15px] [height:15px] [border-radius:9999px] [background:#16a34a] [border:2px_solid_#fff] [font-size:8px] [font-weight:900] [color:#fff]">✓</span>
-                  </span>
-                  <div className="[flex:1] [min-width:0]">
-                    <p className="[margin:0_0_3px] [font-size:13px] [line-height:1.35] [font-weight:600] [color:#3d3d3d] max-[559px]:[font-size:16px] max-[559px]:[line-height:1.3]">
-                      {toast.parts.map((part: ProofPart, pi: number) => (
-                        <span key={pi} className={part.bold ? '[font-weight:900] [color:#151515]' : undefined}>{part.text}</span>
-                      ))}
-                    </p>
-                    <p className="[margin:0] [display:flex] [align-items:center] [gap:5px] [font-size:10.5px] [font-weight:800] [color:#16a34a] max-[559px]:[font-size:10px]">
-                      <span className="[display:block] [width:5px] [height:5px] [border-radius:9999px] [background:#16a34a]"></span>{toast.time} · Terverifikasi
-                    </p>
-                  </div>
-                  <button onClick={dismissProofToast} aria-label="Tutup" className="[flex-shrink:0] [align-self:flex-start] [background:none] [border:none] [cursor:pointer] [padding:0] [font-size:13px] [line-height:1] [color:#c4c4c4] [font-family:inherit]">✕</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : null}
-      
         {/* Floating WhatsApp */}
-        <div className="[position:fixed] [right:20px] [bottom:20px] [z-index:52]">
+        <div className="[position:fixed] [right:20px] [bottom:20px] [z-index:52] max-[559px]:[right:14px] max-[559px]:[bottom:14px]">
           {waBubbleOpen ? (<>
-            <div className="max-[559px]:[width:196px] max-[559px]:[right:4px] max-[559px]:[bottom:26px] max-[559px]:[padding:9px_11px_9px_10px] max-[559px]:[border-radius:13px_13px_5px_13px] [position:absolute] [right:6px] [bottom:30px] [width:270px] [border-radius:18px_18px_6px_18px] [background:#fff] [border:1px_solid_#e5e7eb] [box-shadow:0_10px_34px_rgba(0,0,0,0.18)] [padding:14px_16px_14px_14px]">
-              <button onClick={dismissWaBubble} aria-label="Tutup" className="[position:absolute] [top:-9px] [right:-9px] [display:flex] [align-items:center] [justify-content:center] [width:24px] [height:24px] [border-radius:9999px] [background:#151515] [color:#fff] [border:2px_solid_#fff] [font-size:12px] [font-weight:900] [cursor:pointer] [line-height:1] [padding:0]">✕</button>
-              <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20tertarik%20daftar%20kelas%20TOEFL%20Online." target="_blank" rel="noopener noreferrer" data-analytics-location="whatsapp_bubble" className="[display:flex] [align-items:flex-start] [gap:11px] [text-decoration:none]">
-                <img loading="lazy" decoding="async" src="/assets-c12/admin-avatar.webp" width="96" height="96" alt="Ms. Fini - Admin Full Bright" className="max-[559px]:[width:26px] max-[559px]:[height:26px] [width:43px] [height:45px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366]" />
+            <div className="[position:absolute] [right:6px] [bottom:70px] [width:270px] [border-radius:18px_18px_6px_18px] [background:#fff] [border:1px_solid_#e5e7eb] [box-shadow:0_10px_34px_rgba(0,0,0,0.18)] [padding:14px_16px_14px_14px] max-[559px]:[width:174px] max-[559px]:[right:0] max-[559px]:[bottom:58px] max-[559px]:[padding:8px_10px_8px_9px] max-[559px]:[border-radius:12px_12px_4px_12px]">
+              <button onClick={dismissWaBubble} aria-label="Tutup" className="[position:absolute] [top:-9px] [right:-9px] [display:flex] [align-items:center] [justify-content:center] [width:24px] [height:24px] [border-radius:9999px] [background:#151515] [color:#fff] [border:2px_solid_#fff] [font-size:12px] [font-weight:900] [cursor:pointer] [line-height:1] [padding:0] max-[559px]:[width:20px] max-[559px]:[height:20px] max-[559px]:[font-size:10px]">✕</button>
+              <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20tertarik%20daftar%20kelas%20TOEFL%20Online." target="_blank" rel="noopener noreferrer" data-analytics-location="whatsapp_bubble" className="[display:flex] [align-items:flex-start] [gap:11px] [text-decoration:none] max-[559px]:[gap:7px]">
+                <img loading="lazy" decoding="async" src="/assets-c12/admin-avatar.webp" width="96" height="96" alt="Ms. Fini - Admin Full Bright" className="[width:43px] [height:45px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] max-[559px]:[width:24px] max-[559px]:[height:24px]" />
                 <span className="[display:block]">
-                  <span className="max-[559px]:[font-size:10px] max-[559px]:[margin-bottom:1px] [display:block] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515] [margin-bottom:3px]">Ms. Fini - Admin Full Bright</span>
-                  <span className="[display:block] [font-size:15px] [line-height:1.5] [font-weight:600] [color:#3d3d3d]">Masih bingung atau ragu? Tanya langsung ke saya ☕</span>
-                  <span className="[display:inline-block] [margin-top:8px] [font-size:12px] [font-weight:900] [color:#16a34a]">Balas sekarang →</span>
+                  <span className="[display:block] [font-size:14px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#151515] [margin-bottom:3px] max-[559px]:[font-size:9px] max-[559px]:[margin-bottom:1px]">Ms. Fini - Admin Full Bright</span>
+                  <span className="[display:block] [font-size:15px] [line-height:1.5] [font-weight:600] [color:#3d3d3d] max-[559px]:[font-size:11px] max-[559px]:[line-height:1.35]">Masih bingung atau ragu? Tanya langsung ke saya ☕</span>
+                  <span className="[display:inline-block] [margin-top:8px] [font-size:12px] [font-weight:900] [color:#16a34a] max-[559px]:[margin-top:4px] max-[559px]:[font-size:10px]">Balas sekarang →</span>
                 </span>
               </a>
             </div>
           </>) : null}
-          <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20tertarik%20daftar%20kelas%20TOEFL%20Online." target="_blank" rel="noopener noreferrer" aria-label="Chat WhatsApp" data-analytics-location="floating_whatsapp" className="[position:relative] [display:flex] [height:58px] [width:58px] [align-items:center] [justify-content:center] [border-radius:9999px] [box-shadow:0_6px_22px_rgba(37,211,102,0.5)] [background:#25D366] [overflow:visible]">
+          <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20tertarik%20daftar%20kelas%20TOEFL%20Online." target="_blank" rel="noopener noreferrer" aria-label="Chat WhatsApp" data-analytics-location="floating_whatsapp" className="[position:relative] [display:flex] [height:58px] [width:58px] [align-items:center] [justify-content:center] [border-radius:9999px] [box-shadow:0_6px_22px_rgba(37,211,102,0.5)] [background:#25D366] [overflow:visible] max-[559px]:[height:50px] max-[559px]:[width:50px]">
             <span className="[display:flex] [align-items:center] [justify-content:center]">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.553 4.103 1.522 5.833L0 24l6.302-1.499A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.887 0-3.656-.494-5.192-1.358l-.373-.213-3.741.89.934-3.629-.243-.384A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="white" className="max-[559px]:[width:26px] max-[559px]:[height:26px]"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.553 4.103 1.522 5.833L0 24l6.302-1.499A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.887 0-3.656-.494-5.192-1.358l-.373-.213-3.741.89.934-3.629-.243-.384A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path></svg>
             </span>
           </a>
         </div>
