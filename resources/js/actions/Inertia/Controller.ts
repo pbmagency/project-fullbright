@@ -1250,6 +1250,84 @@ Controller6fa195aa8a9c5e80c1c5ee0d4fea5bd1.head = (options?: RouteQueryOptions):
     /**
 * @see \Inertia\Controller::__invoke
  * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+const Controller0c4f1f5fe0772b1bca28d166dc5c15c9 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url(options),
+    method: 'get',
+})
+
+Controller0c4f1f5fe0772b1bca28d166dc5c15c9.definition = {
+    methods: ["get","head"],
+    url: '/c12-price',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url = (options?: RouteQueryOptions) => {
+    return Controller0c4f1f5fe0772b1bca28d166dc5c15c9.definition.url + queryParams(options)
+}
+
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+Controller0c4f1f5fe0772b1bca28d166dc5c15c9.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url(options),
+    method: 'get',
+})
+/**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+Controller0c4f1f5fe0772b1bca28d166dc5c15c9.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+    const Controller0c4f1f5fe0772b1bca28d166dc5c15c9Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+        Controller0c4f1f5fe0772b1bca28d166dc5c15c9Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url(options),
+            method: 'get',
+        })
+            /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
+ * @route '/c12-price'
+ */
+        Controller0c4f1f5fe0772b1bca28d166dc5c15c9Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: Controller0c4f1f5fe0772b1bca28d166dc5c15c9.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    Controller0c4f1f5fe0772b1bca28d166dc5c15c9.form = Controller0c4f1f5fe0772b1bca28d166dc5c15c9Form
+    /**
+* @see \Inertia\Controller::__invoke
+ * @see vendor/inertiajs/inertia-laravel/src/Controller.php:13
  * @route '/dashboard'
  */
 const Controller42a740574ecbfbac32f8cc353fc32db9 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -1504,6 +1582,7 @@ const Controller = {
     '/c10-lp': Controller22e72a0de684440edf2941f8cdb6f9e2,
     '/c1-lp': Controller61d3222eb21da37214d76ec9302186e3,
     '/c11-problem': Controller6fa195aa8a9c5e80c1c5ee0d4fea5bd1,
+    '/c12-price': Controller0c4f1f5fe0772b1bca28d166dc5c15c9,
     '/dashboard': Controller42a740574ecbfbac32f8cc353fc32db9,
     '/c3-problem': Controller30577f290beec2f7e645688887f0890c,
     '/settings/appearance': Controllere19ee86e9cf603ce1a59a1ec5d21dec5,

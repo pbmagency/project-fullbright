@@ -1,0 +1,24 @@
+@import 'tailwindcss' source(none);
+
+/* Route-specific CSS keeps the public Cycle 12 landing page from loading the
+   dashboard and experiment styles bundled in app.css. */
+@source '../js/pages/cycle12/LandingPage.tsx';
+
+html {
+    scroll-behavior: smooth;
+    background: #fff;
+}
+
+body {
+    margin: 0;
+    background: #fff;
+    color: #151515;
+}
+
+/* Sections below the first viewport are expensive and image-heavy. Let the
+   browser defer their layout and paint until they approach the viewport. */
+section:not(:first-of-type),
+footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+}

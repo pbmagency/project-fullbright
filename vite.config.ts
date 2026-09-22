@@ -13,6 +13,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/cycle10.css',
+                'resources/css/cycle12.css',
+                'resources/js/landing-app.tsx',
                 'resources/js/app.tsx',
             ],
             ssr: 'resources/js/ssr.tsx',

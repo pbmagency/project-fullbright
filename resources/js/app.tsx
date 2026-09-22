@@ -21,7 +21,10 @@ function isLeanInitialPage(): boolean {
     try {
         const component = (JSON.parse(pageData) as { component?: string }).component;
 
-        return component?.startsWith('cycle10/') || component?.startsWith('cycle11/') || false;
+        return component?.startsWith('cycle10/')
+            || component?.startsWith('cycle11/')
+            || component?.startsWith('cycle12/')
+            || false;
     } catch {
         return false;
     }

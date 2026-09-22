@@ -41,11 +41,15 @@
         <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
               imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
               imagesizes="(max-width: 899px) 250px, 560px">
+    @elseif($page['component'] === 'cycle12/LandingPage')
+        <link rel="preload" href="/assets-c12/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high">
     @endif
 
     @viteReactRefresh
     @if($page['component'] === 'cycle10/LandingPage')
         @vite(['resources/css/cycle10.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+    @elseif($page['component'] === 'cycle12/LandingPage')
+        @vite(['resources/css/cycle12.css', 'resources/js/landing-app.tsx'])
     @else
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     @endif
@@ -55,7 +59,26 @@
 </head>
 
 <body class="font-sans antialiased">
-    <x-inertia::app />
+    @if($page['component'] === 'cycle12/LandingPage')
+        {{-- Immediate first paint while the interactive React page boots. --}}
+        <div id="app">
+            <div aria-hidden="true" style="min-height:100vh;background:#fff;color:#151515;font-family:Arial,sans-serif">
+                <div style="height:38px;display:flex;align-items:center;justify-content:center;background:#c10707;color:#fff;font-size:13px;font-weight:800">🔥 FLASH SALE SEPTEMBER · DISKON 60%</div>
+                <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #f3f4f6">
+                    <img src="/logo/Logo-Fullbright.webp" alt="" width="400" height="400" style="width:128px;height:64px;object-fit:contain">
+                    <span style="border-radius:999px;background:#d70808;color:#fff;padding:10px 18px;font-size:13px;font-weight:800">Lihat Harga</span>
+                </div>
+                <div style="max-width:1152px;margin:0 auto;padding:28px 24px 40px;text-align:center">
+                    <div style="display:inline-block;border-radius:999px;background:#fff0f0;color:#d70808;padding:7px 14px;font-size:11px;font-weight:800">PROGRAM TOEFL ONLINE TERSTRUKTUR</div>
+                    <h1 style="max-width:760px;margin:16px auto 12px;font-size:clamp(34px,7vw,58px);line-height:1.08;font-weight:900">Target TOEFL 500+ Kini Lebih Terarah</h1>
+                    <p style="max-width:620px;margin:0 auto 20px;color:#4b5563;font-size:16px;line-height:1.55">Belajar dengan materi terstruktur, latihan, dan pendampingan dari Full Bright Indonesia.</p>
+                    <img src="/assets-c12/hero-consultant.webp" alt="" width="660" height="805" fetchpriority="high" style="display:block;width:260px;height:225px;object-fit:contain;margin:0 auto">
+                </div>
+            </div>
+        </div>
+    @else
+        <x-inertia::app />
+    @endif
 
     <!-- Load non-essential telemetry outside the critical Lighthouse/user path.
          Our first-party /analytics/track still records the initial visit. -->
