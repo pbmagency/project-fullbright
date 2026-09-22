@@ -151,6 +151,21 @@ class ScalevWebhookTest extends TestCase
             ->assertOk()->assertJson(['submitted' => 0, 'paid' => 0]);
     }
 
+    public function test_c12_order_and_payment_are_attributed_to_c12(): void
+    {
+        $this->deliver($this->createdEvent('c12-price'))->assertNoContent();
+
+        $order = ScalevOrder::query()->sole();
+        $this->assertSame('/c12-price', $order->landing_source);
+        $this->get(route('cycle11.scalev-proof'))
+            ->assertOk()->assertJson(['submitted' => 0, 'paid' => 0]);
+
+        $this->deliver($this->paymentEvent('event_c12_paid'))->assertNoContent();
+
+        $analytic = UserAnalytic::query()->sole();
+        $this->assertSame('/c12-price', $analytic->event_data['landing_source']);
+    }
+
     public function test_attributed_payment_can_arrive_before_order_created(): void
     {
         $payment = $this->paymentEvent('event_paid_first');

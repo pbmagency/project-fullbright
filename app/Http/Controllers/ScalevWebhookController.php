@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Log;
 class ScalevWebhookController extends Controller
 {
     private const PAID_STATUSES = ['paid', 'settled'];
-    private const SOURCE = 'c11-problem';
+
+    private const LANDING_SOURCES = [
+        'c11-problem' => '/c11-problem',
+        'c12-price' => '/c12-price',
+    ];
 
     public function __invoke(Request $request): Response
     {
@@ -63,14 +67,15 @@ class ScalevWebhookController extends Controller
     private function handleOrderCreated(array $data): void
     {
         $orderId = $this->stringOrNull($data['id'] ?? null);
-        if ($orderId === null || ! $this->isC11Order($data)) {
+        $landingSource = $this->landingSource($data);
+        if ($orderId === null || $landingSource === null) {
             return;
         }
 
         $order = ScalevOrder::query()->firstOrNew(['scalev_order_id' => $orderId]);
         $wasPaid = $order->exists && in_array($order->payment_status, self::PAID_STATUSES, true);
         $previousStatus = $order->payment_status;
-        $order->fill($this->orderFields($data));
+        $order->fill($this->orderFields($data, $landingSource));
         $order->payment_status = $wasPaid ? $previousStatus : (string) ($data['payment_status'] ?? 'unpaid');
         if (in_array($order->payment_status, self::PAID_STATUSES, true) && $order->paid_at === null) {
             $order->paid_at = now();
@@ -82,7 +87,7 @@ class ScalevWebhookController extends Controller
         }
 
         // An unattributed payment may arrive first. Once order.created brings
-        // the c11 marker, apply that earlier signed delivery to the new order.
+        // a supported landing-page marker, apply that earlier signed delivery.
         ScalevWebhookEvent::query()
             ->whereIn('event', ['payment.received', 'payment.failed', 'order.payment_status_changed'])
             ->where('payload->data->id', $orderId)
@@ -107,8 +112,9 @@ class ScalevWebhookController extends Controller
 
         $order = ScalevOrder::query()->where('scalev_order_id', $orderId)->lockForUpdate()->first();
         // A payment can arrive before order.created, if it carries attribution.
-        if ($order === null && $this->isC11Order($data)) {
-            $fields = $this->orderFields($data);
+        $landingSource = $this->landingSource($data);
+        if ($order === null && $landingSource !== null) {
+            $fields = $this->orderFields($data, $landingSource);
             $fields['payment_status'] = 'unpaid';
             $order = ScalevOrder::create($fields);
         }
@@ -138,7 +144,7 @@ class ScalevWebhookController extends Controller
     /** @param array<string, mixed> $data
      *  @return array<string, mixed>
      */
-    private function orderFields(array $data): array
+    private function orderFields(array $data, string $landingSource): array
     {
         $customer = is_array($data['customer'] ?? null) ? $data['customer'] : [];
         $address = is_array($data['destination_address'] ?? null) ? $data['destination_address'] : [];
@@ -149,7 +155,7 @@ class ScalevWebhookController extends Controller
 
         return [
             'scalev_order_id' => (string) $data['id'],
-            'landing_source' => '/c11-problem',
+            'landing_source' => $landingSource,
             'scalev_order_number' => $this->stringOrNull($data['order_id'] ?? null),
             'secret_slug' => $this->stringOrNull($data['secret_slug'] ?? null),
             'package' => $package,
@@ -166,21 +172,23 @@ class ScalevWebhookController extends Controller
     }
 
     /** @param array<string, mixed> $data */
-    private function isC11Order(array $data): bool
+    private function landingSource(array $data): ?string
     {
         $metadata = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
         foreach ([$data['utm_source'] ?? null, $metadata['utm_source'] ?? null] as $value) {
-            if ($value === self::SOURCE) {
-                return true;
+            if (is_string($value) && isset(self::LANDING_SOURCES[$value])) {
+                return self::LANDING_SOURCES[$value];
             }
         }
 
         $sourceUrl = $this->stringOrNull($metadata['event_source_url'] ?? $data['event_source_url'] ?? null);
         if ($sourceUrl === null) {
-            return false;
+            return null;
         }
         parse_str((string) parse_url($sourceUrl, PHP_URL_QUERY), $query);
-        return ($query['utm_source'] ?? null) === self::SOURCE;
+        $source = $query['utm_source'] ?? null;
+
+        return is_string($source) ? (self::LANDING_SOURCES[$source] ?? null) : null;
     }
 
     /** @param array<string, mixed> $data */
@@ -200,7 +208,7 @@ class ScalevWebhookController extends Controller
                 'currency' => 'IDR',
                 'payment_method' => $order->payment_method,
                 'event_id' => $order->scalev_order_id,
-                'landing_source' => '/c11-problem',
+                'landing_source' => $order->landing_source ?? '/c11-problem',
                 'timestamp' => now()->toIso8601String(),
             ],
             'referral_source' => 'scalev',

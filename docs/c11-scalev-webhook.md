@@ -1,12 +1,14 @@
-# Scalev webhook for `/c11-problem`
+# Scalev webhook for `/c11-problem` and `/c12-price`
 
 The pricing buttons keep using Full Bright's existing Scalev checkout pages. Each
-button adds `utm_source=c11-problem` and a package-specific `utm_content`. The
-webhook stores only orders carrying the c11 marker; the public LP fetches only
-aggregate counts and an anonymous recent-order notice from
-`/c11-problem/scalev-proof`. The page polls every 10 seconds. The popup uses the
-city only when Scalev sends one in `destination_address.city`; it does not invent
-a registration goal such as scholarship or recruitment.
+button adds its landing-page source (`c11-problem` or `c12-price`) and a
+package-specific `utm_content`. The webhook stores only orders carrying one of
+those supported markers and records payments against the matching landing page.
+The public C11 LP fetches only C11 aggregate counts and an anonymous recent-order
+notice from `/c11-problem/scalev-proof`; C12 orders never appear in that proof.
+The C11 page polls every 10 seconds. The popup uses the city only when Scalev
+sends one in `destination_address.city`; it does not invent a registration goal
+such as scholarship or recruitment.
 
 To activate this on a deployed HTTPS site:
 
@@ -18,11 +20,11 @@ To activate this on a deployed HTTPS site:
    `payment.received`, `payment.failed`, and `order.payment_status_changed`,
    then activate it. Scalev sends a signed `business.test_event` on first save;
    the endpoint responds with 204 when the signing secret matches.
-4. Submit one test order using a button on `/c11-problem` and inspect the signed
-   `order.created` event. Confirm its `data.utm_source` or
-   `data.metadata.event_source_url` carries `c11-problem`. If the hosted
+4. Submit test orders using buttons on `/c11-problem` and `/c12-price`, then
+   inspect the signed `order.created` events. Confirm `data.utm_source` or
+   `data.metadata.event_source_url` carries the matching source. If the hosted
    checkout does not retain that parameter, source attribution needs a
-   supported Scalev setting before public counts can appear.
+   supported Scalev setting before analytics or public counts can appear.
 5. Check the proof endpoint after order creation and after a test payment. It
    returns `submitted`, `paid`, and a recent anonymous submission without buyer
    name, phone, or email. A new order should trigger the LP popup.
