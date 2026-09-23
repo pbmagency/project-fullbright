@@ -123,7 +123,7 @@
     @if($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">
-            <a class="c12-banner" href="#pricing" data-analytics-location="banner_pricing">
+            <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_september_diskon_60_banner">
                 <span class="c12-banner-label-full">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
                 <span class="c12-banner-label-short">🔥 FLASH SALE SEPTEMBER · 60%</span>
                 <span class="c12-banner-time" data-c12-countdown>12:00:00</span>
@@ -131,8 +131,8 @@
             <div class="c12-nav-space"></div>
             <header class="c12-nav">
                 <div class="c12-nav-inner">
-                    <a href="#" aria-label="Full Bright Indonesia"><img class="c12-logo" src="/logo/Logo-Fullbright.webp" width="400" height="400" alt="Full Bright Indonesia"></a>
-                    <a class="c12-nav-cta" href="#pricing" data-analytics-location="navbar_pricing">
+                    <a href="#" aria-label="Full Bright Indonesia" data-analytics-location="logo_full_bright_navbar"><img class="c12-logo" src="/logo/Logo-Fullbright.webp" width="400" height="400" alt="Full Bright Indonesia"></a>
+                    <a class="c12-nav-cta" href="#pricing" data-analytics-location="amankan_seat_navbar">
                         <span>🎓 Amankan Seat</span>
                         <span class="c12-nav-price-row"><span class="c12-nav-price-old">Rp250rb</span><span class="c12-nav-price">Rp99rb</span><span class="c12-nav-discount">-60%</span></span>
                     </a>
@@ -153,8 +153,8 @@
                         <p><strong>Persiapkan dari sekarang</strong> dengan strategi <strong>belajar 1 jam sehari</strong> yang telah membantu <strong>45.000+ alumni</strong> meraih <strong>beasiswa impian</strong> mereka.</p>
                         <div class="c12-trust-badges"><span>✓ Lembaga Resmi ITP &amp; IIEF</span><span>✓ 13+ Tahun Pengalaman</span></div>
                         <div class="c12-hero-actions">
-                            <a class="c12-button c12-button-primary" href="#pricing" data-analytics-location="hero_pricing">Mulai Persiapan TOEFL →</a>
-                            <a class="c12-button c12-button-secondary" href="#testimonials" data-analytics-location="hero_testimonials">Lihat Bukti Alumni →</a>
+                            <a class="c12-button c12-button-primary" href="#pricing" data-analytics-location="mulai_persiapan_toefl_hero">Mulai Persiapan TOEFL →</a>
+                            <a class="c12-button c12-button-secondary" href="#testimonials" data-analytics-location="lihat_bukti_alumni_hero">Lihat Bukti Alumni →</a>
                         </div>
                         <div class="c12-trust"><span>★★★★★ 4.9/5 Google Review</span><span>• 45.000+ Alumni Sukses</span><span>• 🛡 Garansi 100%</span></div>
                     </div>
