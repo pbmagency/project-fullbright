@@ -193,9 +193,6 @@ const surveyMsgStyle = (answered: boolean): string =>
 const lbImgStyle = (i: number | null): string =>
   `height:80vh;width:340px;max-width:80vw;border-radius:16px;background-image:url('${WA_SCREENSHOTS[i ?? 0].src}');background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);`;
 
-const rvImgStyle = (i: number | null): string =>
-  `height:85vh;width:400px;max-width:90vw;border-radius:16px;background-image:url('${reviewSrc(i ?? 0)}');background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);`;
-
 const gSideStyle = (side: 'prev' | 'next', gIdx: number): string => {
   const idx = side === 'prev' ? (gIdx - 1 + REVIEW_COUNT) % REVIEW_COUNT : (gIdx + 1) % REVIEW_COUNT;
   const left = side === 'prev' ? 'calc(50% - 260px)' : 'calc(50% + 100px)';
@@ -1707,10 +1704,23 @@ nextReview();
         {/* Review Lightbox */}
         {reviewIdx !== null ? (<>
           <div className="[position:fixed] [inset:0] [z-index:50] [display:flex] [align-items:center] [justify-content:center] [background:rgba(0,0,0,0.92)]" onClick={closeReview}>
-            <button onClick={closeReview} className="[position:absolute] [top:16px] [right:16px] [background:none] [border:none] [color:rgba(255,255,255,0.7)] [font-size:28px] [cursor:pointer]">✕</button>
             <button onClick={prevReview} className="[position:absolute] [left:16px] [background:none] [border:none] [color:rgba(255,255,255,0.7)] [font-size:36px] [cursor:pointer] [padding:8px]">‹</button>
             <div className="[display:flex] [flex-direction:column] [align-items:center] [gap:16px] [padding:0_64px]" onClick={(e) => e.stopPropagation()}>
-              <div role="img" aria-label="Review" style={css(rvImgStyle(reviewIdx))}></div>
+              <div className="[position:relative]">
+                <img
+                  src={reviewSrc(reviewIdx)}
+                  alt={`Review Google alumni ${reviewIdx + 1}`}
+                  className="[display:block] [height:auto] [width:auto] [max-height:85vh] [max-width:90vw] [border-radius:16px] [box-shadow:0_24px_80px_rgba(0,0,0,0.6)]"
+                />
+                <button
+                  type="button"
+                  aria-label="Tutup foto review"
+                  onClick={closeReview}
+                  className="[position:absolute] [top:-44px] [right:0] [z-index:1] [display:flex] [height:40px] [width:40px] [align-items:center] [justify-content:center] [border-radius:9999px] [border:1px_solid_rgba(255,255,255,0.35)] [background:rgba(0,0,0,0.65)] [color:#fff] [font-size:24px] [line-height:1] [cursor:pointer] [box-shadow:0_4px_16px_rgba(0,0,0,0.35)]"
+                >
+                  ✕
+                </button>
+              </div>
               <p className="[margin:0] [font-size:12px] [color:rgba(255,255,255,0.4)]">{(reviewIdx ?? 0) + 1} / {REVIEW_COUNT}</p>
             </div>
             <button onClick={nextReview} className="[position:absolute] [right:16px] [background:none] [border:none] [color:rgba(255,255,255,0.7)] [font-size:36px] [cursor:pointer] [padding:8px]">›</button>
