@@ -22,3 +22,13 @@ body {
     content-visibility: auto;
     contain-intrinsic-size: auto 900px;
 }
+
+.c10-observe-marquees .c10-marquee:not(.c10-marquee-visible) .c10-marquee-track {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .c10-marquee-track {
+        animation: none !important;
+    }
+}

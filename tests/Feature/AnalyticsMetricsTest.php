@@ -16,6 +16,28 @@ class AnalyticsMetricsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_c10_bounce_comparison_splits_visits_at_1523_wib(): void
+    {
+        $cutoff = Carbon::parse('2026-09-24 08:23:00', 'UTC');
+        $this->event('before-bounce', 'visit', '/c10-lp', $cutoff->copy()->subSecond());
+        $this->event('before-engaged', 'visit', '/c10-lp', $cutoff->copy()->subMinute());
+        $this->event('before-engaged', 'scroll', '/c10-lp', $cutoff->copy()->addMinute(), ['depth' => 25]);
+        $this->event('after-bounce', 'visit', '/c10-lp/', $cutoff);
+        $this->event('other-page', 'visit', '/c11-problem', $cutoff);
+
+        $result = app(AbTestingService::class)->getC10BounceComparison(
+            $cutoff->copy()->subHour(),
+            $cutoff->copy()->addHour(),
+        );
+
+        $this->assertSame(2, $result['before']['visits']);
+        $this->assertSame(1, $result['before']['bounces']);
+        $this->assertSame(50.0, $result['before']['bounce_rate']);
+        $this->assertSame(1, $result['after']['visits']);
+        $this->assertSame(1, $result['after']['bounces']);
+        $this->assertSame(100.0, $result['after']['bounce_rate']);
+    }
+
     public function test_tracking_endpoint_keeps_browser_sessions_separate_and_updates_rates(): void
     {
         $events = [

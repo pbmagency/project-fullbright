@@ -118,6 +118,7 @@ const CHART_COLORS = [
 
 const LIVE_REFRESH_PROPS = [
     'matrix',
+    'c10_bounce_comparison',
     'funnel',
     'quality',
     'devices',
@@ -132,6 +133,7 @@ const LIVE_REFRESH_PROPS = [
 
 export default function LabsIndex({
     matrix: rawMatrix,
+    c10_bounce_comparison: c10BounceComparison,
     funnel: rawFunnel,
     quality: rawQuality,
     devices: rawDevices,
@@ -707,6 +709,34 @@ export default function LabsIndex({
                     )}
                 </div>
 
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Bounce /c10-lp — Sebelum &amp; Sesudah Perbaikan</CardTitle>
+                        <CardDescription>
+                            Penanda: 24 September 2026, 15.23 WIB. Sesi dikelompokkan menurut waktu kunjungan; angka mengikuti rentang tanggal dan source yang dipilih.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        {(['before', 'after'] as const).map((period) => {
+                            const cohort = c10BounceComparison[period];
+
+                            return (
+                                <div key={period} className="rounded-lg border p-4">
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        {period === 'before' ? 'Sebelum 15.23 WIB' : 'Sejak 15.23 WIB'}
+                                    </p>
+                                    <p className="mt-2 text-2xl font-bold text-foreground">
+                                        {cohort.bounce_rate === null ? '—' : `${formatPercent(cohort.bounce_rate, 1)}%`}
+                                    </p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+
                 {!hasData ? (
                     <Card className="py-16 text-center">
                         <CardContent>
@@ -777,7 +807,7 @@ export default function LabsIndex({
                                                         }
                                                         className="flex items-center gap-1 hover:text-foreground"
                                                     >
-                                                        Bounce
+                                                        Bounce (full range)
                                                         <ArrowUpDown className="h-3 w-3" />
                                                     </button>
                                                 </th>
@@ -1008,7 +1038,7 @@ export default function LabsIndex({
                                                         </div>
                                                         <div>
                                                             <span className="text-muted-foreground">
-                                                                Bounce:
+                                                                Bounce (full range):
                                                             </span>{' '}
                                                             <span
                                                                 className={

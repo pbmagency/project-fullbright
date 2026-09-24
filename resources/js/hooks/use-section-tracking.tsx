@@ -133,11 +133,25 @@ export function useSectionTracking() {
         };
 
         // Initial scan after first paint
-        requestAnimationFrame(scanAndObserve);
+        let scanFrame = requestAnimationFrame(scanAndObserve);
 
         // Watch for lazy-loaded sections being inserted into the DOM so they
         // are picked up without requiring a full re-mount of this hook.
-        const mutationObserver = new MutationObserver(scanAndObserve);
+        const mutationObserver = new MutationObserver((records) => {
+            const hasNewSection = records.some((record) =>
+                Array.from(record.addedNodes).some((node) =>
+                    node instanceof Element &&
+                    (node.matches('section[id]') || node.querySelector('section[id]')),
+                ),
+            );
+
+            if (!hasNewSection) {
+                return;
+            }
+
+            cancelAnimationFrame(scanFrame);
+            scanFrame = requestAnimationFrame(scanAndObserve);
+        });
         mutationObserver.observe(document.body, {
             childList: true,
             subtree: true,
@@ -146,6 +160,7 @@ export function useSectionTracking() {
         return () => {
             observer.disconnect();
             mutationObserver.disconnect();
+            cancelAnimationFrame(scanFrame);
             // Cancel all pending dwell timers on unmount
             activeTimers.forEach(clearTimeout);
             activeTimers.clear();

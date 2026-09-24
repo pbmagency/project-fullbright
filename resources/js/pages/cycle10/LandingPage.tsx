@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react';
 import { generateEventId, useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
@@ -249,6 +249,7 @@ function CountdownText() {
 function GoogleReviewCarousel({ onOpen }: { onOpen: (i: number) => void }) {
   const [gIdx, setGIdx] = useState<number>(0);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const prevGoogle = useCallback((): void => setGIdx((i) => (i - 1 + REVIEW_COUNT) % REVIEW_COUNT), []);
   const nextGoogle = useCallback((): void => setGIdx((i) => (i + 1) % REVIEW_COUNT), []);
@@ -262,10 +263,8 @@ function GoogleReviewCarousel({ onOpen }: { onOpen: (i: number) => void }) {
     }
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.disconnect();
-      }
+      setIsPlaying(entry.isIntersecting);
+      if (entry.isIntersecting) setIsVisible(true);
     }, { rootMargin: '400px 0px' });
 
     observer.observe(root);
@@ -274,11 +273,11 @@ function GoogleReviewCarousel({ onOpen }: { onOpen: (i: number) => void }) {
   }, []);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isPlaying || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const id = window.setInterval(() => setGIdx((i) => (i + 1) % REVIEW_COUNT), 3000);
     return () => window.clearInterval(id);
-  }, [isVisible]);
+  }, [isPlaying]);
 
   if (!isVisible) {
     return <div ref={rootRef} aria-hidden="true" className="[height:280px] [margin-top:48px]" />;
@@ -334,7 +333,7 @@ export default function LandingPage() {
   }, [trackVisit]);
 
   useEffect(() => {
-    const reveal = (): void => setRenderDeferredContent(true);
+    const reveal = (): void => startTransition(() => setRenderDeferredContent(true));
 
     if ('requestIdleCallback' in window) {
       const idleId = window.requestIdleCallback(reveal, { timeout: 1200 });
@@ -346,6 +345,24 @@ export default function LandingPage() {
 
     return () => globalThis.clearTimeout(timeoutId);
   }, []);
+
+  // The three wide marquees are expensive to composite on slower GPUs.
+  // Keep their animation paused until the strip is near the viewport.
+  useEffect(() => {
+    if (!renderDeferredContent || !('IntersectionObserver' in window)) return;
+    const strips = document.querySelectorAll<HTMLElement>('.c10-marquee');
+    document.documentElement.classList.add('c10-observe-marquees');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle('c10-marquee-visible', entry.isIntersecting);
+      });
+    }, { rootMargin: '200px 0px' });
+    strips.forEach((strip) => observer.observe(strip));
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove('c10-observe-marquees');
+    };
+  }, [renderDeferredContent]);
 
   const handleTrackedClick = useCallback((event: ReactMouseEvent<HTMLDivElement>): void => {
     const target = event.target;
@@ -672,8 +689,8 @@ export default function LandingPage() {
         {/* Social Proof Strip: Alumni Abroad */}
         <div className="[background:#F3F3F3] [padding:32px_0] [overflow:hidden]">
           <p className="[margin:0_0_18px] [text-align:center] [font-size:12px] [font-weight:700] [letter-spacing:0.08em] [text-transform:uppercase] [color:#4b5563]">Alumni Kami Sekarang Kuliah Di</p>
-          <div className="[overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-            <div className="[display:flex] [width:max-content] [animation:infiniteScroll_30s_linear_infinite]">
+          <div className="c10-marquee [overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+            <div className="c10-marquee-track [display:flex] [width:max-content] [animation:infiniteScroll_30s_linear_infinite]">
               
                 <img src="/assets/c11-logos/ui.webp" alt="Universitas Indonesia" loading="lazy" width="110" height="64" className="[width:110px] [height:64px] [margin:0_20px] [flex-shrink:0] [object-fit:contain]" />
               
@@ -1351,8 +1368,8 @@ export default function LandingPage() {
               </div>
       
       
-              <div className="[margin-bottom:56px] [overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-                <div className="[display:flex] [width:max-content] [animation:infiniteScroll_35s_linear_infinite]">
+              <div className="c10-marquee [margin-bottom:56px] [overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+                <div className="c10-marquee-track [display:flex] [width:max-content] [animation:infiniteScroll_35s_linear_infinite]">
                   
                     <div className="[margin:0_8px] [display:flex] [flex-shrink:0] [flex-direction:column] [align-items:center] [gap:8px]">
                       <p className="[margin:0] [font-size:16px] [font-weight:800] [font-family:Nunito,sans-serif] [color:#151515]">Skor <span className="[color:#D70808]">547</span></p>
@@ -1472,8 +1489,8 @@ export default function LandingPage() {
                 </div>
               </div>
       
-              <div className="[margin-top:40px] [overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-                <div className="[display:flex] [width:max-content] [animation:infiniteScroll_40s_linear_infinite]">
+              <div className="c10-marquee [margin-top:40px] [overflow:hidden] [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+                <div className="c10-marquee-track [display:flex] [width:max-content] [animation:infiniteScroll_40s_linear_infinite]">
                   
                     <div className="[margin:0_12px] [display:flex] [flex-shrink:0] [align-items:center] [gap:12px] [border-radius:16px] [border:1px_solid_#f3f4f6] [background:#fff] [padding:16px_20px] [width:220px] [box-shadow:0_2px_12px_rgba(0,0,0,0.06)]">
                       <img src="/assets/reviews/rani.webp" alt="Kak Rani" width={36} height={36} loading="lazy" className="[height:36px] [width:36px] [flex-shrink:0] [border-radius:9999px] [object-fit:cover]" />

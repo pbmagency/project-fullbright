@@ -137,6 +137,12 @@ export interface LabsFilters {
 
 export interface LabsPageProps {
     matrix: MatrixItem[];
+    c10_bounce_comparison: {
+        cutoff: string;
+        timezone: string;
+        before: { visits: number; bounces: number; bounce_rate: number | null };
+        after: { visits: number; bounces: number; bounce_rate: number | null };
+    };
     funnel: FunnelItem[];
     quality: QualityItem[];
     devices: DeviceData[];

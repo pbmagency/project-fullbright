@@ -207,6 +207,7 @@
     <script>
         (function () {
             var loaded = false;
+            var scrollIdleTimer;
 
             function appendScript(src) {
                 var script = document.createElement('script');
@@ -219,6 +220,11 @@
             function loadTelemetry() {
                 if (loaded) return;
                 loaded = true;
+                window.clearTimeout(scrollIdleTimer);
+                ['pointerdown', 'touchstart', 'keydown'].forEach(function (eventName) {
+                    window.removeEventListener(eventName, loadTelemetry);
+                });
+                window.removeEventListener('scroll', scheduleTelemetryAfterScroll);
 
                 window.dataLayer = window.dataLayer || [];
                 window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -258,9 +264,15 @@
                 appendScript('https://a.plerdy.com/public/js/click/main.js');
             }
 
-            ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(function (eventName) {
+            function scheduleTelemetryAfterScroll() {
+                window.clearTimeout(scrollIdleTimer);
+                scrollIdleTimer = window.setTimeout(loadTelemetry, 1200);
+            }
+
+            ['pointerdown', 'touchstart', 'keydown'].forEach(function (eventName) {
                 window.addEventListener(eventName, loadTelemetry, { once: true, passive: true });
             });
+            window.addEventListener('scroll', scheduleTelemetryAfterScroll, { passive: true });
 
             // Preserve telemetry for visitors who read without interacting,
             // while keeping it out of initial rendering and short synthetic runs.

@@ -39,12 +39,13 @@ class LabsController extends Controller
         // Labs can show stale visit, engagement, and lead numbers for 30 minutes
         // after a visitor interacts with a landing page.
         $dataVersion = UserAnalytic::query()->max('id') ?? 0;
-        $cacheKey = "ab_testing_v13_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}";
+        $cacheKey = "ab_testing_v14_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}";
 
         // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
             return [
                 'matrix' => $this->abTestingService->getPerformanceMatrix($startDate, $endDate, $sourceFilter),
+                'c10_bounce_comparison' => $this->abTestingService->getC10BounceComparison($startDate, $endDate, $sourceFilter),
                 'funnel' => $this->abTestingService->getSplitFunnel($startDate, $endDate, $sourceFilter),
                 'quality' => $this->abTestingService->getQualityAnalysis($startDate, $endDate, $sourceFilter),
                 'devices' => $this->abTestingService->getDevicePerformance($startDate, $endDate, $sourceFilter),
@@ -103,7 +104,7 @@ class LabsController extends Controller
 
         $sourceKey = $sourceFilter ?? 'all';
         $dataVersion = UserAnalytic::query()->max('id') ?? 0;
-        Cache::forget("ab_testing_v13_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}");
+        Cache::forget("ab_testing_v14_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}");
 
         return response()->json(['success' => true, 'message' => 'Cache cleared successfully']);
     }

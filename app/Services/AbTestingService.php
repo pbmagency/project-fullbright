@@ -11,6 +11,44 @@ class AbTestingService
 {
     public function __construct(private readonly AnalyticsMetricsService $metrics) {}
 
+    /** Bounce cohorts for the Cycle 10 performance change, split by visit time. */
+    public function getC10BounceComparison(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
+    {
+        $cutoff = Carbon::parse('2026-09-24 15:23:00', 'Asia/Jakarta')->utc();
+        $periods = [
+            'before' => ['<', $cutoff],
+            'after' => ['>=', $cutoff],
+        ];
+        $result = [
+            'cutoff' => $cutoff->toIso8601String(),
+            'timezone' => 'Asia/Jakarta',
+        ];
+
+        foreach ($periods as $name => [$operator, $boundary]) {
+            $visits = DB::table('user_analytics as v')
+                ->where('v.event_type', 'visit')
+                ->whereBetween('v.created_at', [$startDate, $endDate])
+                ->where('v.created_at', $operator, $boundary)
+                ->whereIn('v.event_data->landing_source', ['/c10-lp', '/c10-lp/'])
+                ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('v.referral_source', $sourceFilter));
+
+            $total = (clone $visits)->distinct()->count('v.session_id');
+            // Engagement may happen after the cutoff for a visitor who arrived before it.
+            // Use the selected report window for engagement, and the visit time for cohorts.
+            $bounced = clone $visits;
+            $this->metrics->applyBounceConditions($bounced, $startDate, $endDate, 'v');
+            $bounceCount = $bounced->distinct()->count('v.session_id');
+
+            $result[$name] = [
+                'visits' => $total,
+                'bounces' => $bounceCount,
+                'bounce_rate' => $total > 0 ? round($bounceCount / $total * 100, 2) : null,
+            ];
+        }
+
+        return $result;
+    }
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     public function getPerformanceMatrix(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array
