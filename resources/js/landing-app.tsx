@@ -178,7 +178,10 @@ const idleWindow = window as Window & {
     ) => number;
 };
 
-window.setTimeout(() => {
+// Start loading the rest of the page after the first paint. Delaying this for
+// eight seconds leaves only the server-rendered hero in the document, so users
+// cannot scroll beyond it until the React bundle finally mounts.
+window.requestAnimationFrame(() => {
     if (idleWindow.requestIdleCallback) {
         idleWindow.requestIdleCallback(() => void mountInteractivePage(), {
             timeout: 1200,
@@ -186,7 +189,7 @@ window.setTimeout(() => {
     } else {
         void mountInteractivePage();
     }
-}, 8000);
+});
 
 const interactiveRoot = document.getElementById('app');
 
@@ -201,6 +204,14 @@ if (interactiveRoot && 'IntersectionObserver' in window) {
 }
 
 window.addEventListener('pointerdown', () => void mountInteractivePage(), {
+    once: true,
+    passive: true,
+});
+window.addEventListener('wheel', () => void mountInteractivePage(), {
+    once: true,
+    passive: true,
+});
+window.addEventListener('touchstart', () => void mountInteractivePage(), {
     once: true,
     passive: true,
 });
