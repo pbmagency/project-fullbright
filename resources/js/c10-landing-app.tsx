@@ -41,7 +41,7 @@ export async function mountC10App(): Promise<void> {
     if (!root) return;
 
     // Sembunyikan skeleton server-rendered — React akan render konten interaktif
-    await createInertiaApp({
+    const criticalEl = document.getElementById('c10-critical'); if (criticalEl) criticalEl.style.display = 'none'; await createInertiaApp({
         page: initialC10Page(root),
         // C10 LP tidak butuh shared layout (no sidebar/navbar dari app)
         resolve: () => ({ default: LandingPage }),
