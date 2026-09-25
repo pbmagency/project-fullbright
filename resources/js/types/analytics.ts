@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // Labs Analytics — Shared Type Definitions
 // Matches the data shapes returned by AbTestingService.php
 // ============================================================
@@ -144,6 +144,11 @@ export interface LabsPageProps {
         after: { visits: number; bounces: number; bounce_rate: number | null };
     };
     landing_bounce_since_cutoff: {
+        cutoff: string;
+        timezone: string;
+        pages: Record<string, { visits: number; bounces: number; bounce_rate: number | null }>;
+    };
+    landing_bounce_since_1600_cutoff: {
         cutoff: string;
         timezone: string;
         pages: Record<string, { visits: number; bounces: number; bounce_rate: number | null }>;

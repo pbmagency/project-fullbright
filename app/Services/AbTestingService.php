@@ -82,6 +82,39 @@ class AbTestingService
         return $result;
     }
 
+    public function getLandingBounceSince1600Cutoff(?string $sourceFilter = null): array
+    {
+        $cutoff = Carbon::parse('2026-09-25 16:00:00', 'Asia/Jakarta')->utc();
+        $endDate = Carbon::now('UTC');
+        $result = [
+            'cutoff' => $cutoff->toIso8601String(),
+            'timezone' => 'Asia/Jakarta',
+            'pages' => [],
+        ];
+
+        foreach (['/c10-lp', '/c12-price'] as $page) {
+            $visits = DB::table('user_analytics as v')
+                ->where('v.event_type', 'visit')
+                ->whereBetween('v.created_at', [$cutoff, $endDate])
+                ->whereIn('v.event_data->landing_source', [$page, "{$page}/"])
+                ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('v.referral_source', $sourceFilter));
+
+            $total = (clone $visits)->distinct()->count('v.session_id');
+            $bounced = clone $visits;
+            $this->metrics->applyBounceConditions($bounced, $cutoff, $endDate, 'v');
+            $bounceCount = $bounced->distinct()->count('v.session_id');
+
+            $result['pages'][$page] = [
+                'visits' => $total,
+                'bounces' => $bounceCount,
+                'bounce_rate' => $total > 0 ? round($bounceCount / $total * 100, 2) : null,
+            ];
+        }
+
+        return $result;
+    }
+
+
     /** Hourly bounce breakdown for /c10-lp since 14:50 today */
     public function getC10HourlyBounceSince1450(?string $sourceFilter = null): array
     {
@@ -937,3 +970,4 @@ class AbTestingService
         return $this->safeDiv($numerator, $denominator) * 100;
     }
 }
+

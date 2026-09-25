@@ -120,6 +120,7 @@ const LIVE_REFRESH_PROPS = [
     'matrix',
     'c10_bounce_comparison',
     'landing_bounce_since_cutoff',
+    'landing_bounce_since_1600_cutoff',
     'c10_hourly_bounce',
     'funnel',
     'quality',
@@ -137,6 +138,7 @@ export default function LabsIndex({
     matrix: rawMatrix,
     c10_bounce_comparison: c10BounceComparison,
     landing_bounce_since_cutoff: landingBounceSinceCutoff,
+    landing_bounce_since_1600_cutoff: landingBounceSince1600Cutoff,
     c10_hourly_bounce: c10HourlyBounce,
     funnel: rawFunnel,
     quality: rawQuality,
@@ -151,7 +153,7 @@ export default function LabsIndex({
 }: LabsPageProps) {
     useLiveAnalyticsRefresh(LIVE_REFRESH_PROPS);
 
-    // Normalise all props — PHP Collections can serialize as objects
+    // Normalise all props � PHP Collections can serialize as objects
     const matrix = toSafeArray<MatrixItem>(rawMatrix);
     const safeFunnel = toSafeArray<FunnelItem>(rawFunnel);
     const quality = toSafeArray(rawQuality);
@@ -191,7 +193,7 @@ export default function LabsIndex({
         return undefined;
     });
 
-    // ── Page Filter (localStorage persisted) ──────────────────
+    // -- Page Filter (localStorage persisted) ------------------
     // Normalize any landing_source to a clean pathname (strip protocol+domain if present)
     const normalizePath = useCallback((source: string): string => {
         try {
@@ -203,7 +205,7 @@ export default function LabsIndex({
             // ignore invalid URLs
         }
 
-        // Already a path — ensure it starts with /
+        // Already a path � ensure it starts with /
         return source.startsWith('/') ? source : `/${source}`;
     }, []);
 
@@ -255,7 +257,7 @@ export default function LabsIndex({
 
     const clearPageFilter = () => setSelectedPages([]);
 
-    // ── Filtered data (page filter applied) ──────────────────
+    // -- Filtered data (page filter applied) ------------------
     const isPageFiltered = selectedPages.length > 0;
     // Normalize both sides so /test-v1 matches whether stored as path or full URL
     const pageMatch = useCallback(
@@ -715,7 +717,7 @@ export default function LabsIndex({
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Bounce /c10-lp — Sebelum &amp; Sesudah Perbaikan</CardTitle>
+                        <CardTitle>Bounce /c10-lp � Sebelum &amp; Sesudah Perbaikan</CardTitle>
                         <CardDescription>
                             Penanda: 24 September 2026, 15.23 WIB. Sesi dikelompokkan menurut waktu kunjungan; angka mengikuti rentang tanggal dan source yang dipilih.
                         </CardDescription>
@@ -730,7 +732,7 @@ export default function LabsIndex({
                                         {period === 'before' ? 'Sebelum 15.23 WIB' : 'Sejak 15.23 WIB'}
                                     </p>
                                     <p className="mt-2 text-2xl font-bold text-foreground">
-                                        {cohort.bounce_rate === null ? '—' : `${formatPercent(cohort.bounce_rate, 1)}%`}
+                                        {cohort.bounce_rate === null ? '�' : `${formatPercent(cohort.bounce_rate, 1)}%`}
                                     </p>
                                     <p className="mt-1 text-sm text-muted-foreground">
                                         {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
@@ -743,7 +745,7 @@ export default function LabsIndex({
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Bounce /c10-lp &amp; /c12-price — Sejak 25 September 2026</CardTitle>
+                        <CardTitle>Bounce /c10-lp &amp; /c12-price � Sejak 25 September 2026 (11.00 WIB)</CardTitle>
                         <CardDescription>
                             Mulai 25 September 2026, 11.00 WIB. Menghitung seluruh sesi sejak waktu tersebut dengan rumus bounce yang sama; mengikuti filter source, tanpa dibatasi rentang tanggal di atas.
                         </CardDescription>
@@ -758,7 +760,7 @@ export default function LabsIndex({
                                         {page}
                                     </p>
                                     <p className="mt-2 text-2xl font-bold text-foreground">
-                                        {cohort.bounce_rate === null ? '—' : `${formatPercent(cohort.bounce_rate, 1)}%`}
+                                        {cohort.bounce_rate === null ? '�' : `${formatPercent(cohort.bounce_rate, 1)}%`}
                                     </p>
                                     <p className="mt-1 text-sm text-muted-foreground">
                                         {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
@@ -771,7 +773,35 @@ export default function LabsIndex({
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Bounce /c10-lp — Hourly (Sejak 14:50 WIB)</CardTitle>
+                        <CardTitle>Bounce /c10-lp &amp; /c12-price - Sejak 25 September 2026 (16.00 WIB)</CardTitle>
+                        <CardDescription>
+                            Mulai 25 September 2026, 16.00 WIB. Menghitung seluruh sesi sejak waktu tersebut dengan rumus bounce yang sama; mengikuti filter source, tanpa dibatasi rentang tanggal di atas.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        {(['/c10-lp', '/c12-price'] as const).map((page) => {
+                            const cohort = landingBounceSince1600Cutoff.pages[page];
+
+                            return (
+                                <div key={page} className="rounded-lg border p-4">
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        {page}
+                                    </p>
+                                    <p className="mt-2 text-2xl font-bold text-foreground">
+                                        {cohort.bounce_rate === null ? '-' : `%`}
+                                    </p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Bounce /c10-lp � Hourly (Sejak 14:50 WIB)</CardTitle>
                         <CardDescription>
                             Perkembangan bounce rate setiap jam khusus untuk halaman /c10-lp sejak perbaikan performa diluncurkan hari ini.
                         </CardDescription>
@@ -1634,3 +1664,8 @@ export default function LabsIndex({
         </AdminLayout>
     );
 }
+
+
+
+
+

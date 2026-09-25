@@ -47,6 +47,7 @@ class LabsController extends Controller
                 'matrix' => $this->abTestingService->getPerformanceMatrix($startDate, $endDate, $sourceFilter),
                 'c10_bounce_comparison' => $this->abTestingService->getC10BounceComparison($startDate, $endDate, $sourceFilter),
                 'landing_bounce_since_cutoff' => $this->abTestingService->getLandingBounceSinceCutoff($sourceFilter),
+                'landing_bounce_since_1600_cutoff' => $this->abTestingService->getLandingBounceSince1600Cutoff($sourceFilter),
                 'funnel' => $this->abTestingService->getSplitFunnel($startDate, $endDate, $sourceFilter),
                 'quality' => $this->abTestingService->getQualityAnalysis($startDate, $endDate, $sourceFilter),
                 'devices' => $this->abTestingService->getDevicePerformance($startDate, $endDate, $sourceFilter),
@@ -110,3 +111,5 @@ class LabsController extends Controller
         return response()->json(['success' => true, 'message' => 'Cache cleared successfully']);
     }
 }
+
+
