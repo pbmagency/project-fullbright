@@ -1,4 +1,4 @@
-import inertia from '@inertiajs/vite';
+﻿import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -15,6 +15,7 @@ export default defineConfig({
                 'resources/css/cycle10.css',
                 'resources/css/cycle12.css',
                 'resources/js/landing-app.tsx',
+                'resources/js/c10-app.tsx',
                 'resources/js/app.tsx',
             ],
             ssr: 'resources/js/ssr.tsx',

@@ -82,6 +82,54 @@ class AbTestingService
         return $result;
     }
 
+    /** Hourly bounce breakdown for /c10-lp since 14:50 today */
+    public function getC10HourlyBounceSince1450(?string $sourceFilter = null): array
+    {
+        $startTime = Carbon::today('Asia/Jakarta')->setTime(14, 50)->utc();
+        $endDate = Carbon::now('UTC');
+
+        $visits = DB::table('user_analytics as v')
+            ->selectRaw("DATE_FORMAT(CONVERT_TZ(v.created_at, '+00:00', '+07:00'), '%H:00') as hour, COUNT(DISTINCT v.session_id) as visits")
+            ->where('v.event_type', 'visit')
+            ->whereBetween('v.created_at', [$startTime, $endDate])
+            ->whereIn('v.event_data->landing_source', ['/c10-lp', '/c10-lp/'])
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('v.referral_source', $sourceFilter))
+            ->groupBy('hour')
+            ->get()
+            ->keyBy('hour');
+
+        $bouncesQuery = DB::table('user_analytics as v')
+            ->selectRaw("DATE_FORMAT(CONVERT_TZ(v.created_at, '+00:00', '+07:00'), '%H:00') as hour, COUNT(DISTINCT v.session_id) as bounces")
+            ->where('v.event_type', 'visit')
+            ->whereBetween('v.created_at', [$startTime, $endDate])
+            ->whereIn('v.event_data->landing_source', ['/c10-lp', '/c10-lp/'])
+            ->when($sourceFilter && $sourceFilter !== 'all', fn ($query) => $query->where('v.referral_source', $sourceFilter));
+
+        $this->metrics->applyBounceConditions($bouncesQuery, $startTime, $endDate, 'v');
+
+        $bounces = $bouncesQuery->groupBy('hour')->get()->keyBy('hour');
+
+        $results = [];
+        $currentHour = Carbon::today('Asia/Jakarta')->setTime(14, 0);
+        $nowHour = Carbon::now('Asia/Jakarta')->startOfHour();
+
+        while ($currentHour->lte($nowHour)) {
+            $hourLabel = $currentHour->format('H:00');
+            $visitCount = $visits->get($hourLabel)->visits ?? 0;
+            $bounceCount = $bounces->get($hourLabel)->bounces ?? 0;
+
+            $results[] = [
+                'hour' => $hourLabel,
+                'visits' => (int) $visitCount,
+                'bounces' => (int) $bounceCount,
+                'bounce_rate' => $visitCount > 0 ? round($bounceCount / $visitCount * 100, 1) : null,
+            ];
+            $currentHour->addHour();
+        }
+
+        return $results;
+    }
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     public function getPerformanceMatrix(Carbon $startDate, Carbon $endDate, ?string $sourceFilter = null): array

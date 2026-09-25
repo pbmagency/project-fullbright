@@ -1,4 +1,4 @@
-import { Head, router, useHttp } from '@inertiajs/react';
+﻿import { Head, router, useHttp } from '@inertiajs/react';
 import { format, parse } from 'date-fns';
 import {
     Activity,
@@ -120,6 +120,7 @@ const LIVE_REFRESH_PROPS = [
     'matrix',
     'c10_bounce_comparison',
     'landing_bounce_since_cutoff',
+    'c10_hourly_bounce',
     'funnel',
     'quality',
     'devices',
@@ -136,6 +137,7 @@ export default function LabsIndex({
     matrix: rawMatrix,
     c10_bounce_comparison: c10BounceComparison,
     landing_bounce_since_cutoff: landingBounceSinceCutoff,
+    c10_hourly_bounce: c10HourlyBounce,
     funnel: rawFunnel,
     quality: rawQuality,
     devices: rawDevices,
@@ -764,6 +766,36 @@ export default function LabsIndex({
                                 </div>
                             );
                         })}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Bounce /c10-lp — Hourly (Sejak 14:50 WIB)</CardTitle>
+                        <CardDescription>
+                            Perkembangan bounce rate setiap jam khusus untuk halaman /c10-lp sejak perbaikan performa diluncurkan hari ini.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[300px] w-full mt-4">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={c10HourlyBounce} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.15 0 0)" opacity={0.3} />
+                                    <XAxis dataKey="hour" fontSize={12} stroke="oklch(0.65 0 0)" />
+                                    <YAxis yAxisId="left" fontSize={12} stroke="oklch(0.65 0 0)" />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'oklch(0.08 0 0)', border: '1px solid oklch(0.15 0 0)', borderRadius: '8px' }}
+                                        formatter={(value, name) => {
+                                            if (name === 'bounce_rate') return [`${value}%`, 'Bounce Rate'];
+                                            return [value, name === 'visits' ? 'Visits' : 'Bounces'];
+                                        }}
+                                    />
+                                    <Legend />
+                                    <Bar yAxisId="left" dataKey="visits" name="Visits" fill="oklch(0.6 0.12 184)" radius={[4, 4, 0, 0]} />
+                                    <Bar yAxisId="left" dataKey="bounces" name="Bounces" fill="oklch(0.77 0.19 70)" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </CardContent>
                 </Card>
 

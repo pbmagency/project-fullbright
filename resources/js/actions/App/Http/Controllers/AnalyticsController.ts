@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AnalyticsController::track
- * @see app/Http/Controllers/AnalyticsController.php:41
+ * @see app/Http/Controllers/AnalyticsController.php:42
  * @route '/analytics/track'
  */
 export const track = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ track.definition = {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::track
- * @see app/Http/Controllers/AnalyticsController.php:41
+ * @see app/Http/Controllers/AnalyticsController.php:42
  * @route '/analytics/track'
  */
 track.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ track.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::track
- * @see app/Http/Controllers/AnalyticsController.php:41
+ * @see app/Http/Controllers/AnalyticsController.php:42
  * @route '/analytics/track'
  */
 track.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ track.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\AnalyticsController::track
- * @see app/Http/Controllers/AnalyticsController.php:41
+ * @see app/Http/Controllers/AnalyticsController.php:42
  * @route '/analytics/track'
  */
     const trackForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ track.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\AnalyticsController::track
- * @see app/Http/Controllers/AnalyticsController.php:41
+ * @see app/Http/Controllers/AnalyticsController.php:42
  * @route '/analytics/track'
  */
         trackForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -56,7 +56,7 @@ track.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     track.form = trackForm
 /**
 * @see \App\Http\Controllers\AnalyticsController::trackBatch
- * @see app/Http/Controllers/AnalyticsController.php:84
+ * @see app/Http/Controllers/AnalyticsController.php:85
  * @route '/analytics/track-batch'
  */
 export const trackBatch = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -71,7 +71,7 @@ trackBatch.definition = {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::trackBatch
- * @see app/Http/Controllers/AnalyticsController.php:84
+ * @see app/Http/Controllers/AnalyticsController.php:85
  * @route '/analytics/track-batch'
  */
 trackBatch.url = (options?: RouteQueryOptions) => {
@@ -80,7 +80,7 @@ trackBatch.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::trackBatch
- * @see app/Http/Controllers/AnalyticsController.php:84
+ * @see app/Http/Controllers/AnalyticsController.php:85
  * @route '/analytics/track-batch'
  */
 trackBatch.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -90,7 +90,7 @@ trackBatch.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\AnalyticsController::trackBatch
- * @see app/Http/Controllers/AnalyticsController.php:84
+ * @see app/Http/Controllers/AnalyticsController.php:85
  * @route '/analytics/track-batch'
  */
     const trackBatchForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -100,7 +100,7 @@ trackBatch.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\AnalyticsController::trackBatch
- * @see app/Http/Controllers/AnalyticsController.php:84
+ * @see app/Http/Controllers/AnalyticsController.php:85
  * @route '/analytics/track-batch'
  */
         trackBatchForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -189,7 +189,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
 export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -204,7 +204,7 @@ exportMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
 exportMethod.url = (options?: RouteQueryOptions) => {
@@ -213,7 +213,7 @@ exportMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
 exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -222,7 +222,7 @@ exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
 exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -232,7 +232,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
     const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -242,7 +242,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
         exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -251,7 +251,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\AnalyticsController::exportMethod
- * @see app/Http/Controllers/AnalyticsController.php:167
+ * @see app/Http/Controllers/AnalyticsController.php:168
  * @route '/admin/export'
  */
         exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

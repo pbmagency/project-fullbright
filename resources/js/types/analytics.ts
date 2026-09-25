@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Labs Analytics — Shared Type Definitions
 // Matches the data shapes returned by AbTestingService.php
 // ============================================================
@@ -148,6 +148,12 @@ export interface LabsPageProps {
         timezone: string;
         pages: Record<string, { visits: number; bounces: number; bounce_rate: number | null }>;
     };
+    c10_hourly_bounce: Array<{
+        hour: string;
+        visits: number;
+        bounces: number;
+        bounce_rate: number | null;
+    }>;
     funnel: FunnelItem[];
     quality: QualityItem[];
     devices: DeviceData[];

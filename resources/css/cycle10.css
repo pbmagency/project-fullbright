@@ -32,3 +32,17 @@ body {
         animation: none !important;
     }
 }
+
+/* Hero image: promote to own compositor layer sehingga drop-shadow filter
+   tidak re-trigger layout pada mobile GPU yang lambat. */
+#hero-section-inner img[fetchpriority="high"] {
+    will-change: transform;
+}
+
+/* Pastikan font Nunito tidak blocking render — gunakan swap sehingga teks
+   terlihat segera dengan system font, lalu swap ke Nunito saat tersedia. */
+@font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-display: optional;
+}

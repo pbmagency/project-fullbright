@@ -34,6 +34,7 @@ class AnalyticsController extends Controller
             'referralData' => $this->getReferralData($startDate, $endDate),
             'conversionFunnel' => $this->metrics->dashboardFunnel($startDate, $endDate),
             'capabilities' => $this->metrics->capabilities(),
+            'bounceData' => $this->metrics->hourlyBounceData('14:50'),
             'dateRange' => $dateRange,
         ]);
     }

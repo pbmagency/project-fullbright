@@ -340,4 +340,105 @@ class AnalyticsMetricsService
     {
         return $denominator > 0 ? ($numerator / $denominator) * 100 : 0;
     }
+
+    /**
+     * Hourly bounce/visit breakdown untuk hari ini mulai dari jam tertentu.
+     * Digunakan untuk section Bounce Analysis di dashboard.
+     *
+     * @param string $startTime Format 'H:i' (e.g. '14:50')
+     * @return array<int, array{hour: string, visits: int, bounces: int, bounce_rate: float}>
+     */
+    public function hourlyBounceData(string $startTime = '14:50'): array
+    {
+        // Hari ini dari startTime sampai sekarang (timezone Asia/Jakarta)
+        $today = Carbon::now('Asia/Jakarta');
+        [$startHour, $startMin] = explode(':', $startTime);
+        $from = Carbon::now('Asia/Jakarta')->startOfDay()->addHours((int) $startHour)->addMinutes((int) $startMin);
+        $to = $today->copy()->endOfDay();
+
+        // Ambil semua visit sessions per jam (dengan timezone UTC untuk DB)
+        $fromUtc = $from->copy()->utc();
+        $toUtc = $to->copy()->utc();
+
+        // Build hourly slots dari startTime sampai jam sekarang
+        $currentHour = Carbon::now('Asia/Jakarta');
+        $slots = [];
+        $cursor = $from->copy()->minute(0)->second(0);
+
+        while ($cursor->lte($currentHour)) {
+            $slots[] = $cursor->format('H:00');
+            $cursor->addHour();
+        }
+
+        if (empty($slots)) {
+            return [];
+        }
+
+        // Query: count distinct sessions per HOUR (in Jakarta timezone)
+        $visitsByHour = DB::table('user_analytics')
+            ->selectRaw("DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+07:00'), '%H:00') as hour")
+            ->selectRaw('COUNT(DISTINCT session_id) as total')
+            ->where('event_type', 'visit')
+            ->whereBetween('created_at', [$fromUtc, $toUtc])
+            ->groupByRaw("DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+07:00'), '%H:00')")
+            ->pluck('total', 'hour');
+
+        // Query: bounced sessions per hour (tidak ada engagement signal)
+        // Ambil session_id semua visit di window ini, lalu filter bounce
+        $visitSessions = DB::table('user_analytics')
+            ->selectRaw("session_id, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+07:00'), '%H:00') as hour")
+            ->where('event_type', 'visit')
+            ->whereBetween('created_at', [$fromUtc, $toUtc])
+            ->distinct()
+            ->get()
+            ->groupBy('hour');
+
+        // Untuk setiap session, cek apakah bounce (tidak ada engagement signal dalam window yang sama)
+        $bouncedByHour = [];
+        foreach ($visitSessions as $hour => $sessions) {
+            $bouncedCount = 0;
+            $sessionIds = $sessions->pluck('session_id')->toArray();
+
+            // Session yang punya engagement signal dalam window hari ini
+            $engagedSessionIds = DB::table('user_analytics')
+                ->whereIn('session_id', $sessionIds)
+                ->whereBetween('created_at', [$fromUtc, $toUtc])
+                ->where(function ($q) {
+                    $q->where(function ($scroll) {
+                        $scroll->where('event_type', 'scroll')
+                            ->where('event_data->depth', '>=', self::SCROLL_THRESHOLD);
+                    })->orWhere(function ($dwell) {
+                        $dwell->where('event_type', 'engagement')
+                            ->where('event_data->type', 'dwell_ping')
+                            ->where('event_data->duration', '>=', self::DWELL_THRESHOLD_MS);
+                    })->orWhere(function ($action) {
+                        $action->whereIn('event_type', self::FUNNEL_ACTION_EVENTS);
+                    })->orWhere(function ($conversion) {
+                        $conversion->where('event_type', 'conversion')
+                            ->whereIn('event_data->type', array_merge(
+                                self::LEAD_CONVERSION_TYPES,
+                                self::LEGACY_CHECKOUT_CONVERSION_TYPES
+                            ));
+                    });
+                })
+                ->distinct()
+                ->pluck('session_id');
+
+            $bouncedCount = count($sessionIds) - $engagedSessionIds->count();
+            $bouncedByHour[$hour] = max(0, $bouncedCount);
+        }
+
+        return collect($slots)->map(function (string $slot) use ($visitsByHour, $bouncedByHour) {
+            $visits = (int) ($visitsByHour[$slot] ?? 0);
+            $bounces = (int) ($bouncedByHour[$slot] ?? 0);
+
+            return [
+                'hour' => $slot,
+                'visits' => $visits,
+                'bounces' => $bounces,
+                'engaged' => max(0, $visits - $bounces),
+                'bounce_rate' => $visits > 0 ? round(($bounces / $visits) * 100, 1) : 0.0,
+            ];
+        })->values()->all();
+    }
 }

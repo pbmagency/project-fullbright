@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
 
 <head>
@@ -41,6 +41,34 @@
         <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
               imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
               imagesizes="(max-width: 899px) 250px, 560px">
+        {{-- Preconnect Bunny Fonts supaya Nunito tidak blocking render --}}
+        <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+        {{-- Critical inline CSS untuk C10: Banner + Navbar + Hero skeleton.
+             Penyebab utama FCP/LCP mobile buruk = CSS 187KB render-blocking 1056ms.
+             Dengan inline CSS ini, browser bisa paint above-the-fold SEBELUM JS. --}}
+        <style>
+            *,*::before,*::after{box-sizing:border-box}
+            html{background:#fff;scroll-behavior:smooth}
+            body{margin:0;background:#fff;color:#151515;font-family:Nunito,system-ui,Arial,sans-serif}
+            #c10-crit-banner{position:fixed;inset:0 0 auto;z-index:51;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;overflow:hidden;background:#c10707;color:#fff;font-size:13px;font-weight:800;line-height:1.4;text-align:center;text-decoration:none;white-space:nowrap}
+            #c10-crit-banner-short{display:none}
+            #c10-crit-banner-time{padding:3px 10px;border-radius:999px;background:#fff;color:#c10707;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+            #c10-crit-nav-space{height:102px}
+            #c10-crit-nav{position:fixed;inset:38px 0 auto;z-index:50;height:64px;border-bottom:1px solid #f3f4f6;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+            #c10-crit-nav-inner{max-width:1152px;height:64px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+            #c10-crit-logo{display:block;width:160px;height:auto;object-fit:contain}
+            #c10-crit-cta{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:7px 16px;border-radius:999px;background:#d70808;box-shadow:0 6px 16px rgba(215,8,8,.35);color:#fff;font-size:13px;font-weight:800;line-height:1.2;text-decoration:none;white-space:nowrap}
+            #c10-crit-price-row{display:flex;align-items:center;gap:5px}
+            #c10-crit-price-old{color:rgba(255,255,255,.92);font-size:11px;text-decoration:line-through}
+            #c10-crit-price{font-size:14px;font-weight:900}
+            #c10-crit-discount{padding:2px 7px;border-radius:999px;background:#f59e0b;color:#151515;font-size:10px;font-weight:900}
+            #c10-crit-hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 55%,#fff5f5 100%)}
+            @media(max-width:500px){
+                #c10-crit-banner{padding:10px 12px}
+                #c10-crit-banner-full{display:none}
+                #c10-crit-banner-short{display:inline;font-size:12.5px}
+            }
+        </style>
     @elseif($page['component'] === 'cycle12/LandingPage')
         <link rel="preload" href="/assets-c12/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
               imagesrcset="/assets-c12/hero-consultant-360.webp 360w, /assets-c12/hero-consultant.webp 660w"
@@ -108,7 +136,8 @@
 
     @viteReactRefresh
     @if($page['component'] === 'cycle10/LandingPage')
-        @vite(['resources/css/cycle10.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        {{-- C10: pakai c10-app.tsx (deferred lean entry point) bukan app.tsx (berat, full dashboard) --}}
+        @vite(['resources/css/cycle10.css', 'resources/js/c10-app.tsx'])
     @elseif($page['component'] === 'cycle12/LandingPage')
         @vite(['resources/css/cycle12.css', 'resources/js/landing-app.tsx'])
     @else
@@ -120,7 +149,79 @@
 </head>
 
 <body class="font-sans antialiased">
-    @if($page['component'] === 'cycle12/LandingPage')
+    @if($page['component'] === 'cycle10/LandingPage')
+        {{-- Server-rendered critical skeleton untuk C10.
+             React akan hydrate/replace ini setelah JS selesai.
+             Tujuan: FCP/LCP mobile membaik karena konten terlihat TANPA menunggu JS. --}}
+        <div id="c10-critical" aria-hidden="true">
+            <a id="c10-crit-banner" href="#pricing">
+                <span id="c10-crit-banner-full">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
+                <span id="c10-crit-banner-short">🔥 FLASH SALE SEPTEMBER · 60%</span>
+                <span id="c10-crit-banner-time" data-c10-countdown>12:00:00</span>
+            </a>
+            <div id="c10-crit-nav-space"></div>
+            <header id="c10-crit-nav">
+                <div id="c10-crit-nav-inner">
+                    <a href="#" aria-label="Full Bright Indonesia">
+                        <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
+                    </a>
+                    <a id="c10-crit-cta" href="#pricing">
+                        <span>🎓 Amankan Seat</span>
+                        <span id="c10-crit-price-row">
+                            <span id="c10-crit-price-old">Rp250rb</span>
+                            <span id="c10-crit-price">Rp99rb</span>
+                            <span id="c10-crit-discount">-60%</span>
+                        </span>
+                    </a>
+                </div>
+            </header>
+            <div id="c10-crit-hero" style="min-height:420px"></div>
+        </div>
+        <script>
+            (function () {
+                var duration = 12 * 60 * 60 * 1000;
+                var start = Number(localStorage.getItem('fb_flash_start') || 0);
+                if (!start) {
+                    start = Date.now();
+                    try { localStorage.setItem('fb_flash_start', String(start)); } catch (e) {}
+                }
+                var output = document.getElementById('c10-crit-banner-time');
+                var banner = document.getElementById('c10-crit-banner');
+                var nav = document.getElementById('c10-crit-nav');
+                var navSpace = document.getElementById('c10-crit-nav-space');
+                function tick() {
+                    var secs = Math.max(0, Math.floor((start + duration - Date.now()) / 1000));
+                    if (output) output.textContent =
+                        String(Math.floor(secs / 3600)).padStart(2,'0') + ':' +
+                        String(Math.floor((secs % 3600) / 60)).padStart(2,'0') + ':' +
+                        String(secs % 60).padStart(2,'0');
+                    if (secs === 0) {
+                        if (banner) banner.hidden = true;
+                        if (nav) nav.style.top = '0';
+                        if (navSpace) navSpace.style.height = '64px';
+                        return false;
+                    }
+                    return true;
+                }
+                if (tick()) {
+                    var t = window.setInterval(function () { if (!tick()) window.clearInterval(t); }, 1000);
+                }
+                // Hide skeleton once React has hydrated (app div gets children)
+                var appEl = document.getElementById('app');
+                if (appEl && window.MutationObserver) {
+                    var mo = new MutationObserver(function() {
+                        if (appEl.children.length) {
+                            var crit = document.getElementById('c10-critical');
+                            if (crit) crit.style.display = 'none';
+                            mo.disconnect();
+                        }
+                    });
+                    mo.observe(appEl, { childList: true });
+                }
+            })();
+        </script>
+        <div id="app"></div>
+    @elseif($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">
             <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_september_diskon_60_banner">
