@@ -220,7 +220,8 @@
                 }
             })();
         </script>
-        <div id="app" data-page="{{ json_encode($page) }}"></div>
+        <script data-page="app" type="application/json">@json($page)</script>
+        <div id="app"></div>
     @elseif($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">

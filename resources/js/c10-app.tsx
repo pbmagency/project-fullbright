@@ -87,9 +87,7 @@ async function navigateToHash(destination: string): Promise<void> {
 
 function mountInteractivePage(): Promise<void> {
     if (!mountPromise) {
-        mountPromise = import('./c10-landing-app').then(({ mountC10App }) => {
-            mountC10App();
-        });
+        mountPromise = import('./c10-landing-app').then(({ mountC10App }) => mountC10App());
     }
     return mountPromise;
 }
