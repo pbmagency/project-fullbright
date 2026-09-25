@@ -39,7 +39,7 @@ class LabsController extends Controller
         // Labs can show stale visit, engagement, and lead numbers for 30 minutes
         // after a visitor interacts with a landing page.
         $dataVersion = UserAnalytic::query()->max('id') ?? 0;
-        $cacheKey = "ab_testing_v15_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}";
+        $cacheKey = "ab_testing_v16_{$startDate->format('Y-m-d')}_{$endDate->format('Y-m-d')}_{$sourceKey}_{$dataVersion}";
 
         // 30-minute cache for high-traffic tolerance
         $data = Cache::remember($cacheKey, 30 * 60, function () use ($startDate, $endDate, $sourceFilter) {
@@ -48,6 +48,7 @@ class LabsController extends Controller
                 'c10_bounce_comparison' => $this->abTestingService->getC10BounceComparison($startDate, $endDate, $sourceFilter),
                 'landing_bounce_since_cutoff' => $this->abTestingService->getLandingBounceSinceCutoff($sourceFilter),
                 'landing_bounce_since_1600_cutoff' => $this->abTestingService->getLandingBounceSince1600Cutoff($sourceFilter),
+                'c10_hourly_bounce' => $this->abTestingService->getC10HourlyBounceSince1450($sourceFilter),
                 'funnel' => $this->abTestingService->getSplitFunnel($startDate, $endDate, $sourceFilter),
                 'quality' => $this->abTestingService->getQualityAnalysis($startDate, $endDate, $sourceFilter),
                 'devices' => $this->abTestingService->getDevicePerformance($startDate, $endDate, $sourceFilter),

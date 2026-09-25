@@ -788,7 +788,7 @@ export default function LabsIndex({
                                         {page}
                                     </p>
                                     <p className="mt-2 text-2xl font-bold text-foreground">
-                                        {cohort.bounce_rate === null ? '-' : `%`}
+                                        {cohort.bounce_rate === null ? '-' : `${formatPercent(cohort.bounce_rate, 1)}%`}
                                     </p>
                                     <p className="mt-1 text-sm text-muted-foreground">
                                         {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
