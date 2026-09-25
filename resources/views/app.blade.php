@@ -36,11 +36,11 @@
 
     <link rel="preload" href="/logo/Logo-Fullbright.webp" as="image" type="image/webp" fetchpriority="high">
     @if(in_array($page['component'], ['cycle10/LandingPage', 'cycle11/LandingPage'], true))
-        {{-- Preload harus memakai kandidat srcset yang sama dengan <img>, kalau
-             tidak browser mengunduh dua kali (satu dari preload, satu dari img). --}}
-        <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
-              imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
-              imagesizes="(max-width: 899px) 250px, 560px">
+        @if($page['component'] === 'cycle11/LandingPage')
+            <link rel="preload" href="/assets/hero-consultant.webp" as="image" type="image/webp" fetchpriority="high"
+                  imagesrcset="/assets/hero-consultant-460-alpha.webp 460w, /assets/hero-consultant-660-alpha.webp 660w, /assets/hero-consultant.webp 820w"
+                  imagesizes="(max-width: 899px) 250px, 560px">
+        @endif
         {{-- Preconnect Bunny Fonts supaya Nunito tidak blocking render --}}
         <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
         {{-- Critical inline CSS untuk C10: Banner + Navbar + Hero skeleton.
@@ -220,7 +220,7 @@
                 }
             })();
         </script>
-        <div id="app"></div>
+        <div id="app" data-page="{{ json_encode($page) }}"></div>
     @elseif($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">
