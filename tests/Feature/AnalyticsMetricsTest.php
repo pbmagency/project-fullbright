@@ -38,6 +38,32 @@ class AnalyticsMetricsTest extends TestCase
         $this->assertSame(100.0, $result['after']['bounce_rate']);
     }
 
+    public function test_landing_bounce_starts_at_11_wib_and_separates_c10_from_c12(): void
+    {
+        $cutoff = Carbon::parse('2026-09-25 04:00:00', 'UTC');
+        Carbon::setTestNow($cutoff->copy()->addHour());
+
+        try {
+            $this->event('too-early', 'visit', '/c10-lp', $cutoff->copy()->subSecond());
+            $this->event('c10-bounce', 'visit', '/c10-lp/', $cutoff);
+            $this->event('c10-engaged', 'visit', '/c10-lp', $cutoff->copy()->addMinute());
+            $this->event('c10-engaged', 'scroll', '/c10-lp', $cutoff->copy()->addMinutes(2), ['depth' => 25]);
+            $this->event('c12-bounce', 'visit', '/c12-price', $cutoff->copy()->addMinute());
+            $this->event('other-page', 'visit', '/c11-problem', $cutoff->copy()->addMinute());
+
+            $result = app(AbTestingService::class)->getLandingBounceSinceCutoff();
+
+            $this->assertSame($cutoff->toIso8601String(), $result['cutoff']);
+            $this->assertSame(2, $result['pages']['/c10-lp']['visits']);
+            $this->assertSame(1, $result['pages']['/c10-lp']['bounces']);
+            $this->assertSame(50.0, $result['pages']['/c10-lp']['bounce_rate']);
+            $this->assertSame(1, $result['pages']['/c12-price']['visits']);
+            $this->assertSame(100.0, $result['pages']['/c12-price']['bounce_rate']);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function test_tracking_endpoint_keeps_browser_sessions_separate_and_updates_rates(): void
     {
         $events = [

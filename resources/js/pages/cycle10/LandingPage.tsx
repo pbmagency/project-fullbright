@@ -324,7 +324,7 @@ export default function LandingPage() {
   const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
 
-  useScrollTracking();
+  useScrollTracking(1000);
   useDwellTime();
   useSectionTracking();
 
@@ -401,7 +401,10 @@ export default function LandingPage() {
     const parsedPrice = Number(anchor.dataset.analyticsPrice);
     const price = Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : undefined;
 
-    trackCTA(location, label, destination);
+    const outboundTransport = isWhatsApp || isCheckout
+      ? { transport: 'beacon' as const }
+      : undefined;
+    trackCTA(location, label, destination, outboundTransport);
 
     if (isCheckout) {
       trackInitiateCheckout(
@@ -413,6 +416,7 @@ export default function LandingPage() {
           payment_url: destination,
         },
         generateEventId(),
+        outboundTransport,
       );
 
       return;
@@ -424,7 +428,7 @@ export default function LandingPage() {
         package: packageName,
         price,
         destination,
-      });
+      }, outboundTransport);
     }
   }, [trackCTA, trackConversion, trackInitiateCheckout]);
 

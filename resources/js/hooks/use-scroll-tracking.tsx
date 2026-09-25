@@ -1,20 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { useAnalytics } from './use-analytics';
 
-export function useScrollTracking() {
+export function useScrollTracking(throttleMs = 200) {
     const { trackScroll } = useAnalytics();
     const scrollDepths = useRef(new Set<number>());
     const lastScrollTime = useRef(0);
 
     useEffect(() => {
-        const handleScroll = () => {
-            const now = Date.now();
-
-            if (now - lastScrollTime.current < 200) {
-return;
-}
-
-            lastScrollTime.current = now;
+        let trailingTimer: ReturnType<typeof setTimeout> | null = null;
+        const recordDepth = () => {
+            lastScrollTime.current = Date.now();
 
             const scrollHeight =
                 document.documentElement.scrollHeight - window.innerHeight;
@@ -38,8 +33,32 @@ return;
             });
         };
 
+        const handleScroll = () => {
+            const remaining = throttleMs - (Date.now() - lastScrollTime.current);
+
+            if (remaining <= 0) {
+                if (trailingTimer !== null) {
+                    clearTimeout(trailingTimer);
+                    trailingTimer = null;
+                }
+
+                recordDepth();
+            } else if (trailingTimer === null) {
+                trailingTimer = setTimeout(() => {
+                    trailingTimer = null;
+                    recordDepth();
+                }, remaining);
+            }
+        };
+
         window.addEventListener('scroll', handleScroll, { passive: true });
 
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [trackScroll]);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+
+            if (trailingTimer !== null) {
+                clearTimeout(trailingTimer);
+            }
+        };
+    }, [trackScroll, throttleMs]);
 }

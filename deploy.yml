@@ -91,6 +91,7 @@ jobs:
             cd ${{ env.TARGET_DIR_LARAVEL }}
             php artisan optimize:clear
             php artisan migrate --force
+            php artisan queue:restart
 
             chown -R pbmag2242:pbmag2242 ${{ env.TARGET_DIR_LARAVEL }}
             chown -R pbmag2242:pbmag2242 ${{ env.TARGET_DIR_PUBLIC }}

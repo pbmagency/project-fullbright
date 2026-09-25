@@ -128,6 +128,104 @@ export function initializeAnalyticsReferral(): void {
     );
 }
 
+type QueuedAnalyticsEvent = {
+    event_type: AnalyticsEventType;
+    event_data: Record<string, unknown>;
+    [key: string]: unknown;
+};
+const analyticsBatch: QueuedAnalyticsEvent[] = [];
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+let batchListenersReady = false;
+let beaconFlushScheduled = false;
+
+function scheduleBatchFlush(): void {
+    if (batchTimer !== null) {
+        return;
+    }
+
+    batchTimer = setTimeout(() => {
+        batchTimer = null;
+        void flushAnalyticsBatch();
+    }, 5000);
+}
+
+async function flushAnalyticsBatch(useBeacon = false): Promise<void> {
+    if (analyticsBatch.length === 0) {
+        return;
+    }
+
+    if (batchTimer !== null) {
+        clearTimeout(batchTimer);
+        batchTimer = null;
+    }
+
+    const events = analyticsBatch.splice(0, 10);
+    const body = JSON.stringify({ events });
+    let accepted = false;
+
+    if (useBeacon && typeof navigator.sendBeacon === 'function') {
+        accepted = navigator.sendBeacon(
+            '/analytics/track-batch',
+            new Blob([body], { type: 'application/json' }),
+        );
+    }
+
+    if (!accepted) {
+        try {
+            const response = await fetch('/analytics/track-batch', {
+                method: 'POST',
+                credentials: 'same-origin',
+                keepalive: useBeacon,
+                headers: { 'Content-Type': 'application/json' },
+                body,
+            });
+            accepted = response.ok || (response.status < 500 && response.status !== 429);
+        } catch {
+            // Keep the events for a later flush.
+        }
+    }
+
+    if (!accepted) {
+        analyticsBatch.unshift(...events);
+    }
+
+    if (analyticsBatch.length > 0) {
+        if (useBeacon && accepted) {
+            void flushAnalyticsBatch(true);
+        } else {
+            scheduleBatchFlush();
+        }
+    }
+}
+
+function queueAnalyticsEvent(event: QueuedAnalyticsEvent, urgent: boolean): void {
+    analyticsBatch.push(event);
+
+    if (!batchListenersReady) {
+        batchListenersReady = true;
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                void flushAnalyticsBatch(true);
+            }
+        });
+        window.addEventListener('pagehide', () => void flushAnalyticsBatch(true));
+    }
+
+    if (urgent) {
+        if (!beaconFlushScheduled) {
+            beaconFlushScheduled = true;
+            queueMicrotask(() => {
+                beaconFlushScheduled = false;
+                void flushAnalyticsBatch(true);
+            });
+        }
+    } else if (analyticsBatch.length >= 10) {
+        void flushAnalyticsBatch();
+    } else {
+        scheduleBatchFlush();
+    }
+}
+
 export async function trackAnalyticsEvent(
     event: AnalyticsEvent,
     options: AnalyticsTrackOptions = {},
@@ -159,6 +257,12 @@ export async function trackAnalyticsEvent(
             utm_content: event.utm_content || urlParams.get('utm_content'),
             utm_term: event.utm_term || urlParams.get('utm_term'),
         };
+
+        if (['/c10-lp', '/c12-price'].includes(getLandingSource())) {
+            queueAnalyticsEvent(payload, options.transport === 'beacon');
+
+            return true;
+        }
 
         // Outbound CTAs can hand control to another app immediately (most
         // notably WhatsApp on mobile). Beacon queues the event before that

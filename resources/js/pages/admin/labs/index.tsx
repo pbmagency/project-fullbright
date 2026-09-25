@@ -119,6 +119,7 @@ const CHART_COLORS = [
 const LIVE_REFRESH_PROPS = [
     'matrix',
     'c10_bounce_comparison',
+    'landing_bounce_since_cutoff',
     'funnel',
     'quality',
     'devices',
@@ -134,6 +135,7 @@ const LIVE_REFRESH_PROPS = [
 export default function LabsIndex({
     matrix: rawMatrix,
     c10_bounce_comparison: c10BounceComparison,
+    landing_bounce_since_cutoff: landingBounceSinceCutoff,
     funnel: rawFunnel,
     quality: rawQuality,
     devices: rawDevices,
@@ -724,6 +726,34 @@ export default function LabsIndex({
                                 <div key={period} className="rounded-lg border p-4">
                                     <p className="text-sm font-medium text-muted-foreground">
                                         {period === 'before' ? 'Sebelum 15.23 WIB' : 'Sejak 15.23 WIB'}
+                                    </p>
+                                    <p className="mt-2 text-2xl font-bold text-foreground">
+                                        {cohort.bounce_rate === null ? '—' : `${formatPercent(cohort.bounce_rate, 1)}%`}
+                                    </p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {formatNumber(cohort.bounces)} bounce / {formatNumber(cohort.visits)} sesi
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Bounce /c10-lp &amp; /c12-price — Sejak 25 September 2026</CardTitle>
+                        <CardDescription>
+                            Mulai 25 September 2026, 11.00 WIB. Menghitung seluruh sesi sejak waktu tersebut dengan rumus bounce yang sama; mengikuti filter source, tanpa dibatasi rentang tanggal di atas.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        {(['/c10-lp', '/c12-price'] as const).map((page) => {
+                            const cohort = landingBounceSinceCutoff.pages[page];
+
+                            return (
+                                <div key={page} className="rounded-lg border p-4">
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        {page}
                                     </p>
                                     <p className="mt-2 text-2xl font-bold text-foreground">
                                         {cohort.bounce_rate === null ? '—' : `${formatPercent(cohort.bounce_rate, 1)}%`}

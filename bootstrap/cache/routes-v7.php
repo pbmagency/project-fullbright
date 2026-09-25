@@ -13,7 +13,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::KZDczDd1ZS0qxF41',
+            '_route' => 'generated::0uBl85SzYJembIet',
           ),
           1 => NULL,
           2 => 
@@ -440,7 +440,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::5A2PLIn5RSv5rS51',
+            '_route' => 'generated::VjFpq5qG2yruHIiV',
           ),
           1 => NULL,
           2 => 
@@ -833,6 +833,25 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
+      '/analytics/track-batch' =>
+      array (
+        0 =>
+        array (
+          0 =>
+          array (
+            '_route' => 'analytics.track-batch',
+          ),
+          1 => NULL,
+          2 =>
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
       '/webhooks/scalev' => 
       array (
         0 => 
@@ -977,7 +996,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::Rj01XFquCV8fDCNH',
+            '_route' => 'generated::PzThZEVHarM6mgfx',
           ),
           1 => NULL,
           2 => 
@@ -1120,7 +1139,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::yOoR1l6njE18xlpC',
+            '_route' => 'generated::126VDuWFHPUyE3Jr',
           ),
           1 => 
           array (
@@ -1241,7 +1260,7 @@ app('router')->setCompiledRoutes(
   ),
   'attributes' => 
   array (
-    'generated::KZDczDd1ZS0qxF41' => 
+    'generated::0uBl85SzYJembIet' =>
     array (
       'methods' => 
       array (
@@ -1265,7 +1284,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::KZDczDd1ZS0qxF41',
+        'as' => 'generated::0uBl85SzYJembIet',
       ),
       'fallback' => false,
       'defaults' => 
@@ -1281,7 +1300,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::yOoR1l6njE18xlpC' => 
+    'generated::126VDuWFHPUyE3Jr' =>
     array (
       'methods' => 
       array (
@@ -1305,7 +1324,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::yOoR1l6njE18xlpC',
+        'as' => 'generated::126VDuWFHPUyE3Jr',
       ),
       'fallback' => false,
       'defaults' => 
@@ -2257,7 +2276,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::5A2PLIn5RSv5rS51' => 
+    'generated::VjFpq5qG2yruHIiV' =>
     array (
       'methods' => 
       array (
@@ -2293,8 +2312,8 @@ app('router')->setCompiledRoutes(
                     return response(\\Illuminate\\Support\\Facades\\View::file(\'E:\\\\PBM\\\\Gorden\\\\project-fullbright\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Configuration\'.\'/../resources/health-up.blade.php\', [
                         \'exception\' => $exception,
                     ]), status: $status);
-                }";s:5:"scope";s:54:"Illuminate\\Foundation\\Configuration\\ApplicationBuilder";s:4:"this";N;s:4:"self";s:32:"00000000000006d50000000000000000";}}',
-        'as' => 'generated::5A2PLIn5RSv5rS51',
+                }";s:5:"scope";s:54:"Illuminate\\Foundation\\Configuration\\ApplicationBuilder";s:4:"this";N;s:4:"self";s:32:"000000000000044c0000000000000000";}}',
+        'as' => 'generated::VjFpq5qG2yruHIiV',
       ),
       'fallback' => false,
       'defaults' => 
@@ -3167,6 +3186,43 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
+    'analytics.track-batch' =>
+    array (
+      'methods' =>
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'analytics/track-batch',
+      'action' =>
+      array (
+        'middleware' =>
+        array (
+          0 => 'web',
+          1 => 'throttle:120,1',
+        ),
+        'uses' => 'App\\Http\\Controllers\\AnalyticsController@trackBatch',
+        'controller' => 'App\\Http\\Controllers\\AnalyticsController@trackBatch',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' =>
+        array (
+        ),
+        'as' => 'analytics.track-batch',
+      ),
+      'fallback' => false,
+      'defaults' =>
+      array (
+      ),
+      'wheres' =>
+      array (
+      ),
+      'bindingFields' =>
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
     'scalev.webhook' => 
     array (
       'methods' => 
@@ -3238,7 +3294,7 @@ app('router')->setCompiledRoutes(
         '__inertiaDevtoolsRenderSource' => 
         array (
           'file' => 'E:\\PBM\\Gorden\\project-fullbright\\routes\\web.php',
-          'line' => 44,
+          'line' => 47,
         ),
       ),
       'wheres' => 
@@ -3284,7 +3340,7 @@ app('router')->setCompiledRoutes(
         '__inertiaDevtoolsRenderSource' => 
         array (
           'file' => 'E:\\PBM\\Gorden\\project-fullbright\\routes\\web.php',
-          'line' => 47,
+          'line' => 50,
         ),
       ),
       'wheres' => 
@@ -3456,7 +3512,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::Rj01XFquCV8fDCNH' => 
+    'generated::PzThZEVHarM6mgfx' =>
     array (
       'methods' => 
       array (
@@ -3483,7 +3539,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::Rj01XFquCV8fDCNH',
+        'as' => 'generated::PzThZEVHarM6mgfx',
       ),
       'fallback' => false,
       'defaults' => 
@@ -3756,7 +3812,7 @@ app('router')->setCompiledRoutes(
                         $config,
                         $isProduction
                     ))($request, $path);
-                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"00000000000006d80000000000000000";}}',
+                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"000000000000044f0000000000000000";}}',
         'as' => 'storage.local',
       ),
       'fallback' => false,
@@ -3789,7 +3845,7 @@ app('router')->setCompiledRoutes(
                         $config,
                         $isProduction
                     ))($request, $path);
-                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"00000000000006f00000000000000000";}}',
+                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"00000000000004680000000000000000";}}',
         'as' => 'storage.local.upload',
       ),
       'fallback' => false,

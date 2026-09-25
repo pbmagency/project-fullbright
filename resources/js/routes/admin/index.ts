@@ -3,7 +3,7 @@ import analytics72d765 from './analytics'
 import labs7ab630 from './labs'
 /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
 export const analytics = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -18,7 +18,7 @@ analytics.definition = {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
 analytics.url = (options?: RouteQueryOptions) => {
@@ -27,7 +27,7 @@ analytics.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
 analytics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -36,7 +36,7 @@ analytics.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
 analytics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -46,7 +46,7 @@ analytics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
     const analyticsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -56,7 +56,7 @@ analytics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
         analyticsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ analytics.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\AnalyticsController::analytics
- * @see app/Http/Controllers/AnalyticsController.php:21
+ * @see app/Http/Controllers/AnalyticsController.php:22
  * @route '/admin'
  */
         analyticsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

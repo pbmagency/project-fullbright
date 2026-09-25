@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:91
+ * @see app/Http/Controllers/LabsController.php:92
  * @route '/admin/labs/clear-cache'
  */
 export const clearCache = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -94,7 +94,7 @@ clearCache.definition = {
 
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:91
+ * @see app/Http/Controllers/LabsController.php:92
  * @route '/admin/labs/clear-cache'
  */
 clearCache.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ clearCache.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:91
+ * @see app/Http/Controllers/LabsController.php:92
  * @route '/admin/labs/clear-cache'
  */
 clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -113,7 +113,7 @@ clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:91
+ * @see app/Http/Controllers/LabsController.php:92
  * @route '/admin/labs/clear-cache'
  */
     const clearCacheForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -123,7 +123,7 @@ clearCache.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\LabsController::clearCache
- * @see app/Http/Controllers/LabsController.php:91
+ * @see app/Http/Controllers/LabsController.php:92
  * @route '/admin/labs/clear-cache'
  */
         clearCacheForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

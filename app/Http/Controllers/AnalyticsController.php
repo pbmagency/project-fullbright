@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessAnalyticsBatch;
 use App\Models\UserAnalytic;
 use App\Services\AnalyticsMetricsService;
 use App\Services\MetaConversionService;
@@ -39,7 +40,83 @@ class AnalyticsController extends Controller
 
     public function track(Request $request, MetaConversionService $metaService): JsonResponse
     {
-        $validated = $request->validate([
+        $validated = $request->validate($this->trackingRules());
+
+        $eventData = $validated['event_data'] ?? [];
+        $eventId = $eventData['event_id'] ?? null;
+
+        if ($eventId && UserAnalytic::query()->where('event_data->event_id', $eventId)->exists()) {
+            return response()->json(['success' => true, 'duplicate' => true]);
+        }
+
+        UserAnalytic::create([
+            // A browser-tab analytics session is more accurate than Laravel's
+            // shared session cookie, which otherwise merges independent tabs
+            // and landing-page tests into one visitor.
+            'session_id' => $eventData['analytics_session_id'] ?? $request->session()->getId(),
+            'event_type' => $validated['event_type'],
+            'event_data' => $eventData,
+            'referral_source' => $validated['referral_source'] ?? null,
+            'utm_source' => $validated['utm_source'] ?? null,
+            'utm_medium' => $validated['utm_medium'] ?? null,
+            'utm_campaign' => $validated['utm_campaign'] ?? null,
+            'utm_content' => $validated['utm_content'] ?? null,
+            'utm_term' => $validated['utm_term'] ?? null,
+            'ip_hash' => hash('sha256', $request->ip().config('app.key')),
+            'user_agent' => $request->userAgent(),
+            'user_id' => $request->user()?->id,
+            'created_at' => now(),
+        ]);
+
+        if ($eventId) {
+            if ($validated['event_type'] === 'visit') {
+                $metaService->sendPageView($request, $eventId);
+            }
+
+            if ($validated['event_type'] === 'initiate_checkout') {
+                $metaService->sendAddToCart($request, $eventId, $eventData);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function trackBatch(Request $request): JsonResponse
+    {
+        if (strlen($request->getContent()) > 65536) {
+            return response()->json(['message' => 'Analytics batch is too large.'], 413);
+        }
+
+        $rules = ['events' => ['required', 'array', 'min:1', 'max:10']];
+
+        foreach ($this->trackingRules() as $field => $constraints) {
+            $rules["events.*.{$field}"] = $constraints;
+        }
+
+        $validated = $request->validate($rules);
+        foreach ($validated['events'] as $event) {
+            $source = $event['event_data']['landing_source'] ?? null;
+            if (! in_array($source, ['/c10-lp', '/c12-price'], true)) {
+                return response()->json(['message' => 'Unsupported landing source.'], 422);
+            }
+        }
+
+        ProcessAnalyticsBatch::dispatch(
+            $validated['events'],
+            $request->session()->getId(),
+            hash('sha256', $request->ip().config('app.key')),
+            $request->ip(),
+            $request->userAgent(),
+            $request->user()?->id,
+            $request->header('Referer'),
+        );
+
+        return response()->json(['status' => 'queued'], 202);
+    }
+
+    private function trackingRules(): array
+    {
+        return [
             'event_type' => ['required', Rule::in([
                 'visit',
                 'scroll',
@@ -83,45 +160,8 @@ class AnalyticsController extends Controller
             'utm_campaign' => ['nullable', 'string', 'max:255'],
             'utm_content' => ['nullable', 'string', 'max:255'],
             'utm_term' => ['nullable', 'string', 'max:255'],
-        ]);
+        ];
 
-        $eventData = $validated['event_data'] ?? [];
-        $eventId = $eventData['event_id'] ?? null;
-
-        if ($eventId && UserAnalytic::query()->where('event_data->event_id', $eventId)->exists()) {
-            return response()->json(['success' => true, 'duplicate' => true]);
-        }
-
-        UserAnalytic::create([
-            // A browser-tab analytics session is more accurate than Laravel's
-            // shared session cookie, which otherwise merges independent tabs
-            // and landing-page tests into one visitor.
-            'session_id' => $eventData['analytics_session_id'] ?? $request->session()->getId(),
-            'event_type' => $validated['event_type'],
-            'event_data' => $eventData,
-            'referral_source' => $validated['referral_source'] ?? null,
-            'utm_source' => $validated['utm_source'] ?? null,
-            'utm_medium' => $validated['utm_medium'] ?? null,
-            'utm_campaign' => $validated['utm_campaign'] ?? null,
-            'utm_content' => $validated['utm_content'] ?? null,
-            'utm_term' => $validated['utm_term'] ?? null,
-            'ip_hash' => hash('sha256', $request->ip().config('app.key')),
-            'user_agent' => $request->userAgent(),
-            'user_id' => $request->user()?->id,
-            'created_at' => now(),
-        ]);
-
-        if ($eventId) {
-            if ($validated['event_type'] === 'visit') {
-                $metaService->sendPageView($request, $eventId);
-            }
-
-            if ($validated['event_type'] === 'initiate_checkout') {
-                $metaService->sendAddToCart($request, $eventId, $eventData);
-            }
-        }
-
-        return response()->json(['success' => true]);
     }
 
     public function export(Request $request): StreamedResponse

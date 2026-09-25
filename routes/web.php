@@ -33,6 +33,9 @@ Route::get('/c11-problem/scalev-proof', C11ScalevProofController::class)
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])
     ->middleware('throttle:120,1')
     ->name('analytics.track');
+Route::post('/analytics/track-batch', [AnalyticsController::class, 'trackBatch'])
+    ->middleware('throttle:120,1')
+    ->name('analytics.track-batch');
 
 // Scalev webhook deliveries. Authenticated by the X-Scalev-Hmac-Sha256
 // signature (not by CSRF), so it is excluded in bootstrap/app.php.

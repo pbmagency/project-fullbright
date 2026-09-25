@@ -143,6 +143,11 @@ export interface LabsPageProps {
         before: { visits: number; bounces: number; bounce_rate: number | null };
         after: { visits: number; bounces: number; bounce_rate: number | null };
     };
+    landing_bounce_since_cutoff: {
+        cutoff: string;
+        timezone: string;
+        pages: Record<string, { visits: number; bounces: number; bounce_rate: number | null }>;
+    };
     funnel: FunnelItem[];
     quality: QualityItem[];
     devices: DeviceData[];

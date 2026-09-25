@@ -2,13 +2,66 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProcessAnalyticsBatch;
 use App\Models\UserAnalytic;
+use App\Services\MetaConversionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class AnalyticsTrackingTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_c10_and_c12_batch_is_queued_then_processed_once(): void
+    {
+        Queue::fake();
+        $events = [
+            ['event_type' => 'visit', 'event_data' => [
+                'event_id' => 'c10-visit-1',
+                'analytics_session_id' => 'browser-tab-1',
+                'landing_source' => '/c10-lp',
+            ]],
+            ['event_type' => 'scroll', 'event_data' => [
+                'event_id' => 'c12-scroll-1',
+                'landing_source' => '/c12-price',
+                'depth' => 50,
+            ]],
+        ];
+
+        $this->postJson(route('analytics.track-batch'), ['events' => $events])
+            ->assertAccepted()->assertJson(['status' => 'queued']);
+        $this->assertDatabaseCount('user_analytics', 0);
+
+        Queue::assertPushed(ProcessAnalyticsBatch::class, 1);
+        $job = Queue::pushed(ProcessAnalyticsBatch::class)->first();
+        $job->handle(app(MetaConversionService::class));
+        $job->handle(app(MetaConversionService::class));
+
+        $this->assertDatabaseCount('user_analytics', 2);
+        $this->assertDatabaseHas('user_analytics', [
+            'session_id' => 'browser-tab-1', 'event_type' => 'visit',
+        ]);
+    }
+
+    public function test_batch_rejects_other_pages_and_more_than_ten_events(): void
+    {
+        Queue::fake();
+        $event = ['event_type' => 'visit', 'event_data' => ['landing_source' => '/']];
+
+        $this->postJson(route('analytics.track-batch'), ['events' => [$event]])
+            ->assertUnprocessable();
+        $event['event_data']['landing_source'] = '/c10-lp';
+        $this->postJson(route('analytics.track-batch'), ['events' => array_fill(0, 11, $event)])
+            ->assertUnprocessable();
+        $this->call(
+            'POST', route('analytics.track-batch'), [], [], [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode(['events' => [$event], 'padding' => str_repeat('x', 65536)]),
+        )->assertStatus(413);
+
+        Queue::assertNothingPushed();
+    }
 
     public function test_unknown_event_type_is_rejected(): void
     {

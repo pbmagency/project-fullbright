@@ -252,7 +252,7 @@ export default function LandingPage({ renderCriticalSections = true }: LandingPa
   const lmsVideoRef = useRef<HTMLVideoElement | null>(null);
   const { trackVisit, trackCTA, trackInitiateCheckout, trackConversion, trackInteraction, trackVideoPlay } = useAnalytics();
 
-  useScrollTracking();
+  useScrollTracking(1000);
   useDwellTime();
   useSectionTracking();
 
