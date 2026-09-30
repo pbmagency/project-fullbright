@@ -349,12 +349,12 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 200000
+                ? 220000
                 : level === 'Intermediate'
-                  ? 280000
+                  ? 294000
                   : level === 'Bundling'
                     ? 325000
-                    : 200000;
+                    : 175000;
 
         try {
             (
@@ -395,12 +395,12 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 200000
+                ? 220000
                 : level === 'Intermediate'
-                  ? 280000
+                  ? 294000
                   : level === 'Bundling'
                     ? 325000
-                    : 200000;
+                    : 175000;
 
         try {
             (
@@ -550,7 +550,7 @@ export default function PricingSection() {
                                         Rp 1.000.000
                                     </span>
                                     <span className="rounded-full bg-[#D70808] px-3 py-1 text-[10px] font-black text-white">
-                                        HEMAT 80%
+                                        HEMAT 78%
                                     </span>
                                 </div>
                                 <p
@@ -559,7 +559,7 @@ export default function PricingSection() {
                                         fontFamily: 'var(--font-heading)',
                                     }}
                                 >
-                                    Rp 200.000
+                                    Rp 220.000
                                 </p>
                             </div>
 
@@ -786,7 +786,7 @@ export default function PricingSection() {
                                         Rp 1.400.000
                                     </span>
                                     <span className="rounded-full bg-[#D70808] px-3 py-1 text-[10px] font-black text-white">
-                                        DISKON 80%
+                                        DISKON 79%
                                     </span>
                                 </div>
                                 <p
@@ -795,7 +795,7 @@ export default function PricingSection() {
                                         fontFamily: "'Nunito', sans-serif",
                                     }}
                                 >
-                                    Rp 280.000
+                                    Rp 294.000
                                 </p>
                             </div>
 
@@ -925,14 +925,14 @@ export default function PricingSection() {
                                     Rp 250.000
                                 </span>
                                 <span className="rounded-full bg-[#D70808] px-2 py-0.5 text-[10px] font-black text-white">
-                                    HEMAT 60%
+                                    HEMAT 30%
                                 </span>
                             </div>
                             <p
                                 className="text-[30px] font-[900] text-[#D70808] sm:text-3xl sm:font-black"
                                 style={{ fontFamily: 'var(--font-heading)' }}
                             >
-                                Rp 99.000
+                                Rp 175.000
                             </p>
                         </div>
 

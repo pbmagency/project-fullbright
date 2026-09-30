@@ -223,9 +223,9 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 250000
+                ? 220000
                 : level === 'Intermediate'
-                  ? 350000
+                  ? 294000
                   : 375000;
 
         try {
@@ -267,9 +267,9 @@ export default function PricingSection() {
         const eventId = generateEventId();
         const price =
             level === 'Starter'
-                ? 250000
+                ? 220000
                 : level === 'Intermediate'
-                  ? 350000
+                  ? 294000
                   : 375000;
 
         try {
@@ -410,7 +410,7 @@ export default function PricingSection() {
                                     className="rounded-full px-2 py-0.5 text-xs font-black text-white"
                                     style={{ backgroundColor: '#D70808' }}
                                 >
-                                    HEMAT 75%
+                                    HEMAT 78%
                                 </span>
                             </div>
                             <p
@@ -420,7 +420,7 @@ export default function PricingSection() {
                                     color: '#D70808',
                                 }}
                             >
-                                Rp 250.000
+                                Rp 220.000
                             </p>
                         </div>
                         <ul className="mb-5 flex flex-1 flex-col gap-2">
@@ -771,7 +771,7 @@ export default function PricingSection() {
                                     className="rounded-full px-2 py-0.5 text-xs font-black text-white"
                                     style={{ backgroundColor: '#D70808' }}
                                 >
-                                    DISKON 75%
+                                    DISKON 79%
                                 </span>
                             </div>
                             <p
@@ -781,7 +781,7 @@ export default function PricingSection() {
                                     color: '#D70808',
                                 }}
                             >
-                                Rp 350.000
+                                Rp 294.000
                             </p>
                         </div>
                         <ul className="mb-5 flex flex-1 flex-col gap-2">

@@ -56,9 +56,10 @@ class MetaConversionService
 
         $level       = $eventData['level'] ?? $eventData['package'] ?? 'Starter';
         $price       = $eventData['price'] ?? match ($level) {
-            'Intermediate' => 350000,
+            'Intermediate' => 294000,
+            'Self', 'Self-Study', 'Self-Study LMS', 'E-Course' => 175000,
             'Bundling'     => 375000,
-            default        => 250000,
+            default        => 220000,
         };
         $productId   = 'toefl-' . strtolower($level);
         $contentName = "TOEFL Full Bright Level {$level}";

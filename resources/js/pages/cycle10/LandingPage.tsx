@@ -597,9 +597,9 @@ export default function LandingPage() {
               <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
                  <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="160" height="160" className="[height:auto] [width:160px] [object-fit:contain] max-[500px]:[width:110px]" />
               </a>
-              <a href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px] max-[500px]:[padding:7px_10px]">
+              <a href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px] max-[500px]:[padding:7px_10px]">
                 <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Amankan Seat</span>
-                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Kelas Live Zoom (-80%)</span>
+                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Kelas Live Zoom (-78%)</span>
               </a>
             </div>
           </header>
@@ -1257,7 +1257,7 @@ export default function LandingPage() {
       <p className="[margin:0_0_8px] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#6b7280]">Total nilai semua fitur di atas</p>
       <p className="[margin:0_0_12px] [font-size:clamp(30px,5vw,40px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#6b7280] [text-decoration:line-through] [text-decoration-color:#D70808] [text-decoration-thickness:3px]">Rp 1.005.000</p>
       <p className="[margin:0_0_6px] [font-size:12px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#D70808]">MULAI DARI HANYA</p>
-      <p className="[margin:0_0_8px] [font-size:clamp(32px,5.4vw,44px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
+      <p className="[margin:0_0_8px] [font-size:clamp(32px,5.4vw,44px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 175.000</p>
       
     </div>
 
@@ -1757,7 +1757,7 @@ export default function LandingPage() {
               
               
               <div className="[display:inline-flex] [gap:4px] [padding:5px] [border-radius:9999px] [background:#fff] [border:1px_solid_#ffb3b3] [box-shadow:0_2px_12px_rgba(215,8,8,0.08)]">
-                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#F97316] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-80%</span></button>
+                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#F97316] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-78%</span></button>
                 <button onClick={() => setMode('self')} style={css(toggleBtnStyle(true))}>Belajar Sendiri</button>
               </div>
             </div>
@@ -1776,9 +1776,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#4b5563]">Rp 250.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 60%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 30%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 175.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -1804,13 +1804,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="99000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Mulai Belajar Mandiri →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="175000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Mulai Belajar Mandiri →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_self_whatsapp" data-analytics-package="Self-Study LMS" data-analytics-price="99000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20E-Course%20Self-Study%20LMS." target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_self_whatsapp" data-analytics-package="Self-Study LMS" data-analytics-price="175000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#9ca3af]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_trial_lms" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
               </div>
             </div>
@@ -1854,7 +1854,7 @@ export default function LandingPage() {
               
               
               <div className="[display:inline-flex] [gap:4px] [padding:5px] [border-radius:9999px] [background:#fff] [border:1px_solid_#ffb3b3] [box-shadow:0_2px_12px_rgba(215,8,8,0.08)]">
-                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(true))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)] [background-color:#F9A316]">-80%</span></button>
+                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(true))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)] [background-color:#F9A316]">-78%</span></button>
                 <button onClick={() => setMode('self')} style={css(toggleBtnStyle(false))}>Belajar Sendiri</button>
               </div>
             </div>
@@ -1873,9 +1873,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#4b5563]">Rp 1.000.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 80%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 78%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 200.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 220.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -1919,13 +1919,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="200000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="220000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_starter_whatsapp" data-analytics-package="Starter" data-analytics-price="200000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Starter" target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_starter_whatsapp" data-analytics-package="Starter" data-analytics-price="220000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -2043,9 +2043,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#4b5563]">Rp 1.400.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 80%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 79%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 280.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 294.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -2087,13 +2087,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="280000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="294000" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [text-decoration:none] [box-sizing:border-box]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#9ca3af]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#9ca3af]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-package="Intermediate" data-analytics-price="280000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href="https://wa.me/6285255499299?text=Halo%20Admin%20Full%20Bright%20Indonesia.%20Saya%20minat%20mau%20daftar%20kelas%20TOEFL%20Level%20Intermediate." target="_blank" rel="noopener noreferrer" data-random-wa="true" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-package="Intermediate" data-analytics-price="294000" data-analytics-conversion="wa_registration" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img src="/assets/admin-avatar.webp" alt="Admin Full Bright" width="192" height="192" loading="lazy" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>

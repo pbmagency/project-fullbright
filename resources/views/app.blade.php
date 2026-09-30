@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
 
 <head>
@@ -178,9 +178,9 @@
                     <a href="#" aria-label="Full Bright Indonesia">
                         <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
                     </a>
-                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)">
+                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)">
                         <span>Amankan Seat</span>
-                        <span id="c10-crit-cta-subtitle">Kelas Live Zoom (-80%)</span>
+                        <span id="c10-crit-cta-subtitle">Kelas Live Zoom (-78%)</span>
                     </a>
                 </div>
             </header>
@@ -245,7 +245,7 @@
                     <a href="#" aria-label="Full Bright Indonesia" data-analytics-location="logo_full_bright_navbar"><img class="c12-logo" src="/logo/Logo-Fullbright.webp" width="400" height="400" alt="Full Bright Indonesia"></a>
                     <a class="c12-nav-cta" href="#pricing" data-analytics-location="amankan_seat_navbar">
                         <span>🎓 Amankan Seat</span>
-                        <span class="c12-nav-price-row"><span class="c12-nav-price-old">Rp250rb</span><span class="c12-nav-price">Rp99rb</span><span class="c12-nav-discount">-60%</span></span>
+                        <span class="c12-nav-price-row"><span class="c12-nav-price-old">Rp250rb</span><span class="c12-nav-price">Rp175rb</span><span class="c12-nav-discount">-30%</span></span>
                     </a>
                 </div>
             </header>

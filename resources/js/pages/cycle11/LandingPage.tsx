@@ -1115,7 +1115,7 @@ export default function LandingPage() {
               <p className="[margin:0_0_8px] [font-size:12px] [font-weight:900] [letter-spacing:0.08em] [text-transform:uppercase] [color:#555b65]">Total nilai semua fitur di atas</p>
               <p className="[margin:0_0_12px] [font-size:clamp(30px,5vw,40px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#555b65] [text-decoration:line-through] [text-decoration-color:#D70808] [text-decoration-thickness:3px]">Rp 1.005.000</p>
               <p className="[margin:0_0_6px] [font-size:12px] [font-weight:900] [letter-spacing:0.06em] [text-transform:uppercase] [color:#D70808]">MULAI DARI HANYA</p>
-              <p className="[margin:0_0_8px] [font-size:clamp(32px,5.4vw,44px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
+              <p className="[margin:0_0_8px] [font-size:clamp(32px,5.4vw,44px)] [line-height:1] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 175.000</p>
               
             </div>
       
@@ -1681,9 +1681,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 250.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 60%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 30%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 99.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 175.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -1709,13 +1709,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl?utm_source=c11-problem&utm_content=self-study" target="_blank" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="99000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Mulai Belajar Mandiri →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-gold-e-course-toefl?utm_source=c11-problem&utm_content=self-study" target="_blank" data-analytics-location="pricing_self_checkout" data-analytics-package="Self-Study LMS" data-analytics-price="175000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Mulai Belajar Mandiri →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Self-Study LMS" data-analytics-price="99000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Self-Study LMS" data-analytics-price="175000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="Admin Full Bright" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <p className="[margin:14px_0_0] [text-align:center] [font-size:13px] [line-height:1.5] [color:#555b65]">Mau intip materinya dulu? <a href="https://class.fullbrightindonesia.com/register" target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_self_trial_lms" className="[font-weight:800] [color:#6b7280] [text-decoration:underline] [text-underline-offset:3px]">Coba gratis 1 modul di LMS</a></p>
               </div>
             </div>
@@ -1784,9 +1784,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 1.000.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 80%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">HEMAT 78%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 200.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 220.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -1830,13 +1830,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=starter" target="_blank" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="200000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-starter-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=starter" target="_blank" data-analytics-location="pricing_starter_checkout" data-analytics-package="Starter" data-analytics-price="220000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Starter" data-analytics-price="200000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_starter_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Starter" data-analytics-price="220000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>
@@ -1954,9 +1954,9 @@ export default function LandingPage() {
                 <div className="[border-radius:16px] [padding:16px] [margin-bottom:20px] [background:#FFF0F0] [border:1.5px_solid_#ffb3b3]">
                   <div className="[display:flex] [align-items:center] [gap:8px] [margin-bottom:4px]">
                     <span className="[font-size:14px] [text-decoration:line-through] [font-weight:600] [color:#555b65]">Rp 1.400.000</span>
-                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 80%</span>
+                    <span className="[font-size:12px] [font-weight:900] [padding:2px_8px] [border-radius:9999px] [color:#fff] [background:#D70808]">DISKON 79%</span>
                   </div>
-                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 280.000</p>
+                  <p className="[margin:0] [font-size:30px] [font-weight:900] [font-family:Nunito,sans-serif] [color:#D70808]">Rp 294.000</p>
                 </div>
                 <ul className="[list-style:none] [margin:0_0_8px] [padding:0] [display:flex] [flex-direction:column] [gap:8px] [flex:1]">
                   
@@ -1998,13 +1998,13 @@ export default function LandingPage() {
                   
                 </ul>
                 <div className="[display:flex] [flex-direction:column] [gap:6px]">
-                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=intermediate" target="_blank" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="280000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
+                  <a href="https://member.fullbrightindonesia.com/paket-premium-toefl-level-intermediate-live-zoom-intensif-flash-sale?utm_source=c11-problem&utm_content=intermediate" target="_blank" data-analytics-location="pricing_intermediate_checkout" data-analytics-package="Intermediate" data-analytics-price="294000" rel="noopener noreferrer" onClick={markCheckoutClicked} className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [border:none] [font-weight:900] [border-radius:16px] [padding:16px_20px] [font-size:16px] [color:#fff] [background:#D70808] [box-shadow:0_6px_24px_rgba(215,8,8,0.4)] [box-sizing:border-box] [cursor:pointer]">Apply Sekarang →</a>
                   <p className="[margin:0] [display:flex] [align-items:center] [justify-content:center] [gap:4px] [font-size:12px] [text-align:center] [color:#555b65]">🔒 Pembayaran aman &amp; terenkripsi</p>
                 </div>
                 <div className="[display:flex] [align-items:center] [gap:12px] [margin:12px_0]">
                   <div className="[flex:1] [height:1px] [background:#e5e7eb]"></div><span className="[font-size:12px] [font-weight:600] [color:#555b65]">atau</span><div className="[flex:1] [height:1px] [background:#e5e7eb]"></div>
                 </div>
-                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Intermediate" data-analytics-price="280000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
+                <a href={waUrl()} target="_blank" rel="noopener noreferrer" data-analytics-location="pricing_intermediate_whatsapp" data-analytics-conversion="wa_registration" data-analytics-package="Intermediate" data-analytics-price="294000" className="[display:inline-flex] [width:100%] [align-items:center] [justify-content:center] [gap:8px] [font-weight:700] [border-radius:16px] [padding:12px_20px] [font-size:14px] [color:#16a34a] [background:transparent] [border:1.5px_solid_#25D366] [text-decoration:none] [box-sizing:border-box]"><img loading="lazy" src="/assets/admin-avatar.jpg" alt="" className="[width:26px] [height:26px] [border-radius:9999px] [object-fit:cover] [border:2px_solid_#25D366] [flex-shrink:0]" />💬 Tanya via WhatsApp</a>
                 <div className="[display:flex] [align-items:center] [justify-content:center] [flex-wrap:wrap] [gap:6px] [margin-top:14px]">
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#FEF3C7] [color:#B45309]">★ 4.9/5</span>
                   <span className="[display:inline-flex] [align-items:center] [gap:4px] [padding:4px_10px] [border-radius:9999px] [font-size:12px] [font-weight:600] [background:#F0FDF4] [color:#15803d]">45.000+</span>

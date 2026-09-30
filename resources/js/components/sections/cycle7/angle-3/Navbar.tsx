@@ -86,19 +86,19 @@ const Navbar = memo(() => {
                     className="group flex flex-col justify-center gap-px rounded-full bg-[#D70808] px-4 py-[7px] shadow-lg transition-all duration-200 hover:shadow-xl hover:brightness-110"
                 >
                     <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
-                        🎓 Amankan Seat
+                        🎓 Amankan Kelas Live Zoom (-78%)
                     </span>
-                    <span className="flex items-center gap-[5px]">
+                    {/* <span className="flex items-center gap-[5px]">
                         <span className="text-[11px] whitespace-nowrap text-white/55 line-through">
-                            Rp250rb
+                            Rp1jt
                         </span>
                         <span className="text-sm font-black whitespace-nowrap text-white">
-                            Rp81rb
+                            Rp190rb
                         </span>
                         <span className="rounded-full bg-amber-500 px-[7px] py-0.5 text-[10px] font-black whitespace-nowrap text-[#151515]">
-                            -68%
+                            -81%
                         </span>
-                    </span>
+                    </span> */}
                 </a>
             </div>
         </header>
