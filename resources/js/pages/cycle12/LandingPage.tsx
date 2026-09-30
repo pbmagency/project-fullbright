@@ -555,14 +555,13 @@ nextReview();
             <a href="#" aria-label="Full Bright Indonesia" data-analytics-location="logo_full_bright_navbar" className="[display:flex] [align-items:center] [text-decoration:none]">
               <img loading="eager" decoding="async" fetchPriority="high" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia" className="[height:auto] [width:160px] [object-fit:contain] [display:block]" />
             </a>
-              <a href="#pricing" data-analytics-location="amankan_seat_navbar" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
-              <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
-              <span className="[display:flex] [align-items:center] [gap:5px]">
-                <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.92)] [white-space:nowrap]">Rp250rb</span>
-                <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp175rb</span>
-                <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-30%</span>
-              </span>
-            </a>
+              <a href="#pricing" data-analytics-location="amankan_seat_navbar" className="[display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px] max-[500px]:[padding:7px_13px]">
+                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
+                <span className="[display:flex] [align-items:center] [gap:5px] [line-height:1]">
+                  <span className="[font-size:11px] [font-weight:700] [color:#fff] [white-space:nowrap]">Kelas Live Zoom</span>
+                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-80%</span>
+                </span>
+              </a>
           </div>
         </header>
       

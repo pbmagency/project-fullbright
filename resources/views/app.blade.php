@@ -57,8 +57,10 @@
             #c10-crit-nav{position:fixed;inset:38px 0 auto;z-index:50;height:64px;border-bottom:1px solid #f3f4f6;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
             #c10-crit-nav-inner{max-width:1152px;height:64px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
             #c10-crit-logo{display:block;width:160px;height:auto;object-fit:contain}
-            #c10-crit-cta{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:7px 16px;border-radius:999px;background:#d70808;box-shadow:0 6px 16px rgba(215,8,8,.35);color:#fff;font-size:13px;font-weight:800;line-height:1.2;text-decoration:none;white-space:nowrap}
-            #c10-crit-cta-subtitle{font-size:13px;font-weight:800}
+            #c10-crit-cta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:7px 16px;border-radius:999px;background:#d70808;box-shadow:0 6px 16px rgba(215,8,8,.35);color:#fff;font-size:13px;font-weight:800;line-height:1.2;text-decoration:none;white-space:nowrap}
+            #c10-crit-cta-sub{display:flex;align-items:center;gap:5px;line-height:1}
+            #c10-crit-cta-sub-text{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+            #c10-crit-cta-badge{padding:2px 7px;border-radius:999px;background:#f59e0b;color:#151515;font-size:10px;font-weight:900;line-height:1}
             #c10-crit-hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 55%,#fff5f5 100%)}
             @media(max-width:500px){
                 #c10-crit-banner{padding:10px 12px}
@@ -66,8 +68,7 @@
                 #c10-crit-banner-short{display:inline;font-size:12.5px}
                 #c10-crit-nav-inner{padding:0 12px}
                 #c10-crit-logo{width:110px}
-                #c10-crit-cta{padding:7px 10px;font-size:11px}
-                #c10-crit-cta-subtitle{font-size:11px}
+                #c10-crit-cta{padding:7px 13px}
             }
         </style>
     @elseif($page['component'] === 'cycle12/LandingPage')
@@ -84,11 +85,10 @@
             .c12-nav { position: fixed; inset: 38px 0 auto; z-index: 50; height: 64px; border-bottom: 1px solid #f3f4f6; background: rgba(255,255,255,.96); }
             .c12-nav-inner { max-width: 1152px; height: 64px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
             .c12-logo { display: block; width: 160px; height: auto; object-fit: contain; }
-            .c12-nav-cta { display: flex; flex-direction: column; justify-content: center; gap: 1px; padding: 7px 16px; border-radius: 999px; background: #d70808; box-shadow: 0 6px 16px rgba(215,8,8,.35); color: #fff; font-size: 13px; font-weight: 800; line-height: 1.2; text-decoration: none; }
-            .c12-nav-price-row { display: flex; align-items: center; gap: 5px; }
-            .c12-nav-price-old { color: rgba(255,255,255,.92); font-size: 11px; text-decoration: line-through; }
-            .c12-nav-price { font-size: 14px; font-weight: 900; }
-            .c12-nav-discount { padding: 2px 7px; border-radius: 999px; background: #f59e0b; color: #151515; font-size: 10px; font-weight: 900; }
+            .c12-nav-cta { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 7px 16px; border-radius: 999px; background: #d70808; box-shadow: 0 6px 16px rgba(215,8,8,.35); color: #fff; font-size: 13px; font-weight: 800; line-height: 1.2; text-decoration: none; white-space: nowrap; }
+            .c12-nav-sub { display: flex; align-items: center; gap: 5px; line-height: 1; }
+            .c12-nav-sub-text { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+            .c12-nav-discount { padding: 2px 7px; border-radius: 999px; background: #f59e0b; color: #151515; font-size: 10px; font-weight: 900; line-height: 1; }
             .c12-hero { position: relative; overflow: hidden; background: linear-gradient(160deg,#fff 55%,#fff5f5 100%); }
             .c12-hero-inner { position: relative; max-width: 1152px; margin: 0 auto; padding: 40px 24px 20px; display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 40px; }
             .c12-hero-copy { display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 1; }
@@ -178,9 +178,12 @@
                     <a href="#" aria-label="Full Bright Indonesia">
                         <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
                     </a>
-                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)">
-                        <span>Amankan Seat</span>
-                        <span id="c10-crit-cta-subtitle">Kelas Live Zoom (-78%)</span>
+                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)">
+                        <span>🎓 Amankan Seat</span>
+                        <span id="c10-crit-cta-sub">
+                            <span id="c10-crit-cta-sub-text">Kelas Live Zoom</span>
+                            <span id="c10-crit-cta-badge">-80%</span>
+                        </span>
                     </a>
                 </div>
             </header>
@@ -245,7 +248,10 @@
                     <a href="#" aria-label="Full Bright Indonesia" data-analytics-location="logo_full_bright_navbar"><img class="c12-logo" src="/logo/Logo-Fullbright.webp" width="400" height="400" alt="Full Bright Indonesia"></a>
                     <a class="c12-nav-cta" href="#pricing" data-analytics-location="amankan_seat_navbar">
                         <span>🎓 Amankan Seat</span>
-                        <span class="c12-nav-price-row"><span class="c12-nav-price-old">Rp250rb</span><span class="c12-nav-price">Rp175rb</span><span class="c12-nav-discount">-30%</span></span>
+                        <span class="c12-nav-sub">
+                            <span class="c12-nav-sub-text">Kelas Live Zoom</span>
+                            <span class="c12-nav-discount">-80%</span>
+                        </span>
                     </a>
                 </div>
             </header>
