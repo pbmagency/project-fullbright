@@ -51,8 +51,8 @@ function formatCountdown(ms: number): string {
   return `${h}:${m}:${s}`;
 }
 function initialMode(): PricingMode {
-  try { return new URLSearchParams(window.location.search).get('mode') === 'tutor' ? 'tutor' : 'self'; }
-  catch { return 'self'; }
+  try { return new URLSearchParams(window.location.search).get('mode') === 'self' ? 'self' : 'tutor'; }
+  catch { return 'tutor'; }
 }
 
 type PricingMode = 'self' | 'tutor';
@@ -307,7 +307,7 @@ export default function LandingPage() {
   const flashSaleTitle = useFlashSaleTitle();
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [bannerH, setBannerH] = useState<number>(38);
-  const [mode, setMode] = useState<PricingMode>('self');
+  const [mode, setMode] = useState<PricingMode>('tutor');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -434,7 +434,7 @@ export default function LandingPage() {
     }
   }, [trackCTA, trackConversion, trackInitiateCheckout]);
 
-  /* pricing mode from ?mode=tutor */
+  /* Default to tutor; ?mode=self still opens the self-study package. */
   useEffect(() => { setMode(initialMode()); }, []);
 
   /* flash-sale visibility: updates only when the window expires (React bails out otherwise) */
@@ -593,17 +593,13 @@ export default function LandingPage() {
       
           {/* Navbar */}
           <header className={`[border-bottom:1px_solid_#f3f4f6] [transition:all_0.3s] ${scrolled ? '[background:rgba(255,255,255,0.95)] [box-shadow:0_4px_12px_rgba(0,0,0,0.08)] [backdrop-filter:blur(8px)]' : '[background:#fff] [box-shadow:0_1px_3px_rgba(0,0,0,0.05)]'}`}>
-            <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px]">
+            <div className="[max-width:1152px] [margin:0_auto] [height:64px] [display:flex] [align-items:center] [justify-content:space-between] [padding:0_24px] max-[500px]:[padding:0_12px]">
               <a href="#" className="[display:flex] [align-items:center] [text-decoration:none]">
-                 <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="160" height="160" className="[height:auto] [width:160px] [object-fit:contain]" />
+                 <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="160" height="160" className="[height:auto] [width:160px] [object-fit:contain] max-[500px]:[width:110px]" />
               </a>
-              <a href="#pricing" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px]">
-                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
-                <span className="[display:flex] [align-items:center] [gap:5px]">
-                  <span className="[font-size:11px] [text-decoration:line-through] [color:rgba(255,255,255,0.92)] [white-space:nowrap]">Rp250rb</span>
-                  <span className="[font-size:14px] [font-weight:900] [color:#fff] [white-space:nowrap]">Rp99rb</span>
-                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-60%</span>
-                </span>
+              <a href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px] max-[500px]:[padding:7px_10px]">
+                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Amankan Seat</span>
+                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Kelas Live Zoom (-80%)</span>
               </a>
             </div>
           </header>
@@ -1761,8 +1757,8 @@ export default function LandingPage() {
               
               
               <div className="[display:inline-flex] [gap:4px] [padding:5px] [border-radius:9999px] [background:#fff] [border:1px_solid_#ffb3b3] [box-shadow:0_2px_12px_rgba(215,8,8,0.08)]">
+                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#F97316] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-80%</span></button>
                 <button onClick={() => setMode('self')} style={css(toggleBtnStyle(true))}>Belajar Sendiri</button>
-                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(false))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [right:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [background:#F97316] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)]">-80%</span></button>
               </div>
             </div>
       
@@ -1858,8 +1854,8 @@ export default function LandingPage() {
               
               
               <div className="[display:inline-flex] [gap:4px] [padding:5px] [border-radius:9999px] [background:#fff] [border:1px_solid_#ffb3b3] [box-shadow:0_2px_12px_rgba(215,8,8,0.08)]">
+                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(true))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [left:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)] [background-color:#F9A316]">-80%</span></button>
                 <button onClick={() => setMode('self')} style={css(toggleBtnStyle(false))}>Belajar Sendiri</button>
-                <button onClick={() => setMode('tutor')} style={css(toggleBtnStyle(true))}>Dibimbing Tutor<span className="[position:absolute] [top:-9px] [right:-6px] [display:flex] [align-items:center] [justify-content:center] [width:34px] [height:34px] [border-radius:9999px] [font-size:11px] [font-weight:900] [color:#151515] [border:2px_solid_#fff] [box-shadow:0_2px_8px_rgba(249,115,22,0.4)] [background-color:#F9A316]">-80%</span></button>
               </div>
             </div>
       

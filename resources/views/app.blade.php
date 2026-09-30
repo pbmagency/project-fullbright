@@ -58,15 +58,16 @@
             #c10-crit-nav-inner{max-width:1152px;height:64px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
             #c10-crit-logo{display:block;width:160px;height:auto;object-fit:contain}
             #c10-crit-cta{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:7px 16px;border-radius:999px;background:#d70808;box-shadow:0 6px 16px rgba(215,8,8,.35);color:#fff;font-size:13px;font-weight:800;line-height:1.2;text-decoration:none;white-space:nowrap}
-            #c10-crit-price-row{display:flex;align-items:center;gap:5px}
-            #c10-crit-price-old{color:rgba(255,255,255,.92);font-size:11px;text-decoration:line-through}
-            #c10-crit-price{font-size:14px;font-weight:900}
-            #c10-crit-discount{padding:2px 7px;border-radius:999px;background:#f59e0b;color:#151515;font-size:10px;font-weight:900}
+            #c10-crit-cta-subtitle{font-size:13px;font-weight:800}
             #c10-crit-hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 55%,#fff5f5 100%)}
             @media(max-width:500px){
                 #c10-crit-banner{padding:10px 12px}
                 #c10-crit-banner-full{display:none}
                 #c10-crit-banner-short{display:inline;font-size:12.5px}
+                #c10-crit-nav-inner{padding:0 12px}
+                #c10-crit-logo{width:110px}
+                #c10-crit-cta{padding:7px 10px;font-size:11px}
+                #c10-crit-cta-subtitle{font-size:11px}
             }
         </style>
     @elseif($page['component'] === 'cycle12/LandingPage')
@@ -177,13 +178,9 @@
                     <a href="#" aria-label="Full Bright Indonesia">
                         <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
                     </a>
-                    <a id="c10-crit-cta" href="#pricing">
-                        <span>🎓 Amankan Seat</span>
-                        <span id="c10-crit-price-row">
-                            <span id="c10-crit-price-old">Rp250rb</span>
-                            <span id="c10-crit-price">Rp99rb</span>
-                            <span id="c10-crit-discount">-60%</span>
-                        </span>
+                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)">
+                        <span>Amankan Seat</span>
+                        <span id="c10-crit-cta-subtitle">Kelas Live Zoom (-80%)</span>
                     </a>
                 </div>
             </header>
