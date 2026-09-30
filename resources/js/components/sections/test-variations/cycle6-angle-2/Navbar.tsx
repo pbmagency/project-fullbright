@@ -55,11 +55,11 @@ const Navbar = memo(() => {
                     className="group flex flex-col justify-center gap-px rounded-full bg-[#D70808] px-4 py-[7px] shadow-lg transition-all duration-200 hover:shadow-xl hover:brightness-110"
                 >
                      <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
-                        🎓 Amankan Kelas
+                        🎓 Amankan Seat
                     </span>
 
                     <span className="text-[11px] leading-[1.2] font-bold whitespace-nowrap text-white">
-                        Live Zoom (-78%)
+                        Kelas Live Zoom (-78%)
                     </span>
                     {/* <span className="flex items-center gap-[5px]">
                         <span className="text-[11px] whitespace-nowrap text-white/55 line-through">

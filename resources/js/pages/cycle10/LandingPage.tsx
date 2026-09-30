@@ -598,8 +598,13 @@ export default function LandingPage() {
                  <img src="/logo/Logo-Fullbright.webp" alt="Full Bright Indonesia" width="160" height="160" className="[height:auto] [width:160px] [object-fit:contain] max-[500px]:[width:110px]" />
               </a>
               <a href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)" className="[display:flex] [flex-direction:column] [justify-content:center] [gap:1px] [border-radius:9999px] [background:#D70808] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] [text-decoration:none] [padding:7px_16px] max-[500px]:[padding:7px_10px]">
-                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Amankan Seat</span>
-                <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2] max-[500px]:[font-size:11px]">Kelas Live Zoom (-78%)</span>
+                  <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
+                        🎓 Amankan Seat
+                    </span>
+
+                    <span className="text-[11px] leading-[1.2] font-bold whitespace-nowrap text-white">
+                        Kelas Live Zoom (-78%)
+                    </span>
               </a>
             </div>
           </header>
