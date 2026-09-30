@@ -1,4 +1,7 @@
+import { useFlashSaleTitle } from '@/lib/flash-sale-title';
+
 export default function UrgencyBanner() {
+    const flashSaleTitle = useFlashSaleTitle();
     return (
         <div
             className="w-full px-4 py-2 text-center text-sm font-bold tracking-wide"
@@ -8,7 +11,7 @@ export default function UrgencyBanner() {
                 fontFamily: 'var(--font-heading)',
             }}
         >
-            ⏳ FLASH SALE SEPTEMBER
+            ⏳ {flashSaleTitle}
             
         </div>
     );

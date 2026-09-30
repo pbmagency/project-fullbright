@@ -5,6 +5,7 @@ import { generateEventId, useAnalytics } from '@/hooks/use-analytics';
 import { useDwellTime } from '@/hooks/use-dwell-time';
 import { useScrollTracking } from '@/hooks/use-scroll-tracking';
 import { useSectionTracking } from '@/hooks/use-section-tracking';
+import { useFlashSaleTitle } from '@/lib/flash-sale-title';
 
 /* ============================================================
    Full Bright Indonesia — landing page TOEFL ITP
@@ -205,6 +206,7 @@ const GLOBAL_CSS = `
 `;
 
 export default function LandingPage() {
+  const flashSaleTitle = useFlashSaleTitle();
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [bannerH, setBannerH] = useState<number>(38);
   const [mode, setMode] = useState<PricingMode>('self');
@@ -479,8 +481,8 @@ export default function LandingPage() {
         {/* Urgency Banner */}
         {flashVisible ? (<>
           <a ref={bannerRef} id="urgency-banner" href="#pricing" className="[position:fixed] [top:0] [left:0] [right:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
-            <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
-            <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 FLASH SALE SEPTEMBER · 60%</span>
+            <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 {flashSaleTitle} · DISKON 60%</span>
+            <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 {flashSaleTitle} · 60%</span>
             <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
               <span id="banner-timer-label" className="[font-size:11px] [font-weight:800] [letter-spacing:0.04em] [text-transform:uppercase] max-[500px]:[display:none]">⏱ Berakhir</span>
               <span ref={countdownRef} className="[font-size:13px] [font-weight:900] [font-variant-numeric:tabular-nums] max-[500px]:[font-size:14px] [letter-spacing:0.04em]">12:00:00</span>

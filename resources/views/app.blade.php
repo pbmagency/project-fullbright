@@ -149,14 +149,26 @@
 </head>
 
 <body class="font-sans antialiased">
+    @php
+        $flashNow = now('Asia/Jakarta');
+        $flashDay = (int) $flashNow->format('j');
+        $flashMonth = (int) $flashNow->format('n');
+        $flashMonthName = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'][$flashMonth - 1];
+        $flashSaleTitle = match (true) {
+            $flashDay <= 5 => 'FLASH SALE GAJIAN',
+            $flashDay === $flashMonth => "FLASH SALE {$flashMonth}.{$flashMonth}",
+            $flashDay >= 25 => 'FLASH SALE AKHIR BULAN',
+            default => "FLASH SALE {$flashMonthName}",
+        };
+    @endphp
     @if($page['component'] === 'cycle10/LandingPage')
         {{-- Server-rendered critical skeleton untuk C10.
              React akan hydrate/replace ini setelah JS selesai.
              Tujuan: FCP/LCP mobile membaik karena konten terlihat TANPA menunggu JS. --}}
         <div id="c10-critical" aria-hidden="true">
             <a id="c10-crit-banner" href="#pricing">
-                <span id="c10-crit-banner-full">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
-                <span id="c10-crit-banner-short">🔥 FLASH SALE SEPTEMBER · 60%</span>
+                <span id="c10-crit-banner-full">🔥 {{ $flashSaleTitle }} · DISKON 60%</span>
+                <span id="c10-crit-banner-short">🔥 {{ $flashSaleTitle }} · 60%</span>
                 <span id="c10-crit-banner-time" data-c10-countdown>12:00:00</span>
             </a>
             <div id="c10-crit-nav-space"></div>
@@ -225,9 +237,9 @@
     @elseif($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">
-            <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_september_diskon_60_banner">
-                <span class="c12-banner-label-full">🔥 FLASH SALE SEPTEMBER · DISKON 60%</span>
-                <span class="c12-banner-label-short">🔥 FLASH SALE SEPTEMBER · 60%</span>
+            <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_diskon_60_banner">
+                <span class="c12-banner-label-full">🔥 {{ $flashSaleTitle }} · DISKON 60%</span>
+                <span class="c12-banner-label-short">🔥 {{ $flashSaleTitle }} · 60%</span>
                 <span class="c12-banner-time" data-c12-countdown>12:00:00</span>
             </a>
             <div class="c12-nav-space"></div>
@@ -277,9 +289,28 @@
                 }
                 var output = document.querySelector('[data-c12-countdown]');
                 var banner = document.querySelector('.c12-banner');
+                var fullLabel = document.querySelector('.c12-banner-label-full');
+                var shortLabel = document.querySelector('.c12-banner-label-short');
                 var navbar = document.querySelector('.c12-nav');
                 var navSpace = document.querySelector('.c12-nav-space');
+                var dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jakarta', month: 'numeric', day: 'numeric' });
+                var monthNames = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+                var lastDateKey = '';
+                function updateTitle() {
+                    var parts = dateFormatter.formatToParts(new Date());
+                    var month = Number(parts.find(function (part) { return part.type === 'month'; }).value);
+                    var day = Number(parts.find(function (part) { return part.type === 'day'; }).value);
+                    var dateKey = month + '-' + day;
+                    if (dateKey === lastDateKey) return;
+                    lastDateKey = dateKey;
+                    var title = day <= 5 ? 'FLASH SALE GAJIAN' :
+                        day === month ? 'FLASH SALE ' + month + '.' + month :
+                        day >= 25 ? 'FLASH SALE AKHIR BULAN' : 'FLASH SALE ' + monthNames[month - 1];
+                    if (fullLabel) fullLabel.textContent = '🔥 ' + title + ' · DISKON 60%';
+                    if (shortLabel) shortLabel.textContent = '🔥 ' + title + ' · 60%';
+                }
                 function updateCountdown() {
+                    updateTitle();
                     var seconds = Math.max(0, Math.floor((start + duration - Date.now()) / 1000));
                     var hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
                     var minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');

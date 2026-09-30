@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { useFlashSaleTitle } from '@/lib/flash-sale-title';
 
 export default function UrgencyBanner() {
+    const flashSaleTitle = useFlashSaleTitle();
     // 1. Set initial state so it doesn't flash the old time before useEffect runs
     const [timeLeft, setTimeLeft] = useState({ hours: 5, minutes: 34, seconds: 20 });
     const [mounted, setMounted] = useState(false);
@@ -64,7 +66,7 @@ export default function UrgencyBanner() {
         >
             <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-center text-[12px] font-[800] tracking-wide text-white sm:gap-x-4 sm:text-[13px]">
                 <span className="flex items-center gap-1.5 uppercase">
-                    <span>🔥</span> FLASH SALE SEPTEMBER
+                    <span>🔥</span> {flashSaleTitle}
                 </span>
 
                 <span
