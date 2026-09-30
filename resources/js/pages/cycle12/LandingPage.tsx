@@ -559,7 +559,7 @@ nextReview();
                 <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
                 <span className="[display:flex] [align-items:center] [gap:5px] [line-height:1]">
                   <span className="[font-size:11px] [font-weight:700] [color:#fff] [white-space:nowrap]">Kelas Live Zoom</span>
-                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-80%</span>
+                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-78%</span>
                 </span>
               </a>
           </div>

@@ -178,11 +178,11 @@
                     <a href="#" aria-label="Full Bright Indonesia">
                         <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
                     </a>
-                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)">
+                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)">
                         <span>🎓 Amankan Seat</span>
                         <span id="c10-crit-cta-sub">
                             <span id="c10-crit-cta-sub-text">Kelas Live Zoom</span>
-                            <span id="c10-crit-cta-badge">-80%</span>
+                            <span id="c10-crit-cta-badge">-78%</span>
                         </span>
                     </a>
                 </div>
@@ -250,7 +250,7 @@
                         <span>🎓 Amankan Seat</span>
                         <span class="c12-nav-sub">
                             <span class="c12-nav-sub-text">Kelas Live Zoom</span>
-                            <span class="c12-nav-discount">-80%</span>
+                            <span class="c12-nav-discount">-78%</span>
                         </span>
                     </a>
                 </div>

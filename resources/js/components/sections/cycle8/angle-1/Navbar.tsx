@@ -87,26 +87,20 @@ const Navbar = memo(() => {
                     onClick={() =>
                         trackCTA('navbar', 'Amankan Seat', '#pricing')
                     }
-                    className="group flex flex-col justify-center gap-px rounded-full bg-[#D70808] px-4 py-[7px] shadow-lg transition-all duration-200 hover:shadow-xl hover:brightness-110"
+                    data-analytics-location="amankan_seat_navbar"
+                    className="group flex flex-col items-center justify-center gap-[1px] rounded-full bg-[#D70808] px-4 py-[7px] [box-shadow:0_6px_16px_rgba(215,8,8,0.35)] transition-all duration-200 hover:shadow-xl hover:brightness-110 max-[500px]:px-[13px]"
                 >
-                     <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
+                    <span className="text-[13px] leading-[1.2] font-extrabold whitespace-nowrap text-white">
                         🎓 Amankan Seat
                     </span>
-
-                    <span className="text-[11px] leading-[1.2] font-bold whitespace-nowrap text-white">
-                        Kelas Live Zoom (-78%)
+                    <span className="flex items-center gap-[5px] leading-none">
+                        <span className="text-[11px] font-bold whitespace-nowrap text-white">
+                            Kelas Live Zoom
+                        </span>
+                        <span className="rounded-full bg-[#F59E0B] px-[7px] py-[2px] text-[10px] font-black whitespace-nowrap text-[#151515]">
+                            -78%
+                        </span>
                     </span>
-                    {/* <span className="flex items-center gap-[5px]">
-                        <span className="text-[11px] whitespace-nowrap text-white/55 line-through">
-                            Rp1jt
-                        </span>
-                        <span className="text-sm font-black whitespace-nowrap text-white">
-                            Rp190rb
-                        </span>
-                        <span className="rounded-full bg-amber-500 px-[7px] py-0.5 text-[10px] font-black whitespace-nowrap text-[#151515]">
-                            -81%
-                        </span>
-                    </span> */}
                 </a>
             </div>
         </header>
