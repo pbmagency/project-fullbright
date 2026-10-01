@@ -168,8 +168,8 @@
              Tujuan: FCP/LCP mobile membaik karena konten terlihat TANPA menunggu JS. --}}
         <div id="c10-critical" aria-hidden="true">
             <a id="c10-crit-banner" href="#pricing">
-                <span id="c10-crit-banner-full">🔥 {{ $flashSaleTitle }} · DISKON 60%</span>
-                <span id="c10-crit-banner-short">🔥 {{ $flashSaleTitle }} · 60%</span>
+                <span id="c10-crit-banner-full">🔥 {{ $flashSaleTitle }} • 78%</span>
+                <span id="c10-crit-banner-short">🔥 {{ $flashSaleTitle }} • 78%</span>
                 <span id="c10-crit-banner-time" data-c10-countdown>12:00:00</span>
             </a>
             <div id="c10-crit-nav-space"></div>
@@ -178,11 +178,11 @@
                     <a href="#" aria-label="Full Bright Indonesia">
                         <img id="c10-crit-logo" src="/logo/Logo-Fullbright.webp" width="160" height="160" alt="Full Bright Indonesia">
                     </a>
-                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-78%)">
+                    <a id="c10-crit-cta" href="#pricing" aria-label="Amankan Seat Kelas Live Zoom (-80%)">
                         <span>🎓 Amankan Seat</span>
                         <span id="c10-crit-cta-sub">
                             <span id="c10-crit-cta-sub-text">Kelas Live Zoom</span>
-                            <span id="c10-crit-cta-badge">-78%</span>
+                            <span id="c10-crit-cta-badge">-80%</span>
                         </span>
                     </a>
                 </div>
@@ -237,9 +237,9 @@
     @elseif($page['component'] === 'cycle12/LandingPage')
         {{-- Permanent server-rendered critical content. React mounts below it. --}}
         <div id="c12-critical">
-            <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_diskon_60_banner">
-                <span class="c12-banner-label-full">🔥 {{ $flashSaleTitle }} · DISKON 60%</span>
-                <span class="c12-banner-label-short">🔥 {{ $flashSaleTitle }} · 60%</span>
+            <a class="c12-banner" href="#pricing" data-analytics-location="flash_sale_diskon_78_banner">
+                <span class="c12-banner-label-full">🔥 {{ $flashSaleTitle }} • 78%</span>
+                <span class="c12-banner-label-short">🔥 {{ $flashSaleTitle }} • 78%</span>
                 <span class="c12-banner-time" data-c12-countdown>12:00:00</span>
             </a>
             <div class="c12-nav-space"></div>
@@ -250,7 +250,7 @@
                         <span>🎓 Amankan Seat</span>
                         <span class="c12-nav-sub">
                             <span class="c12-nav-sub-text">Kelas Live Zoom</span>
-                            <span class="c12-nav-discount">-78%</span>
+                            <span class="c12-nav-discount">-80%</span>
                         </span>
                     </a>
                 </div>
@@ -309,8 +309,8 @@
                     var title = day <= 5 ? 'FLASH SALE GAJIAN' :
                         day === month ? 'FLASH SALE ' + month + '.' + month :
                         day >= 25 ? 'FLASH SALE AKHIR BULAN' : 'FLASH SALE ' + monthNames[month - 1];
-                    if (fullLabel) fullLabel.textContent = '🔥 ' + title + ' · DISKON 60%';
-                    if (shortLabel) shortLabel.textContent = '🔥 ' + title + ' · 60%';
+                    if (fullLabel) fullLabel.textContent = '🔥 ' + title + ' • 78%';
+                    if (shortLabel) shortLabel.textContent = '🔥 ' + title + ' • 78%';
                 }
                 function updateCountdown() {
                     updateTitle();

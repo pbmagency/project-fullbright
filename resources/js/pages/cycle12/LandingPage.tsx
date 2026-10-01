@@ -538,9 +538,9 @@ nextReview();
         {renderCriticalSections ? (<>
         {/* Urgency Banner */}
         {flashVisible ? (<>
-          <a ref={bannerRef} id="urgency-banner" href="#pricing" data-analytics-location="flash_sale_diskon_60_banner" className="[position:fixed] [top:0] [left:0] [right:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
-            <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 {flashSaleTitle} · DISKON 60%</span>
-            <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 {flashSaleTitle} · 60%</span>
+          <a ref={bannerRef} id="urgency-banner" href="#pricing" data-analytics-location="flash_sale_diskon_78_banner" className="[position:fixed] [top:0] [left:0] [right:0] [z-index:51] [display:flex] [align-items:center] [justify-content:center] [flex-wrap:nowrap] [gap:8px] [background:#C10707] [padding:8px_12px] [text-align:center] [text-decoration:none] [white-space:nowrap] [overflow:hidden] max-[500px]:[padding:10px_12px]">
+            <span id="banner-full" className="[font-size:13px] [font-weight:800] [letter-spacing:0.02em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:none]">🔥 {flashSaleTitle} • 78%</span>
+            <span id="banner-short" className="[display:none] [font-size:11px] [font-weight:800] [letter-spacing:0.01em] [text-transform:uppercase] [color:#fff] [line-height:1.4] max-[500px]:[display:inline] max-[500px]:[font-size:12.5px]">🔥 {flashSaleTitle} • 78%</span>
             <span className="[display:inline-flex] [align-items:center] [gap:5px] [flex-shrink:0] [background:#fff] [color:#C10707] [border-radius:9999px] [padding:3px_10px] [line-height:1.2]">
               <span id="banner-timer-label" className="[font-size:11px] [font-weight:800] [letter-spacing:0.04em] [text-transform:uppercase] max-[500px]:[display:none]">⏱ Berakhir</span>
               <span className="[font-size:13px] [font-weight:900] [font-variant-numeric:tabular-nums] max-[500px]:[font-size:14px] [letter-spacing:0.04em]">{countdown}</span>
@@ -559,7 +559,7 @@ nextReview();
                 <span className="[font-size:13px] [font-weight:800] [color:#fff] [white-space:nowrap] [line-height:1.2]">🎓 Amankan Seat</span>
                 <span className="[display:flex] [align-items:center] [gap:5px] [line-height:1]">
                   <span className="[font-size:11px] [font-weight:700] [color:#fff] [white-space:nowrap]">Kelas Live Zoom</span>
-                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-78%</span>
+                  <span className="[background:#F59E0B] [color:#151515] [font-size:10px] [font-weight:900] [padding:2px_7px] [border-radius:9999px] [white-space:nowrap]">-80%</span>
                 </span>
               </a>
           </div>

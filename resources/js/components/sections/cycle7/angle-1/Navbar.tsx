@@ -90,7 +90,7 @@ const Navbar = memo(() => {
                     </span>
 
                     <span className="text-[11px] leading-[1.2] font-bold whitespace-nowrap text-white">
-                        Kelas Live Zoom (-78%)
+                        Kelas Live Zoom (-80%)
                     </span>
                 </a>
             </div>
