@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\Api\AnalyticsFeedController;
 use App\Http\Controllers\C11ScalevProofController;
 use App\Http\Controllers\LabsController;
 use App\Http\Controllers\ScalevWebhookController;
@@ -30,6 +31,9 @@ Route::get('/c11-problem/scalev-proof', C11ScalevProofController::class)
     ->name('cycle11.scalev-proof');
 
 // ── Analytics tracking endpoint (public, validated and rate-limited) ─────────
+Route::get('/api/analytics/feed', [AnalyticsFeedController::class, 'feed'])
+    ->middleware('throttle:60,1')
+    ->name('api.analytics.feed');
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])
     ->middleware('throttle:120,1')
     ->name('analytics.track');
