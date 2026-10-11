@@ -19,7 +19,7 @@ class AnalyticsFeedTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $response = $this->getJson('/api/analytics/feed?range=7')
+        $response = $this->getJson('/ops-analytics/feed?range=7')
             ->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('schema_version', 2)

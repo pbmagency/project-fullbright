@@ -31,7 +31,7 @@ Route::get('/c11-problem/scalev-proof', C11ScalevProofController::class)
     ->name('cycle11.scalev-proof');
 
 // ── Analytics tracking endpoint (public, validated and rate-limited) ─────────
-Route::get('/api/analytics/feed', [AnalyticsFeedController::class, 'feed'])
+Route::get('/ops-analytics/feed', [AnalyticsFeedController::class, 'feed'])
     ->middleware('throttle:60,1')
     ->name('api.analytics.feed');
 Route::post('/analytics/track', [AnalyticsController::class, 'track'])
